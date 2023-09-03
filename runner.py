@@ -182,7 +182,6 @@ def edit():
 def bkp():
     if not bkp_flag:
         raise Exception("Backup process flag was not passed. Invalid operation.")
-    print("Starting backup daemon...")
 
 def quit():
     print("Quitting...")

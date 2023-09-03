@@ -50,7 +50,7 @@ if ! command -v ./gum &>/dev/null; then
         url="${gum_binary_links["$arch"]}"
     else
         echo "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
-        exit 1
+        return
     fi
     echo "Fetching gum binary..."
     wget "$url"
@@ -74,30 +74,59 @@ if ! test -d "cache"; then
 fi
 
 echo
-echo "Running program..."
 ARGFLAG=0
 for arg in "$@"; do
     case $arg in
     -b | --wbkp)
+        echo "Running program..."
         python3 runner.py wbkp
         ARGFLAG=1
         ;;
     -h | --help)
         echo "Usage: ./start.sh [OPTION]"
         echo "Options:"
-        echo "  -b, --wbkp      Run and start backup process"
+        echo "  -b, --wbkp      Run and start backup daemon"
         echo "  -h, --help      Print help and exit"
+        echo "  -c, --clean     Clean up cache and daemon files"
+        ARGFLAG=2
+        ;;
+    -c | --clean)
+        echo "Cleaning up..."
+        echo "Removing cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
+        rm -rf cache bkp/pid bkp/logs bkp/bkp.out bkp
+        echo
+        ARGFLAG=3
         ;;
     *)
         echo "Invalid option: $arg"
-        exit 1
+        return
         ;;
     esac
 done
 if [ $ARGFLAG -eq 0 ]; then
+    echo "Running program..."
     python3 runner.py
-else
+elif [ $ARGFLAG -eq 1 ]; then
     chmod +x ./bkp_daemon.sh
+    echo "=========================="
+    echo "Starting backup daemon..."
+    if ! test -d "bkp"; then
+        echo "Creating bkp directory..."
+        mkdir bkp
+    fi
+    nohup ./bkp_daemon.sh start > bkp/bkp.out &
+    echo "Backup daemon started!"
+    echo
+    echo "Usage: ./bkp_daemon.sh [OPTION]"
+    echo "Options:"
+    echo "  start      Start backup daemon"
+    echo "  stop       Stop backup daemon"
+    echo "  restart    Restart backup daemon"
+    echo "  status     Check status of backup daemon"
+    echo
+    echo "You can view daemon logs in ./bkp/logs/TRAPP-DAEMON.log"
+    echo "You can view any daemon output in ./bkp/bkp.out"
+    echo "=========================="
 fi
 echo "Program exited. Deactivating virtual environment..."
 deactivate

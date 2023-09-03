@@ -6,11 +6,11 @@
 
 daemonName="TRAPP-DAEMON"
 
-pidDir="./pid"
+pidDir="./bkp/pid"
 pidFile="$pidDir/$daemonName.pid"
-pidFile="$daemonName.pid"
+# pidFile="$daemonName.pid"
 
-logDir="./logs"
+logDir="./bkp/logs"
 # To use a dated log file.
 # logFile="$logDir/$daemonName-"`date +"%Y-%m-%d"`".log"
 # To use a regular log file.
@@ -55,12 +55,13 @@ setupDaemon() {
 startDaemon() {
     # Start the daemon.
     setupDaemon # Make sure the directories are there.
-    if [[ $(checkDaemon) = 1 ]]; then
+    checkDaemon
+    if [[ "$?" -eq 1 ]]; then
         echo -e " * \033[31;5;148mError\033[39m: $daemonName is already running."
         exit 1
     fi
     echo " * Starting $daemonName with PID: $myPid."
-    echo "$myPid" >> "$pidFile"
+    echo "$myPid" > "$pidFile"
     log '*** '$(date +"%Y-%m-%d")": Starting up $daemonName."
 
     # Start the loop.
@@ -69,21 +70,25 @@ startDaemon() {
 
 stopDaemon() {
     # Stop the daemon.
-    if [[ $(checkDaemon) -eq 0 ]]; then
+    checkDaemon
+    if [[ "$?" -eq 0 ]]; then
         echo -e " * \033[31;5;148mError\033[39m: $daemonName is not running."
         exit 1
     fi
     echo " * Stopping $daemonName"
-    log '*** '$(date +"%Y-%m-%d")": $daemonName stopped."
 
     if [[ ! -z $(cat $pidFile) ]]; then
         kill -9 $(cat "$pidFile") &>/dev/null
     fi
+
+    log '*** '$(date +"%Y-%m-%d")": $daemonName stopped."
+    echo " * Stopped $daemonName with PID: $(cat $pidFile)."
 }
 
 statusDaemon() {
     # Query and return whether the daemon is running.
-    if [[ $(checkDaemon) -eq 1 ]]; then
+    checkDaemon
+    if [[ "$?" -eq 1 ]]; then
         echo " * $daemonName is running."
     else
         echo " * $daemonName isn't running."
@@ -93,7 +98,8 @@ statusDaemon() {
 
 restartDaemon() {
     # Restart the daemon.
-    if [[ $(checkDaemon) = 0 ]]; then
+    checkDaemon
+    if [[ "$?" -eq 0 ]]; then
         # Can't restart it if it isn't running.
         echo "$daemonName isn't running."
         exit 1
@@ -112,10 +118,11 @@ checkDaemon() {
         if [ -f "$pidFile" ]; then
             if [[ $(cat "$pidFile") = "$oldPid" ]]; then
                 # Daemon is running.
-                # echo 1
+                log "*** Found $daemonName with PID: $oldPid. Stopping..."
                 return 1
             else
                 # Daemon isn't running.
+                log "*** No $daemonName found with PID: $oldPid."
                 return 0
             fi
         fi
@@ -168,7 +175,7 @@ log() {
 if [ -f "$pidFile" ]; then
     oldPid=$(cat "$pidFile")
 fi
-checkDaemon
+# checkDaemon
 case "$1" in
 start)
     startDaemon
