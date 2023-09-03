@@ -32,7 +32,7 @@ fi
 # Check if gum is installed
 if ! command -v gum &> /dev/null; then
     echo "charmbracelet/gum was not found. Installing"
-    go install github.com/charmbracelet/gum@latest
+    go get github.com/charmbracelet/gum@latest
     echo "Installed gum!"
 else
     if ! test -d "/cache"; then
