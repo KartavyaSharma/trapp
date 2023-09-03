@@ -29,7 +29,7 @@ else
     echo "All dependencies are present!"
 fi
 
-printf "\n\n\n"
+echo
 echo "Running program..."
 python3 runner.py
     

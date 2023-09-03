@@ -1,12 +1,13 @@
 """Test availability of required packages."""
 
+from pathlib import Path
+
 import warnings
 
 with warnings.catch_warnings():
     # Ignore deprecated pkg_resources warning
     warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-    from pathlib import Path
     import pkg_resources
 
 
