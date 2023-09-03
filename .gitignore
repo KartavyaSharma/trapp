@@ -5,3 +5,8 @@ __pycache__
 cache
 *.tar.gz.*
 gum
+pid
+logs
+nohup.out
+*.pid
+*.log

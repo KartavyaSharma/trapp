@@ -6,7 +6,7 @@
 
 daemonName="TRAPP-DAEMON"
 
-pidDir="./pid"
+pidDir="pid"
 pidFile="$pidDir/$daemonName.pid"
 pidFile="$daemonName.pid"
 
