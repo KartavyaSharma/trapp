@@ -2,3 +2,4 @@ env
 job_applications.csv
 .vscode
 __pycache__
+cache
