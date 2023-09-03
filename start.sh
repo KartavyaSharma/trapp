@@ -3,10 +3,10 @@
 # Dictionary to maintain gum binary links
 declare -A gum_binary_links
 
-gum_binary_links["Darwin arm64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz"
-gum_binary_links["Darwin x86_64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz"
-gum_binary_links["Linux arm64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz"
-gum_binary_links["Linux x86_64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz"
+gum_binary_links["Darwin arm64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz"
+gum_binary_links["Darwin x86_64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz"
+gum_binary_links["Linux arm64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz"
+gum_binary_links["Linux x86_64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz"
 
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
@@ -43,11 +43,12 @@ if ! command -v gum &> /dev/null; then
     echo "Determining system architecture"
     arch=$(uname -s -m)
     echo "Fetching gum binary..."
-    wget "${gum_binary_links["$arch"]}"
-    tar -xzf gum
-    chmod +x gum
+    url="${gum_binary_links["$arch"]}"
+    wget "$url"
+    tar -xzf $(basename "$url") 
+    chmod +x $(basename "$url")
     echo "Setting gum alias in .bash_profile"
-    fullpath=$(realpath ./gum)
+    fullpath=$(realpath gum)
     echo 'export PATH="$PATH:${fullpath}"' >> ~/.bash_profile
     echo "Installed gum!"
 else
