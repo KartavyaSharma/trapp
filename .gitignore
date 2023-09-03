@@ -1,0 +1,4 @@
+env
+job_applications.csv
+.vscode
+__pycache__

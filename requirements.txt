@@ -1,0 +1,8 @@
+##### Requirements without Version Specifiers #####
+shellingham
+pandas
+validators
+
+##### Requirements with Version Specifiers #####
+typer==0.9.0
+rich==13.5.2
