@@ -45,7 +45,7 @@ if ! command -v gum &> /dev/null; then
     echo "Fetching gum binary..."
     url="${gum_binary_links["$arch"]}"
     wget "$url"
-    tar -xzf $(basename "$url") 
+    tar -xzf $(basename "$url") gum -O > gum 
     chmod +x $(basename "$url")
     echo "Setting gum alias in .bash_profile"
     fullpath=$(realpath gum)
