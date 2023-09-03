@@ -18,7 +18,7 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
             echo "Environment directory exists. Activating environment..."
             source ./env/bin/activate
         else
-            echo "`env` folder exists, but activate file missing."
+            echo "$(env) folder exists, but activate file missing."
         fi
     else
         echo "Environment directory does not exist. Creating a new environment..."
@@ -42,7 +42,7 @@ else
 fi
 
 # Check if gum is installed
-if ! command -v ./gum &> /dev/null; then
+if ! command -v ./gum &>/dev/null; then
     echo "charmbracelet/gum was not found. Installing"
     echo "Determining system architecture"
     arch=$(uname -s -m)
@@ -70,33 +70,34 @@ fi
 # Set a flag so that the "WOW, ..." print does not run every time.
 if ! test -d "cache"; then
     echo "Creating cache file..."
-    mkdir cache && touch ./cache/gum.flag && echo "1" >> ./cache/gum.flag
+    mkdir cache && touch ./cache/gum.flag && echo "1" >>./cache/gum.flag
 fi
 
 echo
 echo "Running program..."
 ARGFLAG=0
-for arg in "$@"
-do
+for arg in "$@"; do
     case $arg in
-        -b | --wbkp)
+    -b | --wbkp)
         python3 runner.py wbkp
         ARGFLAG=1
         ;;
-        -h | --help)
+    -h | --help)
         echo "Usage: ./start.sh [OPTION]"
         echo "Options:"
         echo "  -b, --wbkp      Run and start backup process"
         echo "  -h, --help      Print help and exit"
         ;;
-        *)
+    *)
         echo "Invalid option: $arg"
         exit 1
         ;;
     esac
 done
 if [ $ARGFLAG -eq 0 ]; then
-    python3 runner.py 
+    python3 runner.py
+else
+    chmod +x ./bkp_daemon.sh
 fi
 echo "Program exited. Deactivating virtual environment..."
 deactivate
