@@ -67,3 +67,5 @@ fi
 echo
 echo "Running program..."
 python3 runner.py 
+echo "Program exited. Deactivating virtual environment..."
+deactivate
