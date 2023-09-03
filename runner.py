@@ -30,8 +30,8 @@ def main():
             ["echo", "Choose utility to run:"]
         )
         menuChoice = filter(subprocess.run(
-            ["./gum", "choose", constants.VIEW[0], constants.ADD[0],
-                constants.EDIT[0], constants.QUIT[0]],
+            ["./gum", "choose", constants.VIEW, constants.ADD,
+                constants.EDIT, constants.QUIT],
             stdout=subprocess.PIPE,
         ))
     except Exception as e:
@@ -161,6 +161,7 @@ def add():
     df = pd.DataFrame(df_dict, index=[0])
     # Append dataframe to CSV
     df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+    print("Job entry added!")
 
 
 def edit():

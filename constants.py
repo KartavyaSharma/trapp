@@ -1,8 +1,8 @@
 ##### Select Menu Constants #####
-ADD = ("Add new job application", "add")
-EDIT = ("Edit existing job application", "edit")
-VIEW = ("View all job applications", "view")
-QUIT = ("Quit", "quit")
+ADD = "Add new job application"
+EDIT = "Edit existing job application"
+VIEW = "View all job applications"
+QUIT = "Quit"
 
 CHOICE_MAP = {
     "Add new job application": "add",

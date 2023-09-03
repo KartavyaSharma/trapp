@@ -13,9 +13,13 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
     echo "Not in a virtual environment"
     # Check if env file exists in current directory
     echo "Checking if env file exists..."
-    if test -d "env" && test -f "/env/bin/activate"; then
-        echo "Environment directory exists. Activating environment..."
-        source ./env/bin/activate
+    if test -d env; then
+        if test -f ./env/bin/activate; then
+            echo "Environment directory exists. Activating environment..."
+            source ./env/bin/activate
+        else
+            echo "`env` folder exists, but activate file missing."
+        fi
     else
         echo "Environment directory does not exist. Creating a new environment..."
         python3 -m venv env
