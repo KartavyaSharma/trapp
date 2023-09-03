@@ -75,6 +75,28 @@ fi
 
 echo
 echo "Running program..."
-python3 runner.py 
+ARGFLAG=0
+for arg in "$@"
+do
+    case $arg in
+        -b | --wbkp)
+        python3 runner.py wbkp
+        ARGFLAG=1
+        ;;
+        -h | --help)
+        echo "Usage: ./start.sh [OPTION]"
+        echo "Options:"
+        echo "  -b, --wbkp      Run and start backup process"
+        echo "  -h, --help      Print help and exit"
+        ;;
+        *)
+        echo "Invalid option: $arg"
+        exit 1
+        ;;
+    esac
+done
+if [ $ARGFLAG -eq 0 ]; then
+    python3 runner.py 
+fi
 echo "Program exited. Deactivating virtual environment..."
 deactivate
