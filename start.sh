@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Dictionary to maintain gum binary links
+declare -A gum_binary_links
+
+gum_binary_links["Darwin arm64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz"
+gum_binary_links["Darwin x86_64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz"
+gum_binary_links["Linux arm64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz"
+gum_binary_links["Linux x86_64"] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz"
+
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
     echo "Not in a virtual environment"
@@ -32,7 +40,15 @@ fi
 # Check if gum is installed
 if ! command -v gum &> /dev/null; then
     echo "charmbracelet/gum was not found. Installing"
-    go get github.com/charmbracelet/gum@latest
+    echo "Determining system architecture"
+    arch=$(uname -s -m)
+    echo "Fetching gum binary..."
+    wget "${gum_binary_links["$arch"]}"
+    tar -xzf gum
+    chmod +x gum
+    echo "Setting gum alias in .bash_profile"
+    fullpath=$(realpath ./gum)
+    echo 'export PATH="$PATH:${fullpath}"' >> ~/.bash_profile
     echo "Installed gum!"
 else
     if ! test -d "/cache"; then
@@ -50,5 +66,4 @@ fi
 
 echo
 echo "Running program..."
-python3 runner.py
-    
+python3 runner.py 
