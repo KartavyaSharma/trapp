@@ -35,7 +35,7 @@ if ! command -v gum &> /dev/null; then
     go install github.com/charmbracelet/gum@latest
     echo "Installed gum!"
 else
-    if ! test -f "/cache/gum.flag"; then
+    if ! test -d "/cache"; then
         echo "WOW, you already have the gum library you SHELL fiend!"
     else
         echo "Gum library detected. Onward!"
