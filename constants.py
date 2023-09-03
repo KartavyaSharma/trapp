@@ -3,12 +3,14 @@ ADD = "Add new job application"
 EDIT = "Edit existing job application"
 VIEW = "View all job applications"
 QUIT = "Quit"
+BKP = "Start Backup Daemon"
 
 CHOICE_MAP = {
     "Add new job application": "add",
     "Edit existing job application": "edit",
     "View all job applications": "view",
-    "Quit": "quit"
+    "Quit": "quit",
+    "Start Backup Daemon": "bkp"
 }
 
 ##### File Constants #####
@@ -32,3 +34,6 @@ STATUS_REJECTED = "Rejected"
 ##### Date Constants #####
 DATE_NOW = "Today"
 DATE_CUSTOM = "Custom"
+
+##### Flag Constants #####
+BKP_FLAG = "wbkp"

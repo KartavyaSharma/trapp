@@ -2,10 +2,14 @@ import constants
 import pandas as pd
 import os
 import subprocess
+import sys
 import validators
 
 from datetime import date
 from datetime import datetime
+
+global bkp_flag
+bkp_flag = False
 
 
 def filter(subprocess_output):
@@ -29,11 +33,18 @@ def main():
         subprocess.run(
             ["echo", "Choose utility to run:"]
         )
-        menuChoice = filter(subprocess.run(
-            ["./gum", "choose", constants.VIEW, constants.ADD,
-                constants.EDIT, constants.QUIT],
-            stdout=subprocess.PIPE,
-        ))
+        if bkp_flag:
+            menuChoice = filter(subprocess.run(
+                ["./gum", "choose", constants.VIEW, constants.ADD,
+                    constants.EDIT, constants.BKP, constants.QUIT],
+                stdout=subprocess.PIPE,
+            ))
+        else:
+            menuChoice = filter(subprocess.run(
+                ["./gum", "choose", constants.VIEW, constants.ADD,
+                    constants.EDIT, constants.QUIT],
+                stdout=subprocess.PIPE,
+            ))
     except Exception as e:
         print(e)
         return
@@ -50,7 +61,8 @@ def menu_choice(choice):
         'view': view,
         'add': add,
         'edit': edit,
-        'quit': quit
+        'quit': quit,
+        'bkp': bkp
     }
     func = switcher.get(choice, lambda: "Invalid choice")
     return func
@@ -167,9 +179,17 @@ def add():
 def edit():
     print("Editing job application...")
 
+def bkp():
+    if not bkp_flag:
+        raise Exception("Backup process flag was not passed. Invalid operation.")
+    print("Starting backup daemon...")
 
 def quit():
     print("Quitting...")
 
 if __name__ == "__main__":
+    # Check if bkp flag is set
+    if len(sys.argv) > 1:
+        if sys.argv[1] == constants.BKP_FLAG:
+            bkp_flag = True
     main()
