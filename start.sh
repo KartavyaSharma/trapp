@@ -43,7 +43,10 @@ else
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
-mkdir cache && touch cache/gum.flag && echo "1" >> cache/gum.flag
+if ! test -d "/cache"; then
+    echo "Creating cache file..."
+    mkdir cache && touch ./cache/gum.flag && echo "1" >> ./cache/gum.flag
+fi
 
 echo
 echo "Running program..."
