@@ -47,7 +47,12 @@ if ! command -v ./gum &> /dev/null; then
     echo "Determining system architecture"
     arch=$(uname -s -m)
     echo "Fetching gum binary..."
-    url="${gum_binary_links["$arch"]}"
+    if test "${gum_binary_links["$arch"]+isset}"; then
+        url="${gum_binary_links["$arch"]}"
+    else
+        echo "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
+        exit 1
+    fi
     wget "$url"
     tar -xzf $(basename "$url") gum
     chmod +x $(basename "$url")
