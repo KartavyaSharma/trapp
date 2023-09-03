@@ -1,5 +1,5 @@
 # trapp
-TRack your job APPlications, but on the SHELL
+<ins>TR</ins>ack your job <ins>APP</ins>lications, but on the SHELL
 
 ## Usage
 
