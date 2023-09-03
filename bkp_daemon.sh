@@ -83,6 +83,7 @@ stopDaemon() {
 
     log '*** '$(date +"%Y-%m-%d")": $daemonName stopped."
     echo " * Stopped $daemonName with PID: $(cat $pidFile)."
+    echo
 }
 
 statusDaemon() {
@@ -93,6 +94,7 @@ statusDaemon() {
     else
         echo " * $daemonName isn't running."
     fi
+    echo
     exit 0
 }
 
@@ -106,6 +108,8 @@ restartDaemon() {
     fi
     stopDaemon
     startDaemon
+    echo
+
 }
 
 checkDaemon() {

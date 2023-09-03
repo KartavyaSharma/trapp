@@ -86,8 +86,11 @@ for arg in "$@"; do
         echo "Usage: ./start.sh [OPTION]"
         echo "Options:"
         echo "  -b, --wbkp      Run and start backup daemon"
-        echo "  -h, --help      Print help and exit"
         echo "  -c, --clean     Clean up cache and daemon files"
+        echo "  -s, --stop      Stop backup daemon"
+        echo "  -r, --restart   Restart backup daemon"
+        echo "  -t, --test      Test if backup daemon is running"
+        echo "  -h, --help      Print help and exit"
         ARGFLAG=2
         ;;
     -c | --clean)
@@ -96,6 +99,22 @@ for arg in "$@"; do
         rm -rf cache bkp/pid bkp/logs bkp/bkp.out bkp
         echo
         ARGFLAG=3
+        ;;
+    -s | --stop)
+        ./bkp_daemon.sh stop
+        ARGFLAG=4
+        ;;
+    -r | --restart)
+        # Stop and start daemon
+        ./bkp_daemon.sh stop
+        # Start daemon as a background process
+        echo "Starting backup daemon..."
+        nohup ./bkp_daemon.sh start > bkp/bkp.out &
+        ARGFLAG=5
+        ;;
+    -t | --test)
+        ./bkp_daemon.sh status
+        ARGFLAG=6
         ;;
     *)
         echo "Invalid option: $arg"
@@ -117,12 +136,12 @@ elif [ $ARGFLAG -eq 1 ]; then
     nohup ./bkp_daemon.sh start > bkp/bkp.out &
     echo "Backup daemon started!"
     echo
-    echo "Usage: ./bkp_daemon.sh [OPTION]"
+    echo "Usage: ./start.sh [OPTION]"
     echo "Options:"
-    echo "  start      Start backup daemon"
-    echo "  stop       Stop backup daemon"
-    echo "  restart    Restart backup daemon"
-    echo "  status     Check status of backup daemon"
+    echo "  -s, --stop      Stop backup daemon"
+    echo "  -r, --restart   Restart backup daemon"
+    echo "  -t, --test      Test if backup daemon is running"
+    echo "  -h, --help      Print help and exit"
     echo
     echo "You can view daemon logs in ./bkp/logs/TRAPP-DAEMON.log"
     echo "You can view any daemon output in ./bkp/bkp.out"
