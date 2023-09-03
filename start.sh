@@ -34,7 +34,6 @@ if ! command -v gum &> /dev/null; then
     echo "charmbracelet/gum was not found. Installing"
     go install github.com/charmbracelet/gum@latest
     echo "Installed gum!"
-    mkdir cache && touch cache/gum.flag && echo "1" >> cache/gum.flag
 else
     if ! test -f "/cache/gum.flag"; then
         echo "WOW, you already have the gum library you SHELL fiend!"
@@ -42,6 +41,9 @@ else
         echo "Gum library detected. Onward!"
     fi
 fi
+
+# Set a flag so that the "WOW, ..." print does not run every time.
+mkdir cache && touch cache/gum.flag && echo "1" >> cache/gum.flag
 
 echo
 echo "Running program..."
