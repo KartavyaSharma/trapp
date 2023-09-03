@@ -39,18 +39,21 @@ fi
 
 # Check if gum is installed
 if ! command -v gum &> /dev/null; then
-    echo "charmbracelet/gum was not found. Installing"
-    echo "Determining system architecture"
-    arch=$(uname -s -m)
-    echo "Fetching gum binary..."
-    url="${gum_binary_links["$arch"]}"
-    wget "$url"
-    tar -xzf $(basename "$url") gum
-    chmod +x $(basename "$url")
-    echo "Setting gum alias in .bash_profile"
-    fullpath=$(realpath gum)
-    echo 'export PATH="$PATH:${fullpath}"' >> ~/.bash_profile
-    echo "Installed gum!"
+    if ! test -f gum; then:
+        echo "charmbracelet/gum was not found. Installing"
+        echo "Determining system architecture"
+        arch=$(uname -s -m)
+        echo "Fetching gum binary..."
+        url="${gum_binary_links["$arch"]}"
+        wget "$url"
+        tar -xzf $(basename "$url") gum
+        chmod +x $(basename "$url")
+        echo "Installed gum!"
+    else
+        echo "Adding gum to path..."
+        fullpath=$(realpath gum)
+        export PATH="$PATH:$fullpath"
+    fi
 else
     if ! test -d "/cache"; then
         echo "WOW, you already have the gum library you SHELL fiend!"
