@@ -1,18 +1,11 @@
 #!/bin/bash
 
-# This is a skeleton of a bash daemon. To use for yourself, just set the
-# daemonName variable and then enter in the commands to run in the doCommands
-# function. Modify the variables just below to fit your preference.
-
 daemonName="TRAPP-DAEMON"
 
 pidDir="./bkp/pid"
 pidFile="$pidDir/$daemonName.pid"
-# pidFile="$daemonName.pid"
 
 logDir="./bkp/logs"
-# To use a dated log file.
-# logFile="$logDir/$daemonName-"`date +"%Y-%m-%d"`".log"
 # To use a regular log file.
 logFile="$logDir/$daemonName.log"
 
@@ -25,10 +18,6 @@ doCommands() {
     # This is where you put all the commands for the daemon.
     echo "Running commands."
 }
-
-################################################################################
-# Below is the skeleton functionality of the daemon.
-################################################################################
 
 myPid=$(echo $$)
 
