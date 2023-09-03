@@ -30,7 +30,7 @@ def main():
             ["echo", "Choose utility to run:"]
         )
         menuChoice = filter(subprocess.run(
-            ["gum", "choose", constants.VIEW[0], constants.ADD[0],
+            ["./gum", "choose", constants.VIEW[0], constants.ADD[0],
                 constants.EDIT[0], constants.QUIT[0]],
             stdout=subprocess.PIPE,
         ))
@@ -66,13 +66,13 @@ def view():
 
     print("Do you want to sort by a column?")
     sort_choice = filter(subprocess.run(
-        ["gum", "choose", "Yes", "No"],
+        ["./gum", "choose", "Yes", "No"],
         stdout=subprocess.PIPE,
         shell=False
     ))
     if sort_choice == "Yes":
         sort_choice = filter(subprocess.run(
-            ["gum", "choose"] + constants.COLUMN_NAMES,
+            ["./gum", "choose"] + constants.COLUMN_NAMES,
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -87,20 +87,20 @@ def add():
     print("Adding new job application...")
     # Ask user for company name
     company_name = filter(subprocess.run(
-        ["gum", "input", "--placeholder", constants.INPUT_COMPANY_NAME],
+        ["./gum", "input", "--placeholder", constants.INPUT_COMPANY_NAME],
         stdout=subprocess.PIPE,
         shell=False
     ))
     # Ask user for position
     position = filter(subprocess.run(
-        ["gum", "input", "--placeholder", constants.INPUT_POSITION],
+        ["./gum", "input", "--placeholder", constants.INPUT_POSITION],
         stdout=subprocess.PIPE,
         shell=False
     ))
     # Ask user for date applied
     print("Choose date applied:")
     date_choice = filter(subprocess.run(
-        ["gum", "choose", constants.DATE_NOW, constants.DATE_CUSTOM],
+        ["./gum", "choose", constants.DATE_NOW, constants.DATE_CUSTOM],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -110,7 +110,7 @@ def add():
         formatted_date = date_applied.strftime("%m/%d/%Y")
     elif date_choice == constants.DATE_CUSTOM:
         date_applied = filter(subprocess.run(
-            ["gum", "input", "--placeholder", constants.INPUT_DATE_APPLIED],
+            ["./gum", "input", "--placeholder", constants.INPUT_DATE_APPLIED],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -124,7 +124,7 @@ def add():
     # Ask user for status
     print("Choose current status:")
     current_status = filter(subprocess.run(
-        ["gum", "choose", constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
+        ["./gum", "choose", constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
             constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
         stdout=subprocess.PIPE,
         shell=False
@@ -133,7 +133,7 @@ def add():
     success_flag = True
     while success_flag:
         portal_link = filter(subprocess.run(
-            ["gum", "input", "--placeholder", constants.INPUT_PORTAL_LINK],
+            ["./gum", "input", "--placeholder", constants.INPUT_PORTAL_LINK],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -145,7 +145,7 @@ def add():
             success_flag = False
     # Ask user for notes
     notes = filter(subprocess.run(
-        ["gum", "input", "--placeholder", constants.INPUT_NOTES],
+        ["./gum", "input", "--placeholder", constants.INPUT_NOTES],
         stdout=subprocess.PIPE,
         shell=False
     ))

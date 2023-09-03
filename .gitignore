@@ -3,3 +3,5 @@ job_applications.csv
 .vscode
 __pycache__
 cache
+*.tar.gz.*
+gum

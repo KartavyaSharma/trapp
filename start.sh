@@ -38,24 +38,20 @@ else
 fi
 
 # Check if gum is installed
-if ! command -v gum &> /dev/null; then
-    if ! test -f gum; then:
-        echo "charmbracelet/gum was not found. Installing"
-        echo "Determining system architecture"
-        arch=$(uname -s -m)
-        echo "Fetching gum binary..."
-        url="${gum_binary_links["$arch"]}"
-        wget "$url"
-        tar -xzf $(basename "$url") gum
-        chmod +x $(basename "$url")
-        echo "Installed gum!"
-    else
-        echo "Adding gum to path..."
-        fullpath=$(realpath gum)
-        export PATH="$PATH:$fullpath"
-    fi
+if ! command -v ./gum &> /dev/null; then
+    echo "charmbracelet/gum was not found. Installing"
+    echo "Determining system architecture"
+    arch=$(uname -s -m)
+    echo "Fetching gum binary..."
+    url="${gum_binary_links["$arch"]}"
+    wget "$url"
+    tar -xzf $(basename "$url") gum
+    chmod +x $(basename "$url")
+    echo "Installed gum!"
+    echo "Cleaning up..."
+    rm $(basename "$url")
 else
-    if ! test -d "/cache"; then
+    if ! test -d "cache"; then
         echo "WOW, you already have the gum library you SHELL fiend!"
     else
         echo "Gum library detected. Onward!"
@@ -63,7 +59,7 @@ else
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
-if ! test -d "/cache"; then
+if ! test -d "cache"; then
     echo "Creating cache file..."
     mkdir cache && touch ./cache/gum.flag && echo "1" >> ./cache/gum.flag
 fi
