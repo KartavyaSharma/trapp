@@ -137,11 +137,7 @@ elif [ $ARGFLAG -eq 1 ]; then
     echo "Backup daemon started!"
     echo
     echo "Usage: ./start.sh [OPTION]"
-    echo "Options:"
-    echo "  -s, --stop      Stop backup daemon"
-    echo "  -r, --restart   Restart backup daemon"
-    echo "  -t, --test      Test if backup daemon is running"
-    echo "  -h, --help      Print help and exit"
+    echo "For more options, run ./start.sh --help"
     echo
     echo "You can view daemon logs in ./bkp/logs/TRAPP-DAEMON.log"
     echo "You can view any daemon output in ./bkp/bkp.out"

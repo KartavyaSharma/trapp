@@ -19,7 +19,7 @@ doCommands() {
     echo "Running commands."
 }
 
-myPid=$(echo $$)
+myPid=$$
 
 setupDaemon() {
     # Make sure that the directories work.
