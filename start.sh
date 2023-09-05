@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Make a temporary alias for echo
+alias cecho="./echo.sh"
+
 # Dictionary to maintain gum binary links
 declare -A gum_binary_links
 
@@ -10,60 +13,59 @@ gum_binary_links["Linux x86_64"]="https://github.com/charmbracelet/gum/releases/
 
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
-    echo "Not in a virtual environment"
+    cecho -c yellow -t "Not in a virtual environment"
     # Check if env file exists in current directory
-    echo "Checking if env file exists..."
+    cecho -c yellow -t "Checking if env file exists..."
     if test -d env; then
         if test -f ./env/bin/activate; then
-            echo "Environment directory exists. Activating environment..."
+            cecho -c green -t "Environment directory exists. Activating environment..."
             source ./env/bin/activate
         else
-            echo "$(env) folder exists, but activate file missing."
+            cecho -c red -t "$(env) folder exists, but activate file missing."
         fi
     else
-        echo "Environment directory does not exist. Creating a new environment..."
+        cecho -c yellow -t "Environment directory does not exist. Creating a new environment..."
         python3 -m venv env
-        echo "New virtual environment created. Activating..."
+        cecho -c green -t "New virtual environment created. Activating..."
         source ./env/bin/activate
     fi
 else
-    echo "Virtual environment found!"
+    cecho -c green -t "Virtual environment found!"
 fi
 
 # Check if requirements are satisfied in virtual environment
 output=$(python3 ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
-    echo "Error: python3 ./tests/test_requirements.py failed with output:"
-    echo "$output"
-    echo "Dependency requirements not satisfied. Installing dependencies..."
+    cecho -c red -t "Error: python3 ./tests/test_requirements.py failed with output^"
+    cecho -c red -t "Dependency requirements not satisfied. Installing dependencies..."
     pip3 install -r requirements.txt
 else
-    echo "All dependencies are present!"
+    cecho -c green -t "All dependencies are present!"
 fi
 
 # Check if gum is installed
 if ! command -v ./gum &>/dev/null; then
-    echo "charmbracelet/gum was not found. Installing"
-    echo "Determining system architecture"
+    cecho -c yellow -t "charmbracelet/gum was not found. Installing"
+    echo "Determining system architecture..."
     arch=$(uname -s -m)
     if test "${gum_binary_links["$arch"]+isset}"; then
         url="${gum_binary_links["$arch"]}"
     else
-        echo "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
+        cecho -c red -t "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
         return
     fi
     echo "Fetching gum binary..."
     wget "$url"
     tar -xzf $(basename "$url") gum
     chmod +x $(basename "$url")
-    echo "Installed gum!"
+    cecho -c green -t "Installed gum!"
     echo "Cleaning up..."
     rm $(basename "$url")
 else
     if ! test -d "cache"; then
-        echo "WOW, you already have the gum library you SHELL fiend!"
+        cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
     else
-        echo "Gum library detected. Onward!"
+        cecho -c green -t "Gum library detected. Onward!"
     fi
 fi
 
@@ -108,7 +110,7 @@ for arg in "$@"; do
         # Stop and start daemon
         ./bkp_daemon.sh stop
         # Start daemon as a background process
-        echo "Starting backup daemon..."
+        cecho -c green -t "Starting backup daemon..."
         nohup ./bkp_daemon.sh start > bkp/bkp.out &
         ARGFLAG=5
         ;;
@@ -117,24 +119,24 @@ for arg in "$@"; do
         ARGFLAG=6
         ;;
     *)
-        echo "Invalid option: $arg"
+        cecho -c red -t "Invalid option: $arg"
         return
         ;;
     esac
 done
 if [ $ARGFLAG -eq 0 ]; then
-    echo "Running program..."
+    cecho -c green -t "Running program..."
     python3 runner.py
 elif [ $ARGFLAG -eq 1 ]; then
     chmod +x ./bkp_daemon.sh
     echo "=========================="
     echo "Starting backup daemon..."
     if ! test -d "bkp"; then
-        echo "Creating bkp directory..."
+        cecho -c yellow -t "Creating bkp directory..."
         mkdir bkp
     fi
     nohup ./bkp_daemon.sh start > bkp/bkp.out &
-    echo "Backup daemon started!"
+    cecho -c green -t "Backup daemon started!"
     echo
     echo "Usage: ./start.sh [OPTION]"
     echo "For more options, run ./start.sh --help"
@@ -143,5 +145,5 @@ elif [ $ARGFLAG -eq 1 ]; then
     echo "You can view any daemon output in ./bkp/bkp.out"
     echo "=========================="
 fi
-echo "Program exited. Deactivating virtual environment..."
+cecho -c green -t "Program exited. Deactivating virtual environment..."
 deactivate
