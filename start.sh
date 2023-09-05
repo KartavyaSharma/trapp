@@ -17,7 +17,6 @@ if [[ "$arch" == "Linux" ]]; then
         cecho -c red -t "pip3 or pip not found. Likely because of a missing `ensurepip` module. This is required to create a virtual environment."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
         sudo apt-get install python3-venv python3-pip
-        goto check
     fi
 fi
 
