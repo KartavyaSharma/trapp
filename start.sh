@@ -7,8 +7,9 @@ alias cecho="./echo.sh"
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
     cecho -c yellow -t "You are on Linux. Performing check for required Python packages..."
+    check:
     if command -v pip3 &> /dev/null; then
-        cecho -c geen -t "pip3 found!"
+        cecho -c green -t "pip3 found!"
     elif command -v pip &> /dev/null; then
         cecho -c green -t "pip found!"
         alias pip3=pip
@@ -16,6 +17,7 @@ if [[ "$arch" == "Linux" ]]; then
         cecho -c red -t "pip3 or pip not found. Likely because of a missing `ensurepip` module. This is required to create a virtual environment."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
         sudo apt-get install python3-venv python3-pip
+        goto check
     fi
 fi
 
