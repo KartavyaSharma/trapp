@@ -45,7 +45,7 @@ fi
 
 # Check if gum is installed
 if ! command -v ./gum &>/dev/null; then
-    cecho -c yellow -t "charmbracelet/gum was not found. Installing"
+    cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
     echo "Determining system architecture..."
     arch=$(uname -s -m)
     if test "${gum_binary_links["$arch"]+isset}"; then
@@ -54,7 +54,7 @@ if ! command -v ./gum &>/dev/null; then
         cecho -c red -t "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
         return
     fi
-    echo "Fetching gum binary..."
+    cecho -c yellow -t "Fetching gum binary..."
     wget "$url"
     tar -xzf $(basename "$url") gum
     chmod +x $(basename "$url")
