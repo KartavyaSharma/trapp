@@ -7,7 +7,6 @@ alias cecho="./echo.sh"
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
     cecho -c yellow -t "You are on Linux. Performing check for required Python packages..."
-    check:
     if command -v pip3 &> /dev/null; then
         cecho -c green -t "pip3 found!"
     elif command -v pip &> /dev/null; then
