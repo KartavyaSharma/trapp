@@ -10,32 +10,32 @@ RESET='\033[0m'
 
 # Parse command-line arguments
 while getopts ":c:t:" opt; do
-  case $opt in
-  c)
-    case "$OPTARG" in
-    red) COLOR="$RED" ;;
-    green) COLOR="$GREEN" ;;
-    yellow) COLOR="$YELLOW" ;;
-    *)
-      echo "Invalid color specified. Use 'red', 'green', or 'yellow'." >&2
-      exit 1
-      ;;
-    esac
-    ;;
-  t)
-    TEXT="$OPTARG"
-    ;;
-  \?)
-    echo "Usage: $0 -c {red|green|yellow} -t 'your text'"
-    exit 1
-    ;;
-  esac
+	case $opt in
+	c)
+		case "$OPTARG" in
+		red) COLOR="$RED" ;;
+		green) COLOR="$GREEN" ;;
+		yellow) COLOR="$YELLOW" ;;
+		*)
+			echo "Invalid color specified. Use 'red', 'green', or 'yellow'." >&2
+			exit 1
+			;;
+		esac
+		;;
+	t)
+		TEXT="$OPTARG"
+		;;
+	\?)
+		echo "Usage: $0 -c {red|green|yellow} -t 'your text'"
+		exit 1
+		;;
+	esac
 done
 
 # Check if both color and text are provided
 if [ -z "$COLOR" ] || [ -z "$TEXT" ]; then
-  echo "Usage: $0 -c {red|green|yellow} -t 'your text'"
-  exit 1
+    echo "Usage: $0 -c {red|green|yellow} -t 'your text'"
+    exit 1
 fi
 
 # Print the text in the specified color
