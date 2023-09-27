@@ -4,13 +4,15 @@ EDIT = "Edit existing job application"
 VIEW = "View all job applications"
 QUIT = "Quit"
 BKP = "Start Backup Daemon"
+PRT = "Print to file"
 
 CHOICE_MAP = {
     "Add new job application": "add",
     "Edit existing job application": "edit",
     "View all job applications": "view",
     "Quit": "quit",
-    "Start Backup Daemon": "bkp"
+    "Start Backup Daemon": "bkp",
+    "Print to file": "print"
 }
 
 ##### File Constants #####
@@ -50,3 +52,6 @@ ENDC = '\033[0m'
 ##### Command Constants #####
 GUM_CHOOSE = ['./gum', 'choose']
 GUM_INPUT_W_PLACEHOLDER = ['./gum', 'input', '--placeholder']
+
+##### Display Constants #####
+MAX_COL_WIDTH = 40

@@ -11,4 +11,5 @@ bkp
 **/*.log
 **/*.out
 **/*.csv
+**/*.tmp
 *.tar.gz.*

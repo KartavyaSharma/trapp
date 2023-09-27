@@ -1,10 +1,10 @@
 import constants
-import pandas as pd
+import curses
 import os
+import pandas as pd
 import subprocess
 import sys
 import validators
-import curses
 
 from datetime import date
 from datetime import datetime
@@ -29,6 +29,8 @@ def get_terminal_width():
 
 
 def main():
+    # Set pandas config to print columns with max width
+    pd.set_option('display.max_colwidth', constants.MAX_COL_WIDTH)
     # Check if source CSV file exists
     if os.path.isfile(constants.SOURCE_CSV) == False:
         print("Source CSV file does not exist. Creating new file named job_applications.csv...")
@@ -45,19 +47,11 @@ def main():
         subprocess.run(
             ["echo", "Choose utility to run:"]
         )
-        if bkp_flag:
-            menuChoice = filter(subprocess.run(
-                [*constants.GUM_CHOOSE] +
-                [constants.VIEW, constants.ADD, constants.EDIT,
-                    constants.BKP, constants.QUIT],
-                stdout=subprocess.PIPE,
-            ))
-        else:
-            menuChoice = filter(subprocess.run(
-                [*constants.GUM_CHOOSE] +
-                [constants.VIEW, constants.ADD, constants.EDIT, constants.QUIT],
-                stdout=subprocess.PIPE,
-            ))
+        cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.QUIT]
+        menuChoice = filter(subprocess.run(
+            [*cmd] + [constants.BKP] if bkp_flag else [*cmd],
+            stdout=subprocess.PIPE,
+        ))
     except Exception as e:
         print(e)
         return
@@ -65,7 +59,7 @@ def main():
         menu_choice(constants.CHOICE_MAP[menuChoice])()
     except Exception as e:
         print(e)
-        return
+        sys.exit(1)
 
 
 # Switch case for menu choice
@@ -75,7 +69,8 @@ def menu_choice(choice):
         'add': add,
         'edit': edit,
         'quit': quit,
-        'bkp': bkp
+        'bkp': bkp,
+        'print': print_to_file,
     }
     func = switcher.get(choice, lambda: "Invalid choice")
     return func
@@ -245,6 +240,9 @@ def edit():
         elif check_out == constants.DEFAULT_COLUMN_CHOOSE:
             print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
             continue
+        elif check_out is None:
+            print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
+            continue 
         else:
             success_flag = False
     # Get rows that match check_out
@@ -380,8 +378,12 @@ def bkp():
         raise Exception("Backup process flag was not passed. Invalid operation.")
 
 
+def print_to_file():
+    print("Printing to file...")
+
+
 def quit():
-    print("Quitting...")
+    raise Exception("Quitting...")
 
 
 if __name__ == "__main__":
