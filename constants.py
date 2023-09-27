@@ -46,3 +46,6 @@ OKGREEN = '\033[92m'
 WARNING = '\033[1;33m'
 FAIL = '\033[1;31m'
 ENDC = '\033[0m'
+
+##### Command Constants #####
+GUM_CHOOSE = ['./gum', 'choose']

@@ -45,13 +45,13 @@ def main():
         )
         if bkp_flag:
             menuChoice = filter(subprocess.run(
-                ["./gum", "choose", constants.VIEW, constants.ADD,
+                [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
                     constants.EDIT, constants.BKP, constants.QUIT],
                 stdout=subprocess.PIPE,
             ))
         else:
             menuChoice = filter(subprocess.run(
-                ["./gum", "choose", constants.VIEW, constants.ADD,
+                [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
                     constants.EDIT, constants.QUIT],
                 stdout=subprocess.PIPE,
             ))
@@ -88,13 +88,13 @@ def view():
 
     print("Do you want to sort by a column?")
     sort_choice = filter(subprocess.run(
-        ["./gum", "choose", "Yes", "No"],
+        [*constants.GUM_CHOOSE] + ["Yes", "No"],
         stdout=subprocess.PIPE,
         shell=False
     ))
     if sort_choice == "Yes":
         sort_choice = filter(subprocess.run(
-            ["./gum", "choose"] + constants.COLUMN_NAMES,
+            [*constants.GUM_CHOOSE] + constants.COLUMN_NAMES,
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -122,7 +122,7 @@ def add():
     # Ask user for date applied
     print("Choose date applied:")
     date_choice = filter(subprocess.run(
-        ["./gum", "choose", constants.DATE_NOW, constants.DATE_CUSTOM],
+        [*constants.GUM_CHOOSE] + [constants.DATE_NOW, constants.DATE_CUSTOM],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -146,7 +146,7 @@ def add():
     # Ask user for status
     print("Choose current status:")
     current_status = filter(subprocess.run(
-        ["./gum", "choose", constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
+        [*constants.GUM_CHOOSE] + [constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
             constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
         stdout=subprocess.PIPE,
         shell=False
@@ -228,7 +228,7 @@ def edit():
             print(f'{constants.FAIL}You cannot edit a column header!{constants.ENDC}')
             print('Do you want to try again?')
             retry_choice = filter(subprocess.run(
-                ["./gum", "choose", "Yes", "No"],
+                [*constants.GUM_CHOOSE] + ["Yes", "No"],
                 stdout=subprocess.PIPE,
                 shell=False
             ))
@@ -246,7 +246,7 @@ def edit():
     original_df = df.copy()
     # Get original index of matching rows
     # original_index = df.index[df['Company'] == check_out].tolist()[0]
-    df = df.loc[df['Company'] == check_out]
+    df = df.loc[df[constants.COLUMN_NAMES[0]] == check_out]
     original_index = df.index.values[0]
     print(f'{constants.OKGREEN}Here are the entries that match your search:{constants.ENDC}')
     # If there are multiple rows, ask user to choose one
@@ -263,7 +263,7 @@ def edit():
             trunc_row_str = row_str[:terminal_width]
             dup_companies.append(trunc_row_str)
         company_row = subprocess.Popen(
-            ['./gum', 'choose'] + dup_companies,
+            [*constants.GUM_CHOOSE] + dup_companies,
             stdout=subprocess.PIPE,
             shell=False
         )
@@ -285,14 +285,14 @@ def edit():
     # Ask user if they want to update the status or any other column
     print("What do you want to update?")
     update_choice = filter(subprocess.run(
-        ["./gum", "choose", "Status", "Other"],
+        [*constants.GUM_CHOOSE] + ["Status", "Other"],
         stdout=subprocess.PIPE,
         shell=False
     ))
     if update_choice == "Status":
         print("Choose new status:")
         current_status = filter(subprocess.run(
-            ["./gum", "choose", constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
+            [*constants.GUM_CHOOSE] + [constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
                 constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
             stdout=subprocess.PIPE,
             shell=False
@@ -301,7 +301,7 @@ def edit():
     elif update_choice == "Other":
         print("Choose column to update:")
         column_choice = filter(subprocess.run(
-            ["./gum", "choose"] + constants.COLUMN_NAMES,
+            [*constants.GUM_CHOOSE] + constants.COLUMN_NAMES,
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -315,14 +315,14 @@ def edit():
     # Confirm changes
     print("Confirm changes?")
     confirm_choice = filter(subprocess.run(
-        ["./gum", "choose", "Yes", "No"],
+        [*constants.GUM_CHOOSE] + ["Yes", "No"],
         stdout=subprocess.PIPE,
         shell=False
     ))
     if confirm_choice == "Yes":
         # Update CSV
         original_df.loc[original_index] = df.iloc[0]
-        original_df.to_csv(constants.SOURCE_CSV)
+        original_df.to_csv(constants.SOURCE_CSV, index=False)
         print("Entry updated!")
     else:
         print("Changes not saved.")
