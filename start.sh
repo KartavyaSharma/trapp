@@ -98,17 +98,7 @@ for arg in "$@"; do
     -b | --wbkp)
         echo "Running program..."
         python3 runner.py wbkp
-        ex_code=$?
-        if [ $ex_code -ne 0 ]; then
-            cecho -c red -t "Error: python3 runner.py --wbkp failed. Cannot start backup daemon."
-            return
-        fi
-        if [ $ex_code -eq 20 ]; then
-            ARGFLAG=1
-        else
-            cecho -c yellow -t "You did not specify to start a backup daemon with --wbkp. Failed"
-            return
-        fi
+        ARGFLAG=1
         ;;
     -h | --help)
         echo "Usage: ./start.sh [OPTION]"

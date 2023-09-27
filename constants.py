@@ -44,7 +44,7 @@ BKP_FLAG = "wbkp"
 DEFAULT_COLUMN_CHOOSE = "Default"
 
 ##### COLORS #####
-OKGREEN = '\033[92m'
+OKGREEN = '\033[1;32m'
 WARNING = '\033[1;33m'
 FAIL = '\033[1;31m'
 ENDC = '\033[0m'

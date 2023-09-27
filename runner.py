@@ -8,6 +8,7 @@ import validators
 
 from datetime import date
 from datetime import datetime
+from os import system
 
 global bkp_flag
 bkp_flag = False
@@ -49,17 +50,13 @@ def main():
         )
         cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.QUIT]
         menuChoice = filter(subprocess.run(
-            [*cmd] + [constants.BKP] if bkp_flag else [*cmd],
+            [constants.BKP] if bkp_flag else [*cmd],
             stdout=subprocess.PIPE,
         ))
     except Exception as e:
         print(e)
         return
-    try:
-        menu_choice(constants.CHOICE_MAP[menuChoice])()
-    except Exception as e:
-        print(e)
-        sys.exit(1)
+    menu_choice(constants.CHOICE_MAP[menuChoice])()
 
 
 # Switch case for menu choice
@@ -375,15 +372,29 @@ def update(df, original_df, original_index, old_df):
 
 def bkp():
     if not bkp_flag:
-        raise Exception("Backup process flag was not passed. Invalid operation.")
+        print(f'{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}')
+        sys.exit(1)
 
 
 def print_to_file():
+    if os.path.isfile(constants.SOURCE_CSV) == False:
+        print("Source CSV file does not exist. Please add a job entry first.")
+        return
+    df = pd.read_csv(constants.SOURCE_CSV)
     print("Printing to file...")
+    with open('output.tmp', 'w') as outF:
+        df_string = df.to_string(header=True, index=False)
+        outF.write(df_string)
+    outF.close()
+    # bat the file without wrapping
+    print(f'{constants.OKGREEN}Written to file successfully!{constants.ENDC}')
+    print(f'{constants.OKGREEN}Here is a file preview:{constants.ENDC}')
+    system('sleep 2')
+    system('bat --wrap=never --color=never output.tmp')
 
 
 def quit():
-    raise Exception("Quitting...")
+    print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')
 
 
 if __name__ == "__main__":
