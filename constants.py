@@ -38,6 +38,9 @@ DATE_CUSTOM = "Custom"
 ##### Flag Constants #####
 BKP_FLAG = "wbkp"
 
+##### Default Choices #####
+DEFAULT_COLUMN_CHOOSE = "Default"
+
 ##### COLORS #####
 OKGREEN = '\033[92m'
 WARNING = '\033[1;33m'

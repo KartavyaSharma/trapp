@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 import validators
+import shutil
+import curses
 
 from datetime import date
 from datetime import datetime
@@ -15,6 +17,15 @@ bkp_flag = False
 def filter(subprocess_output):
     return subprocess_output.stdout.decode('utf-8').strip()
 
+def get_terminal_width():
+    try:
+        curses.setupterm()
+        size = curses.tigetnum("cols")
+        if size == None:
+            return None
+        return size
+    except curses.error:
+        return None
 
 def main():
     # Check if source CSV file exists
@@ -182,11 +193,13 @@ def edit():
         print("Source CSV file does not exist. Please add a job entry first.")
         return
     success_flag = True
+    check_out = constants.DEFAULT_COLUMN_CHOOSE
     while success_flag:
         # Ask user to choose job entry
         column = subprocess.Popen(
                 ['column', '-s,', '-t', f'{constants.SOURCE_CSV}'],
-                stdout=subprocess.PIPE
+                stdout=subprocess.PIPE,
+                shell=False
         )
         less = subprocess.Popen(
                 ['less', '-#2', '-N', '-S'],
@@ -224,10 +237,42 @@ def edit():
                 continue
             else:
                 return
+        elif check_out == constants.DEFAULT_COLUMN_CHOOSE:
+            print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
+            continue
         else:
             success_flag = False
-    print(f'Choose job entry to edit: {check_out}')
-        
+    # Get rows that match check_out
+    df = pd.read_csv(constants.SOURCE_CSV)
+    df = df.loc[df['Company'] == check_out]
+    # If there are multiple rows, ask user to choose one
+    if len(df.index) > 1:
+        print(df)
+        print(f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
+        terminal_width = get_terminal_width()
+        if terminal_width == None: 
+            terminal_width = 80
+        # Ask user to choose one row (show complete row)
+        dup_companies = []
+        for row in df.values.tolist():
+            row_str = "\t".join(row[:4])
+            trunc_row_str = row_str[:terminal_width]
+            dup_companies.append(trunc_row_str)
+        company_row = subprocess.Popen(
+            ['./gum', 'choose'] + dup_companies,
+            stdout=subprocess.PIPE,
+            shell=False
+        )
+        position = subprocess.Popen(
+            ['awk', '-F', '\t', '{print $2}'],
+            stdin=company_row.stdout,
+            stdout=subprocess.PIPE
+        )
+        company_row.stdout.close()
+        position_output = position.communicate()[0].decode('utf-8').strip()
+        df = df.loc[df['Position'] == position_output]
+    # Print dataframe
+    print(df)
 
 def bkp():
     if not bkp_flag:
