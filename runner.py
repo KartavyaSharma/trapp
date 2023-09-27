@@ -4,7 +4,6 @@ import os
 import subprocess
 import sys
 import validators
-import shutil
 import curses
 
 from datetime import date
@@ -244,7 +243,12 @@ def edit():
             success_flag = False
     # Get rows that match check_out
     df = pd.read_csv(constants.SOURCE_CSV)
+    original_df = df.copy()
+    # Get original index of matching rows
+    # original_index = df.index[df['Company'] == check_out].tolist()[0]
     df = df.loc[df['Company'] == check_out]
+    original_index = df.index.values[0]
+    print(f'{constants.OKGREEN}Here are the entries that match your search:{constants.ENDC}')
     # If there are multiple rows, ask user to choose one
     if len(df.index) > 1:
         print(df)
@@ -270,8 +274,62 @@ def edit():
         )
         company_row.stdout.close()
         position_output = position.communicate()[0].decode('utf-8').strip()
+        intermidiate_index = df.index[df['Position'] == position_output].tolist()[0]
         df = df.loc[df['Position'] == position_output]
-    # Print dataframe
+        original_index = original_index + intermidiate_index - 1
+    elif len(df.index) == 0:
+        print(f'{constants.FAIL}No entries found!{constants.ENDC}')
+        return
+    # print(original_df.iloc[[original_index]])
+    old_df = df.copy()
+    # Ask user if they want to update the status or any other column
+    print("What do you want to update?")
+    update_choice = filter(subprocess.run(
+        ["./gum", "choose", "Status", "Other"],
+        stdout=subprocess.PIPE,
+        shell=False
+    ))
+    if update_choice == "Status":
+        print("Choose new status:")
+        current_status = filter(subprocess.run(
+            ["./gum", "choose", constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
+                constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
+        df['Status'] = current_status
+    elif update_choice == "Other":
+        print("Choose column to update:")
+        column_choice = filter(subprocess.run(
+            ["./gum", "choose"] + constants.COLUMN_NAMES,
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
+        # Ask user for new value
+        new_value = filter(subprocess.run(
+            ["./gum", "input", "--placeholder", f"Input new {column_choice}"],
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
+        df[column_choice] = new_value
+    # Confirm changes
+    print("Confirm changes?")
+    confirm_choice = filter(subprocess.run(
+        ["./gum", "choose", "Yes", "No"],
+        stdout=subprocess.PIPE,
+        shell=False
+    ))
+    if confirm_choice == "Yes":
+        # Update CSV
+        original_df.loc[original_index] = df.iloc[0]
+        original_df.to_csv(constants.SOURCE_CSV)
+        print("Entry updated!")
+    else:
+        print("Changes not saved.")
+    # Print old and new entries
+    print(f'{constants.OKGREEN}Old entry:{constants.ENDC}')
+    print(old_df)
+    print(f'{constants.OKGREEN}New entry:{constants.ENDC}')
     print(df)
 
 def bkp():
