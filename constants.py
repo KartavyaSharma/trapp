@@ -37,3 +37,9 @@ DATE_CUSTOM = "Custom"
 
 ##### Flag Constants #####
 BKP_FLAG = "wbkp"
+
+##### COLORS #####
+OKGREEN = '\033[92m'
+WARNING = '\033[1;33m'
+FAIL = '\033[1;31m'
+ENDC = '\033[0m'

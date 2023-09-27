@@ -177,7 +177,57 @@ def add():
 
 
 def edit():
-    print("Editing job application...")
+    # Make sure job_applications.csv exists
+    if os.path.isfile(constants.SOURCE_CSV) == False:
+        print("Source CSV file does not exist. Please add a job entry first.")
+        return
+    success_flag = True
+    while success_flag:
+        # Ask user to choose job entry
+        column = subprocess.Popen(
+                ['column', '-s,', '-t', f'{constants.SOURCE_CSV}'],
+                stdout=subprocess.PIPE
+        )
+        less = subprocess.Popen(
+                ['less', '-#2', '-N', '-S'],
+                stdin=column.stdout,
+                stdout=subprocess.PIPE
+        )
+        column.stdout.close()
+        gum = subprocess.Popen(
+                ['./gum', 'filter'],
+                stdin=less.stdout,
+                stdout=subprocess.PIPE
+        )
+        less.stdout.close()
+        output = gum.communicate()[0].decode('utf-8')
+        echo_output = subprocess.Popen(
+                ['echo', f'{output}'],
+                stdout=subprocess.PIPE
+        )
+        awk_check = subprocess.Popen(
+                ['awk', '-F', '[[:space:]][[:space:]]+', '{print $1}'],
+                stdin=echo_output.stdout,
+                stdout=subprocess.PIPE
+        )
+        echo_output.stdout.close()
+        check_out = awk_check.communicate()[0].decode('utf-8').strip()
+        if check_out == "Company":
+            print(f'{constants.FAIL}You cannot edit a column header!{constants.ENDC}')
+            print('Do you want to try again?')
+            retry_choice = filter(subprocess.run(
+                ["./gum", "choose", "Yes", "No"],
+                stdout=subprocess.PIPE,
+                shell=False
+            ))
+            if retry_choice == "Yes":
+                continue
+            else:
+                return
+        else:
+            success_flag = False
+    print(f'Choose job entry to edit: {check_out}')
+        
 
 def bkp():
     if not bkp_flag:
