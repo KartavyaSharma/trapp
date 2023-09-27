@@ -258,8 +258,7 @@ def edit():
     # If there are multiple rows, ask user to choose one
     if len(df.index) > 1:
         print(df)
-        print(
-            f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
+        print(f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
         terminal_width = get_terminal_width()
         if terminal_width == None:
             terminal_width = 80
@@ -306,6 +305,20 @@ def edit():
 
 def delete(df, original_df, original_index):
     print("Confirm deletion?")
+    delete_choice = filter(subprocess.run(
+        [*constants.GUM_CHOOSE] + ["Yes", "No"],
+        stdout=subprocess.PIPE,
+        shell=False
+    ))
+    if delete_choice == "Yes":
+        # Delete row from dataframe
+        original_df = original_df.drop(original_index)
+        # Write to CSV
+        original_df.to_csv(constants.SOURCE_CSV, index=False)
+        print("Entry deleted!")
+        print(df)
+    else:
+        print("Deletion not confirmed. Exiting...")
 
 
 def update(df, original_df, original_index, old_df):
