@@ -16,6 +16,7 @@ bkp_flag = False
 def filter(subprocess_output):
     return subprocess_output.stdout.decode('utf-8').strip()
 
+
 def get_terminal_width():
     try:
         curses.setupterm()
@@ -25,6 +26,7 @@ def get_terminal_width():
         return size
     except curses.error:
         return None
+
 
 def main():
     # Check if source CSV file exists
@@ -45,14 +47,15 @@ def main():
         )
         if bkp_flag:
             menuChoice = filter(subprocess.run(
-                [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
-                    constants.EDIT, constants.BKP, constants.QUIT],
+                [*constants.GUM_CHOOSE] +
+                [constants.VIEW, constants.ADD, constants.EDIT,
+                    constants.BKP, constants.QUIT],
                 stdout=subprocess.PIPE,
             ))
         else:
             menuChoice = filter(subprocess.run(
-                [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
-                    constants.EDIT, constants.QUIT],
+                [*constants.GUM_CHOOSE] +
+                [constants.VIEW, constants.ADD, constants.EDIT, constants.QUIT],
                 stdout=subprocess.PIPE,
             ))
     except Exception as e:
@@ -109,13 +112,13 @@ def add():
     print("Adding new job application...")
     # Ask user for company name
     company_name = filter(subprocess.run(
-        ["./gum", "input", "--placeholder", constants.INPUT_COMPANY_NAME],
+        [*constants.GUM_INPUT_W_PLACEHOLDER] + [constants.INPUT_COMPANY_NAME],
         stdout=subprocess.PIPE,
         shell=False
     ))
     # Ask user for position
     position = filter(subprocess.run(
-        ["./gum", "input", "--placeholder", constants.INPUT_POSITION],
+        [*constants.GUM_INPUT_W_PLACEHOLDER] + [constants.INPUT_POSITION],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -132,7 +135,8 @@ def add():
         formatted_date = date_applied.strftime("%m/%d/%Y")
     elif date_choice == constants.DATE_CUSTOM:
         date_applied = filter(subprocess.run(
-            ["./gum", "input", "--placeholder", constants.INPUT_DATE_APPLIED],
+            [*constants.GUM_INPUT_W_PLACEHOLDER] +
+            [constants.INPUT_DATE_APPLIED],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -146,8 +150,9 @@ def add():
     # Ask user for status
     print("Choose current status:")
     current_status = filter(subprocess.run(
-        [*constants.GUM_CHOOSE] + [constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
-            constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
+        [*constants.GUM_CHOOSE] +
+        [constants.STATUS_INIT, constants.STATUS_ASSESSMENT, constants.STATUS_INTERVIEW,
+            constants.STATUS_OFFER, constants.STATUS_REJECTED],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -155,7 +160,8 @@ def add():
     success_flag = True
     while success_flag:
         portal_link = filter(subprocess.run(
-            ["./gum", "input", "--placeholder", constants.INPUT_PORTAL_LINK],
+            [*constants.GUM_INPUT_W_PLACEHOLDER] +
+            [constants.INPUT_PORTAL_LINK],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -167,7 +173,7 @@ def add():
             success_flag = False
     # Ask user for notes
     notes = filter(subprocess.run(
-        ["./gum", "input", "--placeholder", constants.INPUT_NOTES],
+        [*constants.GUM_INPUT_W_PLACEHOLDER] + [constants.INPUT_NOTES],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -196,31 +202,31 @@ def edit():
     while success_flag:
         # Ask user to choose job entry
         column = subprocess.Popen(
-                ['column', '-s,', '-t', f'{constants.SOURCE_CSV}'],
-                stdout=subprocess.PIPE,
-                shell=False
+            ['column', '-s,', '-t', f'{constants.SOURCE_CSV}'],
+            stdout=subprocess.PIPE,
+            shell=False
         )
         less = subprocess.Popen(
-                ['less', '-#2', '-N', '-S'],
-                stdin=column.stdout,
-                stdout=subprocess.PIPE
+            ['less', '-#2', '-N', '-S'],
+            stdin=column.stdout,
+            stdout=subprocess.PIPE
         )
         column.stdout.close()
         gum = subprocess.Popen(
-                ['./gum', 'filter'],
-                stdin=less.stdout,
-                stdout=subprocess.PIPE
+            ['./gum', 'filter'],
+            stdin=less.stdout,
+            stdout=subprocess.PIPE
         )
         less.stdout.close()
         output = gum.communicate()[0].decode('utf-8')
         echo_output = subprocess.Popen(
-                ['echo', f'{output}'],
-                stdout=subprocess.PIPE
+            ['echo', f'{output}'],
+            stdout=subprocess.PIPE
         )
         awk_check = subprocess.Popen(
-                ['awk', '-F', '[[:space:]][[:space:]]+', '{print $1}'],
-                stdin=echo_output.stdout,
-                stdout=subprocess.PIPE
+            ['awk', '-F', '[[:space:]][[:space:]]+', '{print $1}'],
+            stdin=echo_output.stdout,
+            stdout=subprocess.PIPE
         )
         echo_output.stdout.close()
         check_out = awk_check.communicate()[0].decode('utf-8').strip()
@@ -254,7 +260,7 @@ def edit():
         print(df)
         print(f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
         terminal_width = get_terminal_width()
-        if terminal_width == None: 
+        if terminal_width == None:
             terminal_width = 80
         # Ask user to choose one row (show complete row)
         dup_companies = []
@@ -274,7 +280,9 @@ def edit():
         )
         company_row.stdout.close()
         position_output = position.communicate()[0].decode('utf-8').strip()
-        intermidiate_index = df.index[df['Position'] == position_output].tolist()[0]
+        intermidiate_index = df.index[
+            df['Position'] == position_output
+        ].tolist()[0]
         df = df.loc[df['Position'] == position_output]
         original_index = original_index + intermidiate_index - 1
     elif len(df.index) == 0:
@@ -282,6 +290,24 @@ def edit():
         return
     # print(original_df.iloc[[original_index]])
     old_df = df.copy()
+    # Ask user if they want to update or delete the entry
+    print("What do you want to do?")
+    update_choice = filter(subprocess.run(
+        [*constants.GUM_CHOOSE] + ["Update", "Delete"],
+        stdout=subprocess.PIPE,
+        shell=False
+    ))
+    if update_choice == "Update":
+        update(df, original_df, original_index, old_df)
+    elif update_choice == "Delete":
+        delete(df, original_df, original_index)
+
+
+def delete(df, original_df, original_index):
+    print("Confirm deletion?")
+
+
+def update(df, original_df, original_index, old_df):
     # Ask user if they want to update the status or any other column
     print("What do you want to update?")
     update_choice = filter(subprocess.run(
@@ -293,7 +319,7 @@ def edit():
         print("Choose new status:")
         current_status = filter(subprocess.run(
             [*constants.GUM_CHOOSE] + [constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
-                constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
+                                       constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -307,7 +333,8 @@ def edit():
         ))
         # Ask user for new value
         new_value = filter(subprocess.run(
-            ["./gum", "input", "--placeholder", f"Input new {column_choice}"],
+            [*constants.GUM_INPUT_W_PLACEHOLDER] +
+            [f"Input new {column_choice}"],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -332,12 +359,16 @@ def edit():
     print(f'{constants.OKGREEN}New entry:{constants.ENDC}')
     print(df)
 
+
 def bkp():
     if not bkp_flag:
-        raise Exception("Backup process flag was not passed. Invalid operation.")
+        raise Exception(
+            "Backup process flag was not passed. Invalid operation.")
+
 
 def quit():
     print("Quitting...")
+
 
 if __name__ == "__main__":
     # Check if bkp flag is set
