@@ -258,7 +258,8 @@ def edit():
     # If there are multiple rows, ask user to choose one
     if len(df.index) > 1:
         print(df)
-        print(f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
+        print(
+            f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
         terminal_width = get_terminal_width()
         if terminal_width == None:
             terminal_width = 80
@@ -318,8 +319,9 @@ def update(df, original_df, original_index, old_df):
     if update_choice == "Status":
         print("Choose new status:")
         current_status = filter(subprocess.run(
-            [*constants.GUM_CHOOSE] + [constants.STATUS_INIT, constants.STATUS_ASSESSMENT,
-                                       constants.STATUS_INTERVIEW, constants.STATUS_OFFER, constants.STATUS_REJECTED],
+            [*constants.GUM_CHOOSE] +
+            [constants.STATUS_INIT, constants.STATUS_ASSESSMENT, constants.STATUS_INTERVIEW,
+                constants.STATUS_OFFER, constants.STATUS_REJECTED],
             stdout=subprocess.PIPE,
             shell=False
         ))
@@ -362,8 +364,7 @@ def update(df, original_df, original_index, old_df):
 
 def bkp():
     if not bkp_flag:
-        raise Exception(
-            "Backup process flag was not passed. Invalid operation.")
+        raise Exception("Backup process flag was not passed. Invalid operation.")
 
 
 def quit():
