@@ -389,7 +389,8 @@ def print_to_file():
     # bat the file without wrapping
     print(f'{constants.OKGREEN}Written to file successfully!{constants.ENDC}')
     print(f'{constants.OKGREEN}Here is a file preview:{constants.ENDC}')
-    system('sleep 2')
+    # Bad way to run commands, but bat doesn't work with subprocess
+    system('sleep 1')
     system('bat --wrap=never --color=never output.tmp')
 
 
