@@ -74,30 +74,22 @@ def menu_choice(choice):
 
 
 def view():
-    try:
-        df = pd.read_csv(constants.SOURCE_CSV)
-    except Exception as e:
-        print(e)
+    if os.path.isfile(constants.SOURCE_CSV) == False:
+        print("Source CSV file does not exist. Please add a job entry first.")
         return
-    print(df)
-
-    print("Do you want to sort by a column?")
+    df = pd.read_csv(constants.SOURCE_CSV)
+    # Have a default sort option 
+    choices = ["Default"] + constants.COLUMN_NAMES
     sort_choice = filter(subprocess.run(
-        [*constants.GUM_CHOOSE] + ["Yes", "No"],
+        [*constants.GUM_CHOOSE] + [*choices],
         stdout=subprocess.PIPE,
         shell=False
     ))
-    if sort_choice == "Yes":
-        sort_choice = filter(subprocess.run(
-            [*constants.GUM_CHOOSE] + constants.COLUMN_NAMES,
-            stdout=subprocess.PIPE,
-            shell=False
-        ))
-    else:
-        return
-    # Sort dataframe by column
-    df = df.sort_values(by=[sort_choice])
-    print(df)
+    if sort_choice != "Default":
+        # Sort dataframe
+        df = df.sort_values(by=[sort_choice])
+    # Print dataframe
+    file_preview(df)
 
 
 def add():
@@ -382,7 +374,11 @@ def print_to_file():
         return
     df = pd.read_csv(constants.SOURCE_CSV)
     print("Printing to file...")
-    with open('output.tmp', 'w') as outF:
+    file_preview(df, ptf_flag=True)
+
+
+def file_preview(df, ptf_flag=False):
+    with open ('output.tmp', 'w') as outF:
         df_string = df.to_string(header=True, index=False)
         outF.write(df_string)
     outF.close()
@@ -392,7 +388,22 @@ def print_to_file():
     # Bad way to run commands, but bat doesn't work with subprocess
     system('sleep 1')
     system('bat --wrap=never --color=never output.tmp')
-
+    if not ptf_flag:
+        # Ask user if they want to delete the file
+        print("Do you want to delete the tmp file? If not, it will be renamed with a timestamp.")
+        choice = filter(subprocess.run(
+            [*constants.GUM_CHOOSE] + ["Yes", "No"],
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
+    if choice == "Yes":
+        os.remove('output.tmp')
+        print("File deleted!")
+    elif ptf_flag or choice == "No":
+        # Change file name with format job_applications_<timestamp>.preview
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        os.rename('output.tmp', f'job_applications_{timestamp}.preview')
+        print(f'File renamed to job_applications_{timestamp}.preview') 
 
 def quit():
     print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')

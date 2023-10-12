@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make a temporary alias for echo
 alias cecho="./echo.sh"
@@ -114,7 +114,10 @@ for arg in "$@"; do
     -c | --clean)
         echo "Cleaning up..."
         echo "Removing cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
-        rm -rf cache bkp/pid bkp/logs bkp/bkp.out bkp
+        rm -rf cache bkp/pid bkp/logs bkp/bkp.out bkp 
+        echo "Removing preview files..."
+        # Delete any preview files with the .preview extension
+        find . -type f -name "*.preview" -delete
         echo
         ARGFLAG=3
         ;;
