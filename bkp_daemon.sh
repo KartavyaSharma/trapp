@@ -1,18 +1,33 @@
 #!/bin/bash
 
+# Define the daemon name.
 daemonName="TRAPP-DAEMON"
 
+# Define pid and log directories
 pidDir="./bkp/pid"
 pidFile="$pidDir/$daemonName.pid"
 
 logDir="./bkp/logs"
+
 # To use a regular log file.
 logFile="$logDir/$daemonName.log"
 
 # Log maxsize in KB
 logMaxSize=1024 # 1mb
-
 runInterval=20 # In seconds
+
+# TODO: In the future, add support to backup to S3 or Google Drive
+# Define variables for remote backup here
+
+# Define local directory to backup
+trapp_local="${TRAPP_LOCAL:-$HOME/.trapp}"
+trapp_local_dir="bkp"
+trapp_local_path="$trapp_local/$trapp_local_dir"
+
+# Define backup filename bkp-YYYY-MM-DD-HH-MM-SS.csv
+trapp_bkp_file="bkp-$(date +"%Y-%m-%d-%H-%M-%S").csv"
+# Define csv to tar filename <trapp_bkp_file>.tar.gz
+trapp_tar_file="$trapp_bkp_file.tar.gz"
 
 doCommands() {
     # This is where you put all the commands for the daemon.
@@ -20,6 +35,12 @@ doCommands() {
 }
 
 myPid=$$
+
+initDaemon() {
+    # Run through the init script.
+    cecho -c green -t "Starting init script..."
+    python3 init.py # TODO
+}
 
 setupDaemon() {
     # Make sure that the directories work.
@@ -182,8 +203,11 @@ status)
 restart)
     restartDaemon
     ;;
+init)
+    initDaemon
+    ;;
 *)
-    echo -e "\033[31;5;148mError\033[0m: usage $0 { start | stop | restart | status }"
+    echo -e "\033[31;5;148mError\033[0m: usage $0 { start | stop | restart | status | init}"
     exit 1
     ;;
 esac

@@ -13,3 +13,4 @@ bkp
 **/*.csv
 **/*.tmp
 *.tar.gz.*
+*.preview
