@@ -95,6 +95,7 @@ if ! command -v ./$bat_path &>/dev/null; then
         cecho -c yellow -t "Rust not found. Installing..."
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         cecho -c green -t "Rust installed!"
+        source $HOME/.cargo/env
     else
         cecho -c green -t "Rust found!"
     fi
