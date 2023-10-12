@@ -6,27 +6,11 @@ import subprocess
 import sys
 import validators
 
-from datetime import date
-from datetime import datetime
+from datetime import *
 from os import system
 
 global bkp_flag
 bkp_flag = False
-
-
-def filter(subprocess_output):
-    return subprocess_output.stdout.decode('utf-8').strip()
-
-
-def get_terminal_width():
-    try:
-        curses.setupterm()
-        size = curses.tigetnum("cols")
-        if size == None:
-            return None
-        return size
-    except curses.error:
-        return None
 
 
 def main():
@@ -48,7 +32,8 @@ def main():
         subprocess.run(
             ["echo", "Choose utility to run:"]
         )
-        cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.QUIT]
+        cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
+                                         constants.EDIT, constants.PRT, constants.QUIT]
         menuChoice = filter(subprocess.run(
             [constants.BKP] if bkp_flag else [*cmd],
             stdout=subprocess.PIPE,
@@ -78,7 +63,7 @@ def view():
         print("Source CSV file does not exist. Please add a job entry first.")
         return
     df = pd.read_csv(constants.SOURCE_CSV)
-    # Have a default sort option 
+    # Have a default sort option
     choices = ["Default"] + constants.COLUMN_NAMES
     sort_choice = filter(subprocess.run(
         [*constants.GUM_CHOOSE] + [*choices],
@@ -231,7 +216,7 @@ def edit():
             continue
         elif check_out is None:
             print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
-            continue 
+            continue
         else:
             success_flag = False
     # Get rows that match check_out
@@ -364,7 +349,8 @@ def update(df, original_df, original_index, old_df):
 
 def bkp():
     if not bkp_flag:
-        print(f'{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}')
+        print(
+            f'{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}')
         sys.exit(1)
 
 
@@ -377,8 +363,27 @@ def print_to_file():
     file_preview(df, ptf_flag=True)
 
 
+def quit():
+    print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')
+
+
+def filter(subprocess_output):
+    return subprocess_output.stdout.decode('utf-8').strip()
+
+
+def get_terminal_width():
+    try:
+        curses.setupterm()
+        size = curses.tigetnum("cols")
+        if size == None:
+            return None
+        return size
+    except curses.error:
+        return None
+
+
 def file_preview(df, ptf_flag=False):
-    with open ('output.tmp', 'w') as outF:
+    with open('output.tmp', 'w') as outF:
         df_string = df.to_string(header=True, index=False)
         outF.write(df_string)
     outF.close()
@@ -394,10 +399,7 @@ def file_preview(df, ptf_flag=False):
         # Change file name with format job_applications_<timestamp>.preview
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         os.rename('output.tmp', f'job_applications_{timestamp}.preview')
-        print(f'File renamed to job_applications_{timestamp}.preview') 
-
-def quit():
-    print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')
+        print(f'File renamed to job_applications_{timestamp}.preview')
 
 
 if __name__ == "__main__":

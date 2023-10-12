@@ -87,6 +87,7 @@ fi
 
 # Bat binary path
 bat_path="bat/bin/bat"
+bat_commit="fc95468" # Latest commit trapp is tested with
 # Check if sharkdp/bat is installed
 if ! command -v ./$bat_path &>/dev/null; then
     cecho -c yellow -t "sharkdp/bat was not found. Installing..."
@@ -101,8 +102,10 @@ if ! command -v ./$bat_path &>/dev/null; then
     fi
     # Pull bat from github 
     git clone https://github.com/sharkdp/bat.git
-    # Build bat
     cd bat
+    # Switch to stable commit
+    git reset --hard $bat_commit
+    # Build bat
     cargo install --root . --locked bat
     cd ..
     cecho -c green -t "Installed bat!"
