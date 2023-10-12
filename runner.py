@@ -389,17 +389,8 @@ def file_preview(df, ptf_flag=False):
     system('sleep 1')
     system(f'{constants.BAT} --wrap=never --color=never output.tmp')
     if not ptf_flag:
-        # Ask user if they want to delete the file
-        print("Do you want to delete the tmp file? If not, it will be renamed with a timestamp.")
-        choice = filter(subprocess.run(
-            [*constants.GUM_CHOOSE] + ["Yes", "No"],
-            stdout=subprocess.PIPE,
-            shell=False
-        ))
-    if choice == "Yes":
         os.remove('output.tmp')
-        print("File deleted!")
-    elif ptf_flag or choice == "No":
+    else:
         # Change file name with format job_applications_<timestamp>.preview
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         os.rename('output.tmp', f'job_applications_{timestamp}.preview')
