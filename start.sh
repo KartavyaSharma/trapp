@@ -67,7 +67,7 @@ if ! command -v ./gum &>/dev/null; then
     if test "${gum_binary_links["$arch"]+isset}"; then
         url="${gum_binary_links["$arch"]}"
     else
-        cecho -c red -t "Invalid architecture: $arch. trapp is only supported on Darwin and Linux x86_64 and arm64."
+        cecho -c red -t "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
         return
     fi
     cecho -c yellow -t "Fetching gum binary..."
@@ -81,8 +81,30 @@ else
     if ! test -d "cache"; then
         cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
     else
-        cecho -c green -t "Gum library detected. Onward!"
+        cecho -c green -t "Gum library detected"
     fi
+fi
+
+# Bat binary path
+bat_path="bat/bin/bat"
+# Check if sharkdp/bat is installed
+if ! command -v ./$bat_path &>/dev/null; then
+    cecho -c yellow -t "sharkdp/bat was not found. Installing..."
+    # Check if system has rust installed
+    if ! command -v rustc &>/dev/null; then
+        cecho -c yellow -t "Rust not found. Installing..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        cecho -c green -t "Rust installed!"
+    else
+        cecho -c green -t "Rust found!"
+    fi
+    # Pull bat from github 
+    git clone https://github.com/sharkdp/bat.git
+    # Build bat
+    cd bat
+    cargo install --root . --locked bat
+    cd ..
+    cecho -c green -t "Installed bat!"
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
@@ -164,5 +186,13 @@ elif [ $ARGFLAG -eq 1 ]; then
     echo "You can view any daemon output in ./bkp/bkp.out"
     echo "=========================="
 fi
+# Unset all variables
+unset arch
+unset bat_path
+unset gum_binary_links
+unset url
+unset ARGFLAG
+# Exit program
 cecho -c green -t "Program exited. Deactivating virtual environment..."
+unalias cecho
 deactivate

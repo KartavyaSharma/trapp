@@ -6,6 +6,7 @@ gum
 pid
 logs
 bkp
+bat
 
 **/*.pid
 **/*.log

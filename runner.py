@@ -387,7 +387,7 @@ def file_preview(df, ptf_flag=False):
     print(f'{constants.OKGREEN}Here is a file preview:{constants.ENDC}')
     # Bad way to run commands, but bat doesn't work with subprocess
     system('sleep 1')
-    system('bat --wrap=never --color=never output.tmp')
+    system(f'{constants.BAT} --wrap=never --color=never output.tmp')
     if not ptf_flag:
         # Ask user if they want to delete the file
         print("Do you want to delete the tmp file? If not, it will be renamed with a timestamp.")
