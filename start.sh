@@ -93,7 +93,7 @@ if ! command -v ./$bat_path &>/dev/null; then
     cecho -c yellow -t "sharkdp/bat was not found. Installing..."
     # Check if system has rust installed
     if ! command -v rustc &>/dev/null; then
-        cecho -c yellow -t "Rust not found. Installing..."
+        cecho -c yellow -t "Rust not found. Trapp requires rust to work. Installing..."
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         cecho -c green -t "Rust installed!"
         source $HOME/.cargo/env
@@ -144,6 +144,11 @@ for arg in "$@"; do
         echo "Removing preview files..."
         # Delete any preview files with the .preview extension
         find . -type f -name "*.preview" -delete
+        # Removing all dependencies
+        echo "Removing dependencies..."
+        rm -rf env
+        rm -rf bat
+        rm gum
         echo
         ARGFLAG=3
         ;;
