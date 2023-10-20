@@ -53,6 +53,8 @@ ENDC = '\033[0m'
 GUM_CHOOSE = ['./gum', 'choose']
 GUM_INPUT_W_PLACEHOLDER = ['./gum', 'input', '--placeholder']
 BAT = "./bat/bin/bat"
+YN = [*GUM_CHOOSE] + ['YES', 'NO']
+NY = [*GUM_CHOOSE] + ['NO', 'YES']
 
 ##### Display Constants #####
 MAX_COL_WIDTH = 40

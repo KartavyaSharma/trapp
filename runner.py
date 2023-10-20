@@ -38,10 +38,10 @@ def main():
             [constants.BKP] if bkp_flag else [*cmd],
             stdout=subprocess.PIPE,
         ))
+        menu_choice(constants.CHOICE_MAP[menuChoice])()
     except Exception as e:
         print(e)
         return
-    menu_choice(constants.CHOICE_MAP[menuChoice])()
 
 
 # Switch case for menu choice
@@ -63,16 +63,25 @@ def view():
         print("Source CSV file does not exist. Please add a job entry first.")
         return
     df = pd.read_csv(constants.SOURCE_CSV)
-    # Have a default sort option
-    choices = ["Default"] + constants.COLUMN_NAMES
+    # Ask user if they want to sort by column
+    print("Do you want to sort output by a column?")
+    print(f"Possible columns: {[*constants.COLUMN_NAMES]}")
     sort_choice = filter(subprocess.run(
-        [*constants.GUM_CHOOSE] + [*choices],
+        [*constants.NY],
         stdout=subprocess.PIPE,
         shell=False
     ))
-    if sort_choice != "Default":
+    # Have a default sort option
+    if sort_choice == "Yes":
+        print(f"{constants.OKGREEN}Choose option to sort by a specific column, if any. Otherwise, select `default`.{constants.ENDC}")
+        choices = constants.COLUMN_NAMES
+        sort_column = filter(subprocess.run(
+            [*constants.GUM_CHOOSE] + [*choices],
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
         # Sort dataframe
-        df = df.sort_values(by=[sort_choice])
+        df = df.sort_values(by=[sort_column])
     # Print dataframe
     file_preview(df)
 
@@ -203,7 +212,7 @@ def edit():
             print(f'{constants.FAIL}You cannot edit a column header!{constants.ENDC}')
             print('Do you want to try again?')
             retry_choice = filter(subprocess.run(
-                [*constants.GUM_CHOOSE] + ["Yes", "No"],
+                [*constants.YN],
                 stdout=subprocess.PIPE,
                 shell=False
             ))
@@ -278,7 +287,7 @@ def edit():
 def delete(df, original_df, original_index):
     print("Confirm deletion?")
     delete_choice = filter(subprocess.run(
-        [*constants.GUM_CHOOSE] + ["Yes", "No"],
+        [*constants.YN],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -329,7 +338,7 @@ def update(df, original_df, original_index, old_df):
     # Confirm changes
     print("Confirm changes?")
     confirm_choice = filter(subprocess.run(
-        [*constants.GUM_CHOOSE] + ["Yes", "No"],
+        [*constants.YN],
         stdout=subprocess.PIPE,
         shell=False
     ))
@@ -352,6 +361,7 @@ def bkp():
         print(
             f'{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}')
         sys.exit(1)
+    print("Placeholder backup function. TODO")
 
 
 def print_to_file():

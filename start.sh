@@ -122,7 +122,7 @@ ARGFLAG=0
 for arg in "$@"; do
     case $arg in
     -b | --wbkp)
-        echo "Running program..."
+        echo "Running program with backup option..."
         python3 runner.py wbkp
         ARGFLAG=1
         ;;
