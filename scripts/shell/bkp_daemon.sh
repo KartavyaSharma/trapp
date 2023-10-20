@@ -38,7 +38,7 @@ myPid=$$
 
 initDaemon() {
     # Run through the init script.
-    cecho -c green -t "Starting init script..."
+    ./echo.sh -c green -t "Starting init script..."
     python3 init.py # TODO
 }
 

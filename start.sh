@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Make a temporary alias for echo
-alias cecho="./echo.sh"
+alias cecho="./scripts/shell/echo.sh"
 
 # Check system architecture
 arch=$(uname -s)
@@ -60,7 +60,7 @@ else
 fi
 
 # Check if gum is installed
-if ! command -v ./gum &>/dev/null; then
+if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
     echo "Determining system architecture..."
     arch=$(uname -s -m)
@@ -71,12 +71,14 @@ if ! command -v ./gum &>/dev/null; then
         return
     fi
     cecho -c yellow -t "Fetching gum binary..."
+    mkdir bin && cd bin
     wget "$url"
     tar -xzf $(basename "$url") gum
     chmod +x $(basename "$url")
     cecho -c green -t "Installed gum!"
     echo "Cleaning up..."
     rm $(basename "$url")
+    cd ..
 else
     if ! test -d "cache"; then
         cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
@@ -86,7 +88,7 @@ else
 fi
 
 # Bat binary path
-bat_path="bat/bin/bat"
+bat_path="bin/bat/bin/bat"
 bat_commit="fc95468" # Latest commit trapp is tested with
 # Check if sharkdp/bat is installed
 if ! command -v ./$bat_path &>/dev/null; then
@@ -106,7 +108,8 @@ if ! command -v ./$bat_path &>/dev/null; then
     # Switch to stable commit
     git reset --hard $bat_commit
     # Build bat
-    cargo install --root . --locked bat
+    mkdir ../bin/bat
+    cargo install --root ../bin/bat --locked bat
     cd ..
     cecho -c green -t "Installed bat!"
 fi
@@ -147,25 +150,25 @@ for arg in "$@"; do
         # Removing all dependencies
         echo "Removing dependencies..."
         rm -rf env
+        rm -rf bin
         rm -rf bat
-        rm gum
         echo
         ARGFLAG=3
         ;;
     -s | --stop)
-        ./bkp_daemon.sh stop
+        ./scripts/shell/bkp_daemon.sh stop
         ARGFLAG=4
         ;;
     -r | --restart)
         # Stop and start daemon
-        ./bkp_daemon.sh stop
+        ./scripts/shell/bkp_daemon.sh stop
         # Start daemon as a background process
         cecho -c green -t "Starting backup daemon..."
-        nohup ./bkp_daemon.sh start > bkp/bkp.out &
+        nohup ./scripts/shell/bkp_daemon.sh start > bkp/bkp.out &
         ARGFLAG=5
         ;;
     -t | --test)
-        ./bkp_daemon.sh status
+        ./scripts/shell/bkp_daemon.sh status
         ARGFLAG=6
         ;;
     *)
@@ -178,14 +181,14 @@ if [ $ARGFLAG -eq 0 ]; then
     cecho -c green -t "Running program..."
     python3 runner.py
 elif [ $ARGFLAG -eq 1 ]; then
-    chmod +x ./bkp_daemon.sh
+    chmod +x ./scripts/shell/bkp_daemon.sh
     echo "=========================="
     echo "Starting backup daemon..."
     if ! test -d "bkp"; then
         cecho -c yellow -t "Creating bkp directory..."
         mkdir bkp
     fi
-    nohup ./bkp_daemon.sh start > bkp/bkp.out &
+    nohup ./scripts/shell/bkp_daemon.sh start > bkp/bkp.out &
     cecho -c green -t "Backup daemon started!"
     echo
     echo "Usage: ./start.sh [OPTION]"

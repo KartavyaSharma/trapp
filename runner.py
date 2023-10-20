@@ -1,4 +1,4 @@
-import constants
+import constants.constants as constants
 import curses
 import os
 import pandas as pd
@@ -191,7 +191,7 @@ def edit():
         )
         column.stdout.close()
         gum = subprocess.Popen(
-            ['./gum', 'filter'],
+            [*constants.GUM_FILTER],
             stdin=less.stdout,
             stdout=subprocess.PIPE
         )
