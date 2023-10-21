@@ -85,3 +85,14 @@ REDIS_CONTAINER_NAME = "redis-trapp"
 REDIS_DATA_DIR = f"{REDIS_CONTAINER_NAME}-data"
 REDIS_LOG_FILE = f"{PROJECT_ROOT}/logs/redis.log"
 REDIS_STATUS_TMP = f"{PROJECT_ROOT}/logs/redis_status.tmp"
+
+#### Chrome Driver Constants ####
+CHROME_DRIVER_VERSIONS_JSON = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
+CHROME_DRIVER_VERSIONS_CACHE = f"{PROJECT_ROOT}/cache/chrome_driver_versions.json"
+
+#### System Constants ####
+CHROME_DRIVER_SYSTEM_ARCH_MAP = {
+    "Darwin arm64": "mac-arm64",
+    "Darwin x86_64": "mac-x64",
+    "Linux x86_64": "linux64",
+}

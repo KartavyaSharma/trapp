@@ -219,6 +219,15 @@ else
     return
 fi
 
+# Check if chrome-driver is installed in bin/chrome-driver
+if [ -d "bin/chrome-driver" ]; then
+    cecho -c green -t "Chrome driver found!"
+else
+    cecho -c yellow -t "Chrome driver not found. Installing..."
+    mkdir bin/chrome-driver
+    python3 scripts/utils/install_chrome_driver.py
+fi
+
 # Set a flag so that the "WOW, ..." print does not run every time.
 if ! test -d "cache"; then
     echo "Creating cache file..."
