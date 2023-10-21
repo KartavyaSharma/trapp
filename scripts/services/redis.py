@@ -32,7 +32,7 @@ class RedisService:
         Flush Redis database
         """
         # Make sure Redis is running
-        if not self.status():
+        if not RedisService.status():
             raise Exception("Redis is not running")
         with open(f"{constants.REDIS_LOG_FILE}", "a") as log:
             subprocess.call(f"docker exec \
