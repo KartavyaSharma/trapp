@@ -9,39 +9,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
 
-class ScraperBuilder:
-
-    def __init__(self, options: Options = None):
-        """
-        @param options: Options to pass to Chrome driver
-        """
-        self.options = options if options else Options()
-        self.engine = None
-
-    def setup_options(self, default=True, opts: list[str] = []) -> None:
-        """
-        @param default: Whether to use default options
-        @param opts: List of options to add to Chrome driver
-        """    
-        opts = opts if not default else [*constants.CHROME_DRIVER_DEFAULT_OPTS]
-        for arg in opts:
-            self.options.add_argument(arg)
-
-    def build(self, opts: list[str] = []) -> webdriver.Chrome:
-        """
-        @param opts: List of options to add to Chrome driver
-        """
-        self.setup_options(default=not bool(opts), opts=opts)
-        self.engine = ScraperEngine(self.options)
-        return self.engine.create_driver()
-    
-    @staticmethod
-    def run(driver: webdriver.Chrome, url: str, config: any = None) -> None:
-        """
-        @param config: Configuration object for scraper (cookies etc.)
-        """
-        driver.get(url)
-
 class ScraperEngine:
 
     def __init__(self, options: Options, driver: webdriver.Chrome = None):
@@ -67,12 +34,53 @@ class ScraperEngine:
             )
         return self.driver
 
+    def run(self, url: str, config: any = None) -> None:
+        """
+        @param config: Configuration object for scraper (cookies etc.)
+        """
+        self.driver.get(url)
+
+
+class ScraperBuilder:
+
+    def setup_options(self, default=True, opts: list[str] = [], user_opts: Options = None) -> Options:
+        """
+        @param default: Whether to use default options
+        @param opts: List of options to add to Chrome driver
+        """
+        if user_opts:
+            return user_opts
+        options = Options() 
+        opts = opts if not default else [*constants.CHROME_DRIVER_DEFAULT_OPTS]
+        if opts != constants.CHROME_DRIVER_NO_HEADLESS_OPTS:
+            for arg in opts:
+                options.add_argument(arg)
+        return options
+
+    def build(self, opts: list[str] = []) -> ScraperEngine:
+        """
+        @param opts: List of options to add to Chrome driver
+        """
+        options = self.setup_options(default=not bool(opts), opts=opts)
+        engine = ScraperEngine(options)
+        engine.create_driver()
+        return engine
+
 
 class ConfigurationBuilder:
     pass
 
 
 def main(url: str) -> pandas.DataFrame:
+    # Build scraper
     builder = ScraperBuilder()
-    # Run scraper
-    ScraperBuilder.run(builder.build(), url)
+    scraper = builder.build()  # Build scraper
+    scraper.run(url)  # Run scraper
+    # Build no headless scraper
+    scraper_no_headless = builder.build(opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS)
+    scraper_no_headless.run(url)  # Run scraper
+    # Build incognito scraper
+    scraper_incognito = builder.build(opts=["--incognito"])
+    scraper_incognito.run(url)  # Run scraper
+
+    
