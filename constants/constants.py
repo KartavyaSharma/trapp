@@ -98,3 +98,4 @@ CHROME_DRIVER_SYSTEM_ARCH_MAP = {
 }
 
 CHROME_DRIVER_EXECUTABLE = f"{PROJECT_ROOT}/bin/chrome-driver/chromedriver-{CHROME_DRIVER_SYSTEM_ARCH_MAP[f'{os.uname().sysname} {os.uname().machine}']}/chromedriver"
+CHROME_DRIVER_DEFAULT_OPTS = ["--headless"]

@@ -1,4 +1,3 @@
-import constants.constants as constants
 import httpx
 import json
 import os
@@ -6,12 +5,15 @@ import pathlib
 import subprocess
 import sys
 
+import constants.constants as constants
+
 # Make constants accessible to utils
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../../")
 
 # Determine system architecture
 system_arch = subprocess.check_output(
-    "uname -sm", shell=True).decode("utf-8").strip()
+    "uname -sm", shell=True
+).decode("utf-8").strip()
 # Get chrome-driver system architecture identifier using system_arch
 system_arch_identifier = constants.CHROME_DRIVER_SYSTEM_ARCH_MAP[system_arch]
 
@@ -24,24 +26,16 @@ def set_chrome_driver_cache(versions_json: any = None, version_root: str = None)
         with open(constants.CHROME_DRIVER_VERSIONS_CACHE, "w") as cache:
             cache.write(json.dumps(empty_cache))
     else:
-        print(
-            f"Setting cache file with timestamp {versions_json['timestamp']}...")
-        possible_versions = [
-            v['version'] for v in versions_json['versions'] if v['version'].startswith(version_root)]
-        highest_version_suffix = sorted(
-            [int(v.split('.')[-1]) for v in possible_versions])[-1]
+        print(f"Setting cache file with timestamp {versions_json['timestamp']}...")
+        possible_versions = [v['version'] for v in versions_json['versions'] if v['version'].startswith(version_root)]
+        highest_version_suffix = sorted([int(v.split('.')[-1]) for v in possible_versions])[-1]
         resolved_version = f"{version_root}.{highest_version_suffix}"
-        print(
-            f"Setting cache file with chrome-driver version {resolved_version}...")
+        print(f"Setting cache file with chrome-driver version {resolved_version}...")
         # Get chrome-driver url
-        target_version_object = [v for v in versions_json['versions']
-                                 if v['version'] == resolved_version][0]['downloads']['chromedriver']
-        target_version_url = [
-            v for v in target_version_object if v['platform'] == system_arch_identifier][0]['url']
-        print(
-            f"Setting cache file with chrome-driver url {target_version_url}...")
-        constructed_cache = {
-            "timestamp": versions_json['timestamp'], "url": target_version_url}
+        target_version_object = [v for v in versions_json['versions'] if v['version'] == resolved_version][0]['downloads']['chromedriver']
+        target_version_url = [v for v in target_version_object if v['platform'] == system_arch_identifier][0]['url']
+        print(f"Setting cache file with chrome-driver url {target_version_url}...")
+        constructed_cache = {"timestamp": versions_json['timestamp'], "url": target_version_url}
         # Overwrite cache file
         with open(constants.CHROME_DRIVER_VERSIONS_CACHE, "w") as cache:
             cache.write(json.dumps(constructed_cache))
@@ -76,19 +70,27 @@ def main():
     # Download chrome-driver using wget into bin/chrome-driver/
     print(f"Downloading chrome-driver from {url}...")
     subprocess.call(
-        f"wget -O {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip {url}", shell=True)
+        f"wget -O {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip {url}",
+        shell=True
+    )
     # Unzip chrome-driver
     print("Unzipping chrome-driver...")
     subprocess.call(
-        f"unzip {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip -d {constants.PROJECT_ROOT}/bin/chrome-driver/", shell=True)
+        f"unzip {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip -d {constants.PROJECT_ROOT}/bin/chrome-driver/", 
+        shell=True
+    )
     # Remove chrome-driver.zip
     print("Removing chrome-driver.zip...")
     subprocess.call(
-        f"rm {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip", shell=True)
+        f"rm {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip",
+        shell=True
+    )
     # Make chrome-driver executable
     print("Making chrome-driver executable...")
     subprocess.call(
-        f"chmod +x {constants.PROJECT_ROOT}/bin/chrome-driver/chromedriver-{system_arch_identifier}", shell=True)
+        f"chmod +x {constants.PROJECT_ROOT}/bin/chrome-driver/chromedriver-{system_arch_identifier}",
+        shell=True
+    )
 
 
 if __name__ == '__main__':
