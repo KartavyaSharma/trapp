@@ -89,7 +89,7 @@ REDIS_STATUS_TMP = f"{PROJECT_ROOT}/logs/redis_status.tmp"
 
 #### Chrome Driver Constants ####
 CHROME_DRIVER_VERSIONS_JSON = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
-CHROME_DRIVER_VERSIONS_CACHE = f"{PROJECT_ROOT}/cache/chrome_driver_versions.json"
+CHROME_DRIVER_VERSIONS_CACHE = f"{PROJECT_ROOT}/.cache/chrome_driver_versions.json"
 
 CHROME_DRIVER_SYSTEM_ARCH_MAP = {
     "Darwin arm64": "mac-arm64",
@@ -98,5 +98,9 @@ CHROME_DRIVER_SYSTEM_ARCH_MAP = {
 }
 
 CHROME_DRIVER_EXECUTABLE = f"{PROJECT_ROOT}/bin/chrome-driver/chromedriver-{CHROME_DRIVER_SYSTEM_ARCH_MAP[f'{os.uname().sysname} {os.uname().machine}']}/chromedriver"
+
 CHROME_DRIVER_DEFAULT_OPTS = ["--headless"]
 CHROME_DRIVER_NO_HEADLESS_OPTS = ["--no-headless"]
+
+#### Vault Constants ####
+VAULT_PATH = f"{PROJECT_ROOT}/.vault"

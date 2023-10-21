@@ -1,6 +1,6 @@
 import pandas
 
-import scripts.services.auth as auth
+import scripts.services.vault as vault
 import constants.constants as constants
 
 from selenium import webdriver
@@ -82,5 +82,8 @@ def main(url: str) -> pandas.DataFrame:
     # Build incognito scraper
     scraper_incognito = builder.build(opts=["--incognito"])
     scraper_incognito.run(url)  # Run scraper
+    # Build maximized scraper
+    scraper_maximized = builder.build(opts=["--start-maximized"])
+    scraper_maximized.run(url)  # Run scraper
 
     

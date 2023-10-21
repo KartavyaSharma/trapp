@@ -115,7 +115,7 @@ if ! command -v ./bin/gum &>/dev/null; then
     find . ! -name 'gum' -name '.' -name '..' -type d -exec rm -rf {} +
     cd ..
 else
-    if ! test -d "cache"; then
+    if ! test -d ".cache"; then
         cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
     else
         cecho -c green -t "Gum library detected!"
@@ -123,9 +123,9 @@ else
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
-if ! test -d "cache"; then
+if ! test -d ".cache"; then
     echo "Creating cache file..."
-    mkdir cache && touch ./cache/gum.flag && echo "1" >>./cache/gum.flag
+    mkdir .cache && touch ./.cache/gum.flag && echo "1" >>./.cache/gum.flag
 fi
 
 # Bat binary path
@@ -274,8 +274,8 @@ for arg in "$@"; do
         ;;
     -c | --clean)
         echo "Cleaning up..."
-        echo "Removing cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
-        rm -rf cache bkp/pid bkp/logs bkp/bkp.out bkp 
+        echo "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
+        rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp 
         echo "Removing preview files..."
         # Delete any preview files with the .preview extension
         find . -type f -name "*.preview" -delete

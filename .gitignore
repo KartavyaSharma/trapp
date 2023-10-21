@@ -1,7 +1,6 @@
 .vscode
 __pycache__
 env
-cache
 gum
 pid
 logs
@@ -9,6 +8,7 @@ bkp
 bat
 bin
 .vault
+.cache
 
 **/*.pid
 **/*.log
