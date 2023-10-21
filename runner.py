@@ -34,8 +34,11 @@ def main():
         subprocess.run(
             ["echo", "Choose utility to run:"]
         )
-        cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
-                                         constants.EDIT, constants.PRT, constants.AUTO, constants.QUIT]
+        opts = [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.AUTO, constants.QUIT] if \
+            f"{os.uname().sysname} {os.uname().machine}" != "Linux arm64" else \
+            [constants.VIEW, constants.ADD, constants.EDIT,
+                constants.PRT, constants.QUIT]
+        cmd = [*constants.GUM_CHOOSE] + [*opts]
         menuChoice = filter(subprocess.run(
             [constants.BKP] if bkp_flag else [*cmd],
             stdout=subprocess.PIPE,
@@ -244,7 +247,8 @@ def edit():
     # If there are multiple rows, ask user to choose one
     if len(df.index) > 1:
         print(df)
-        print(f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
+        print(
+            f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
         terminal_width = get_terminal_width()
         if terminal_width == None:
             terminal_width = 80
@@ -403,6 +407,7 @@ def auto():
     except Exception as e:
         print(e)
         return
+
 
 def quit():
     print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')

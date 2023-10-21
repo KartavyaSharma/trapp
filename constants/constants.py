@@ -90,9 +90,11 @@ REDIS_STATUS_TMP = f"{PROJECT_ROOT}/logs/redis_status.tmp"
 #### Chrome Driver Constants ####
 CHROME_DRIVER_VERSIONS_JSON = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
 CHROME_DRIVER_VERSIONS_CACHE = f"{PROJECT_ROOT}/cache/chrome_driver_versions.json"
+
 CHROME_DRIVER_SYSTEM_ARCH_MAP = {
     "Darwin arm64": "mac-arm64",
     "Darwin x86_64": "mac-x64",
     "Linux x86_64": "linux64",
 }
+
 CHROME_DRIVER_EXECUTABLE = f"{PROJECT_ROOT}/bin/chrome-driver/chromedriver-{CHROME_DRIVER_SYSTEM_ARCH_MAP[f'{os.uname().sysname} {os.uname().machine}']}/chromedriver"

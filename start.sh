@@ -11,12 +11,14 @@ quit () {
     unset gum_binary_links
     unset url
     unset ARGFLAG
-    # Exit program
-    cecho -c green -t "Program exited. Deactivating virtual environment..."
     unalias cecho
     deactivate
     if [[ "$error" != "" ]]; then
+        cecho -c red -t "Program exited with error. Deactivating virtual environment..."
         cecho -c red -t "Error: $error"
+    else
+        # Exit program
+        cecho -c green -t "Program exited. Deactivating virtual environment..."
     fi
     return
 }
