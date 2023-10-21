@@ -1,5 +1,8 @@
 import pandas
+
 import scripts.services.auth as auth
+import constants.constants as constants
+
 
 class ScraperBuilder:
     pass
@@ -14,4 +17,4 @@ class ConfigurationBuilder:
 
 
 def main(url: str) -> pandas.DataFrame:
-    pass
+    print(constants.CHROME_DRIVER_EXECUTABLE)
