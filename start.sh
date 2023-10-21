@@ -3,6 +3,24 @@
 # Make a temporary alias for echo
 alias cecho="./scripts/shell/echo.sh"
 
+quit () {
+    error=$@
+    # Unset all variables
+    unset arch
+    unset bat_path
+    unset gum_binary_links
+    unset url
+    unset ARGFLAG
+    # Exit program
+    cecho -c green -t "Program exited. Deactivating virtual environment..."
+    unalias cecho
+    deactivate
+    if [[ "$error" != "" ]]; then
+        cecho -c red -t "Error: $error"
+    fi
+    return
+}
+
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
@@ -37,7 +55,8 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
             cecho -c green -t "Environment directory exists. Activating environment..."
             source ./env/bin/activate
         else
-            cecho -c red -t "$(env) folder exists, but activate file missing."
+            quit "$(env) folder exists, but activate file missing. Please delete the env folder and run ./start.sh again."
+            return
         fi
     else
         cecho -c yellow -t "Environment directory does not exist. Creating a new environment..."
@@ -53,7 +72,7 @@ fi
 output=$(python3 ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
     cecho -c red -t "Error: python3 ./tests/test_requirements.py failed with output^"
-    cecho -c red -t "Dependency requirements not satisfied. Installing dependencies..."
+    cecho -c yellow -t "Dependency requirements not satisfied. Installing dependencies..."
     pip3 install -r requirements.txt
 else
     cecho -c green -t "All dependencies are present!"
@@ -67,7 +86,7 @@ if ! command -v ./bin/gum &>/dev/null; then
     if test "${gum_binary_links["$arch"]+isset}"; then
         url="${gum_binary_links["$arch"]}"
     else
-        cecho -c red -t "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
         return
     fi
     cecho -c yellow -t "Fetching gum binary..."
@@ -83,7 +102,7 @@ else
     if ! test -d "cache"; then
         cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
     else
-        cecho -c green -t "Gum library detected"
+        cecho -c green -t "Gum library detected!"
     fi
 fi
 
@@ -117,8 +136,8 @@ fi
 # Check if docker is installed and running
 if ! (command -v docker) > /dev/null
 then
-    echo 'You must have docker installed before running this script! (See https://www.docker.com)' 1>&2
-    exit 1
+    quit "Docker was not found. Please install Docker to use trapp."
+    return
 fi
 
 colima_ver=v0.5.6
@@ -153,6 +172,51 @@ then
     colima start
 else
     cecho -c green -t "Docker runtime found!"
+fi
+
+# Check if Google Chrome is installed on system (only required for autofill)
+# Check if arch is linux
+arch=$(uname -s)
+if [[ "$arch" == "Linux" ]]; then
+    architecture=$(uname -m)
+    if ! (command -v google-chrome) > /dev/null
+    then
+        cecho -c yellow -t "Google Chrome was not found. Installing..."
+        # download binary
+        cd bin
+        mkdir chrome && cd chrome
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_${architecture}.deb
+        # install
+        sudo apt install ./google-chrome-stable_current_amd64.deb
+        # remove installer
+        rm google-chrome-stable_current_amd64.deb
+        cd ../..
+        # Make sure chrome is installed
+        chrome_ver=$(google-chrome --version)
+        if [[ "$chrome_ver" == "" ]];
+        then
+            # Ask user to install Google Chrome
+            cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
+        else
+            export TRAPP_CHROME_VER=$chrome_ver
+            cecho -c green -t "Chrome installed successfully!"
+        fi
+    else
+        cecho -c green -t "Google Chrome found!"
+    fi
+elif [[ "$arch" == "Darwin" ]]; then
+    chrome_ver=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version)
+    if [[ "$chrome_ver" == "" ]];
+    then
+        # Ask user to install Google Chrome
+        cecho -c yellow -t "Google Chrome was not found. Please install Google Chrome to use autofill."
+    else
+        export TRAPP_CHROME_VER=$chrome_ver
+        cecho -c green -t "Google Chrome found!"
+    fi
+else
+    quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+    return
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
@@ -213,7 +277,7 @@ for arg in "$@"; do
         ARGFLAG=6
         ;;
     *)
-        cecho -c red -t "Invalid option: $arg"
+        quit "Invalid option: $arg"
         return
         ;;
     esac
@@ -239,13 +303,5 @@ elif [ $ARGFLAG -eq 1 ]; then
     echo "You can view any daemon output in ./bkp/bkp.out"
     echo "=========================="
 fi
-# Unset all variables
-unset arch
-unset bat_path
-unset gum_binary_links
-unset url
-unset ARGFLAG
-# Exit program
-cecho -c green -t "Program exited. Deactivating virtual environment..."
-unalias cecho
-deactivate
+
+quit

@@ -15,14 +15,16 @@ class RedisService:
         Connect to redis through python client
         """
         # Check if Redis is running
-        if not self.status():
+        if not RedisService.status():
             raise Exception("Redis is not running")
+        # Return Redis client
         return redis.StrictRedis(
             host=constants.REDIS_HOST,
             port=constants.REDIS_PORT,
             db=0,
             password=self.password,
             errors="strict",
+            decode_responses=True
         )
 
     def flush(self) -> None:
@@ -36,7 +38,8 @@ class RedisService:
             subprocess.call(f"docker exec \
                             -it {constants.REDIS_CONTAINER_NAME} \
                             /bin/sh -c 'export REDISCLI_AUTH={self.password}; redis-cli flushall; unset REDISCLI_AUTH'",
-                            shell=True, stdout=log, stderr=log)
+                            shell=True, stdout=log, stderr=log
+                            )
 
     def stop(self) -> None:
         # Clear Redis database
@@ -44,10 +47,13 @@ class RedisService:
         # Stop Redis service, remove container and volume
         with open(f"{constants.REDIS_LOG_FILE}", "a") as log:
             subprocess.call(
-                f"docker rm -f {constants.REDIS_CONTAINER_NAME}", shell=True, stdout=log, stderr=log)
+                f"docker rm -f {constants.REDIS_CONTAINER_NAME}",
+                shell=True, stdout=log, stderr=log)
             subprocess.call(
-                f"docker volume rm {constants.REDIS_DATA_DIR}", shell=True, stdout=log, stderr=log)
+                f"docker volume rm {constants.REDIS_DATA_DIR}",
+                shell=True, stdout=log, stderr=log)
 
+    @staticmethod
     def init(password: str) -> None:
         """
         Start the Redis service through Docker
@@ -69,6 +75,7 @@ class RedisService:
                             redis:5.0.5-alpine3.9 /bin/sh -c 'redis-server --appendonly yes --requirepass {password}'",
                             shell=True, stdout=log, stderr=log)
 
+    @staticmethod
     def status() -> bool:
         """
         Check if Redis is running
