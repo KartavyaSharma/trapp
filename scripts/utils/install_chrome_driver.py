@@ -5,10 +5,11 @@ import pathlib
 import subprocess
 import sys
 
+# Make constants accessible to utils
+sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
+
 import constants.constants as constants
 
-# Make constants accessible to utils
-sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../../")
 
 # Determine system architecture
 system_arch = subprocess.check_output(
@@ -22,6 +23,7 @@ def set_chrome_driver_cache(versions_json: any = None, version_root: str = None)
     if not versions_json:
         # No cache file exists, create one
         print("No cache file exists, creating one...")
+        subprocess.call(f"touch {constants.CHROME_DRIVER_VERSIONS_CACHE}", shell=True)
         empty_cache = {"timestamp": "", "url": ""}
         with open(constants.CHROME_DRIVER_VERSIONS_CACHE, "w") as cache:
             cache.write(json.dumps(empty_cache))

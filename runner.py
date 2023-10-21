@@ -78,7 +78,7 @@ def view():
         shell=False
     ))
     # Have a default sort option
-    if sort_choice == "Yes":
+    if sort_choice == "YES":
         print(f"{constants.OKGREEN}Choose option to sort by a specific column, if any. Otherwise, select `default`.{constants.ENDC}")
         choices = constants.COLUMN_NAMES
         sort_column = filter(subprocess.run(

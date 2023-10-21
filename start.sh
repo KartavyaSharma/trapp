@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Make a temporary alias for echo
-alias cecho="./scripts/shell/echo.sh"
+alias cecho=$(realpath ./scripts/shell/echo.sh)
+# Make echo executable
+chmod +x ./scripts/shell/echo.sh
 
 quit () {
     error=$@
@@ -95,10 +97,12 @@ if ! command -v ./bin/gum &>/dev/null; then
     mkdir bin && cd bin
     wget "$url"
     tar -xzf $(basename "$url") gum
-    chmod +x $(basename "$url")
+    chmod 755 $(basename "$url" | awk -F'.' '{print $1}' | awk -F'_' '{print $1}')
     cecho -c green -t "Installed gum!"
     echo "Cleaning up..."
     rm $(basename "$url")
+    find . ! -name 'gum' -name '.' -name '..' -type f -exec rm -f {} +
+    find . ! -name 'gum' -name '.' -name '..' -type d -exec rm -rf {} +
     cd ..
 else
     if ! test -d "cache"; then
@@ -108,15 +112,22 @@ else
     fi
 fi
 
+# Set a flag so that the "WOW, ..." print does not run every time.
+if ! test -d "cache"; then
+    echo "Creating cache file..."
+    mkdir cache && touch ./cache/gum.flag && echo "1" >>./cache/gum.flag
+fi
+
 # Bat binary path
-bat_path="bin/bat/bin/bat"
+bat_path="./bin/bat/bin/bat"
 bat_commit="fc95468" # Latest commit trapp is tested with
 # Check if sharkdp/bat is installed
-if ! command -v ./$bat_path &>/dev/null; then
+if ! command -v $bat_path &>/dev/null; then
     cecho -c yellow -t "sharkdp/bat was not found. Installing..."
     # Check if system has rust installed
     if ! command -v rustc &>/dev/null; then
         cecho -c yellow -t "Rust not found. Trapp requires rust to work. Installing..."
+        sleep 3
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         cecho -c green -t "Rust installed!"
         source $HOME/.cargo/env
@@ -133,6 +144,8 @@ if ! command -v ./$bat_path &>/dev/null; then
     cargo install --root ../bin/bat --locked bat
     cd ..
     cecho -c green -t "Installed bat!"
+    echo "Cleaning up..."
+    rm -rf bat
 fi
 
 # Check if docker is installed and running
@@ -142,15 +155,14 @@ then
     return
 fi
 
-colima_ver=v0.5.6
+colima_ver="0.5.6"
 # Check if colima is installed
 if ! (command -v colima) > /dev/null
 then
     cecho -c yellow -t "colima was not found. Installing..."
     # download binary
-    mkidir bin/colima
-    cd bin/colima
-    curl -LO https://github.com/abiosoft/colima/releases/download/${colima_ver}/colima-$(uname)-$(uname -m)
+    mkdir bin/colima && cd bin/colima
+    curl -LO https://github.com/abiosoft/colima/releases/download/v$colima_ver/colima-$(uname)-$(uname -m)
     # if usr/local/bin requires sudo, prompt for password
     if [ -w "/usr/local/bin" ]
     then
@@ -163,6 +175,7 @@ then
         # install in $PATH
         sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
     fi
+    cd ..
 else
     cecho -c green -t "Colima found!"
 fi
@@ -185,9 +198,8 @@ if [[ "$arch" == "Linux" ]]; then
     then
         cecho -c yellow -t "Google Chrome was not found. Installing..."
         # download binary
-        cd bin
-        mkdir chrome && cd chrome
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_${architecture}.deb
+        mkdir bin/chrome && cd bin/chrome
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_$architecture.deb
         # install
         sudo apt install ./google-chrome-stable_current_amd64.deb
         # remove installer
@@ -228,12 +240,6 @@ else
     cecho -c yellow -t "Chrome driver not found. Installing..."
     mkdir bin/chrome-driver
     python3 scripts/utils/install_chrome_driver.py
-fi
-
-# Set a flag so that the "WOW, ..." print does not run every time.
-if ! test -d "cache"; then
-    echo "Creating cache file..."
-    mkdir cache && touch ./cache/gum.flag && echo "1" >>./cache/gum.flag
 fi
 
 echo
