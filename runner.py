@@ -149,7 +149,7 @@ def add():
             stdout=subprocess.PIPE,
             shell=False
         ))
-        if portal_link == "q":
+        if portal_link == "Q":
             quit()
         # Validate portal link
         if not validators.url(portal_link):
@@ -392,7 +392,7 @@ def auto():
             stdout=subprocess.PIPE,
             shell=False
         ))
-        if url == "q":
+        if url == "Q":
             quit()
         # Validate URL
         if not validators.url(url):

@@ -34,7 +34,7 @@ INPUT_DATE_APPLIED = "Input date applied (DD/MM/YYYY)"
 INPUT_PORTAL_LINK = "Input portal link"
 INPUT_NOTES = "Input notes"
 INPUT_JOB_POSTING_URL = "Input job posting URL"
-QUIT_INPUT = "Press q to quit"
+QUIT_INPUT = "Type Q to quit"
 
 ##### Status Constants #####
 STATUS_INIT = "Applied"

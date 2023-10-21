@@ -82,6 +82,16 @@ else
     cecho -c green -t "All dependencies are present!"
 fi
 
+# Check if wget2 is installed
+if ! (command -v wget) > /dev/null
+then
+    cecho -c red -t "wget was not found."
+    cecho -c yellow -t "Install wget using \`brew install wget\` on macOS or \`sudo apt-get install wget\` on Linux."
+    quit "wget was not found. Please install wget to use trapp."
+else
+    cecho -c green -t "wget found!"
+fi
+
 # Check if gum is installed
 if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
