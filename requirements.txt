@@ -2,6 +2,7 @@
 shellingham
 pandas
 validators
+redis[hiredis]
 
 ##### Requirements with Version Specifiers #####
 typer==0.9.0

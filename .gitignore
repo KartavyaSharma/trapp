@@ -8,7 +8,7 @@ logs
 bkp
 bat
 bin
-credentials
+.vault
 
 **/*.pid
 **/*.log

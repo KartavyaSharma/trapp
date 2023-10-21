@@ -114,6 +114,47 @@ if ! command -v ./$bat_path &>/dev/null; then
     cecho -c green -t "Installed bat!"
 fi
 
+# Check if docker is installed and running
+if ! (command -v docker) > /dev/null
+then
+    echo 'You must have docker installed before running this script! (See https://www.docker.com)' 1>&2
+    exit 1
+fi
+
+colima_ver=v0.5.6
+# Check if colima is installed
+if ! (command -v colima) > /dev/null
+then
+    cecho -c yellow -t "colima was not found. Installing..."
+    # download binary
+    mkidir bin/colima
+    cd bin/colima
+    curl -LO https://github.com/abiosoft/colima/releases/download/${colima_ver}/colima-$(uname)-$(uname -m)
+    # if usr/local/bin requires sudo, prompt for password
+    if [ -w "/usr/local/bin" ]
+    then
+        cecho -c yellow -t "Installing colima to /usr/local/bin..."
+        # install in $PATH
+        install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+    else
+        cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..." 
+        sleep 2
+        # install in $PATH
+        sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+    fi
+else
+    cecho -c green -t "Colima found!"
+fi
+
+if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]
+then
+    cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
+    # start colima
+    colima start
+else
+    cecho -c green -t "Docker runtime found!"
+fi
+
 # Set a flag so that the "WOW, ..." print does not run every time.
 if ! test -d "cache"; then
     echo "Creating cache file..."

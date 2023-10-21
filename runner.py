@@ -1,10 +1,12 @@
-import constants.constants as constants
 import curses
 import os
 import pandas as pd
 import subprocess
 import sys
 import validators
+
+import constants.constants as constants
+import scripts.services.scraper as scraper
 
 from datetime import *
 from os import system
@@ -33,7 +35,7 @@ def main():
             ["echo", "Choose utility to run:"]
         )
         cmd = [*constants.GUM_CHOOSE] + [constants.VIEW, constants.ADD,
-                                         constants.EDIT, constants.PRT, constants.QUIT]
+                                         constants.EDIT, constants.PRT, constants.AUTO, constants.QUIT]
         menuChoice = filter(subprocess.run(
             [constants.BKP] if bkp_flag else [*cmd],
             stdout=subprocess.PIPE,
@@ -52,6 +54,7 @@ def menu_choice(choice):
         'edit': edit,
         'quit': quit,
         'bkp': bkp,
+        'auto': auto,
         'print': print_to_file,
     }
     func = switcher.get(choice, lambda: "Invalid choice")
@@ -139,10 +142,12 @@ def add():
     while success_flag:
         portal_link = filter(subprocess.run(
             [*constants.GUM_INPUT_W_PLACEHOLDER] +
-            [constants.INPUT_PORTAL_LINK],
+            [constants.INPUT_PORTAL_LINK + f". {constants.QUIT_INPUT}"],
             stdout=subprocess.PIPE,
             shell=False
         ))
+        if portal_link == "q":
+            quit()
         # Validate portal link
         if not validators.url(portal_link):
             print("Invalid URL. Please try again.")
@@ -373,8 +378,35 @@ def print_to_file():
     file_preview(df, ptf_flag=True)
 
 
+def auto():
+    # Ask user for job posting URL
+    success_flag = True
+    while success_flag:
+        url = filter(subprocess.run(
+            [*constants.GUM_INPUT_W_PLACEHOLDER] +
+            [constants.INPUT_JOB_POSTING_URL + f". {constants.QUIT_INPUT}"],
+            stdout=subprocess.PIPE,
+            shell=False
+        ))
+        if url == "q":
+            quit()
+        # Validate URL
+        if not validators.url(url):
+            print("Invalid URL. Please try again.")
+            continue
+        else:
+            success_flag = False
+    # Run scraper module
+    print("Running scraper...")
+    try:
+        df_single_entry = scraper.main(url)
+    except Exception as e:
+        print(e)
+        return
+
 def quit():
     print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')
+    sys.exit(0)
 
 
 def filter(subprocess_output):

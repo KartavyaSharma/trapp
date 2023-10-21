@@ -1,4 +1,10 @@
+import pathlib
+
+#### Project Root ####
+PROJECT_ROOT = f"{pathlib.Path(__file__).parent.resolve()}/.."
+
 ##### Select Menu Constants #####
+AUTO = "Automatically generate entry from url"
 ADD = "Add new job application"
 EDIT = "Edit existing job application"
 VIEW = "View all job applications"
@@ -7,6 +13,7 @@ BKP = "Start Backup Daemon"
 PRT = "Print to file"
 
 CHOICE_MAP = {
+    "Automatically generate entry from url": "auto",
     "Add new job application": "add",
     "Edit existing job application": "edit",
     "View all job applications": "view",
@@ -25,6 +32,8 @@ INPUT_POSITION = "Input position"
 INPUT_DATE_APPLIED = "Input date applied (DD/MM/YYYY)"
 INPUT_PORTAL_LINK = "Input portal link"
 INPUT_NOTES = "Input notes"
+INPUT_JOB_POSTING_URL = "Input job posting URL"
+QUIT_INPUT = "Press q to quit"
 
 ##### Status Constants #####
 STATUS_INIT = "Applied"
@@ -61,3 +70,18 @@ NY = [*GUM_CHOOSE] + ['NO', 'YES']
 
 ##### Display Constants #####
 MAX_COL_WIDTH = 40
+
+#### Platform Constants ####
+LINKEDIN = "linkedin"
+HANDSHAKE = "handshake"
+
+#### Auth Constants ####
+VAULT_PATH = f"{PROJECT_ROOT}/.vault"
+
+#### Redis Constants ####
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_CONTAINER_NAME = "redis-trapp"
+REDIS_DATA_DIR = f"{REDIS_CONTAINER_NAME}-data"
+REDIS_LOG_FILE = f"{PROJECT_ROOT}/logs/redis.log"
+REDIS_STATUS_TMP = f"{PROJECT_ROOT}/logs/redis_status.tmp"
