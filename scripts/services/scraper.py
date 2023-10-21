@@ -1,4 +1,3 @@
-from typing import Any
 import pandas
 
 import scripts.services.auth as auth
@@ -7,6 +6,7 @@ import constants.constants as constants
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from typing import Any
 
 
 class ScraperEngine:
