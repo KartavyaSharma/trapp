@@ -25,14 +25,13 @@ class ScraperBuilder:
         """    
         opts = opts if not default else [*constants.CHROME_DRIVER_DEFAULT_OPTS]
         for arg in opts:
-            print(arg)
             self.options.add_argument(arg)
 
     def build(self, opts: list[str] = []) -> webdriver.Chrome:
         """
         @param opts: List of options to add to Chrome driver
         """
-        self.setup_options(default=bool(opts), opts=opts)
+        self.setup_options(default=not bool(opts), opts=opts)
         self.engine = ScraperEngine(self.options)
         return self.engine.create_driver()
     
