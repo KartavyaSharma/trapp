@@ -1,6 +1,5 @@
 import constants.constants as constants
 import multiprocessing
-import os
 import pandas as pd
 import pathlib
 import threading
@@ -23,7 +22,7 @@ class AutoService:
     thread_local = threading.local()
 
     @staticmethod
-    def run(url: str, result_queue: multiprocessing.Queue = None) -> pd.DataFrame:
+    def run(url: str) -> pd.DataFrame:
         """
         @param url: URL to scrape job application data from
         @param result_queue: Queue to store multiprocessing results in (optional)
@@ -35,7 +34,8 @@ class AutoService:
         # Define engines
         config = configuration_builder.build(url)
         scraper_engine_no_headless = scraper_builder.build(
-            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS)
+            # opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS
+        )
         # Run scraper
         scraper_engine_no_headless.run(config)
 
@@ -62,8 +62,6 @@ class AutoService:
         multiprocessing.log_to_stderr()
         # Define worker pool
         pool = LoggingPool(processes=min(len(urls), constants.MAX_WORKERS))
-        # Define result queue
-        # result_queue = Queue()
         # Get results
         results, final = [], []
         # Start worker functions

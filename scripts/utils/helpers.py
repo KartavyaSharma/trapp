@@ -1,5 +1,6 @@
 import multiprocessing
 import traceback
+import logging
 import re
 
 from . import logger
@@ -32,8 +33,7 @@ class LogExceptions(object):
         except Exception as e:
             # Here we add some debugging help. If multiprocessing's
             # debugging is on, it will arrange to log the traceback
-            log = logger.LoggerBuilder.build()
-            log.error(traceback.format_exc())
+            logger.LoggerBuilder.build(log_level=logging.ERROR).error(traceback.format_exc())
             LogExceptions.error(e)
             # Re-raise the original exception so the Pool worker can
             # clean up

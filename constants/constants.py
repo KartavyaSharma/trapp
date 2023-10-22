@@ -112,6 +112,7 @@ MAX_WORKERS = 4
 
 #### Logging Constants ####
 LOG_FILENAME = f"{PROJECT_ROOT}/logs/trapp.log"
+LOG_THREADED_FILENAME = f"{PROJECT_ROOT}/logs/trapp-threaded.log"
 LOG_TMP_FILENAME = f"{PROJECT_ROOT}/logs/run_error.log"
 LOG_FILEMODE = "a"
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
