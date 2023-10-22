@@ -420,6 +420,7 @@ def auto():
                 print("Running scraper...")
                 try:
                     df = AutoService.run(url)        
+                    file_preview(df)
                     break
                 except Exception as e:
                     print(e)

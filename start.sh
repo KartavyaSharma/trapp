@@ -262,6 +262,12 @@ else
     cecho -c yellow -t "Chrome driver not found. Installing..."
     mkdir bin/chrome-driver
     python3 scripts/utils/install_chrome_driver.py
+    # Check if the script ran successfully
+    if [ $? -ne 0 ]; then
+        rm -rf bin/chrome-driver
+        quit "scripts/utils/install_chrome_driver.py failed. Please check the logs for more information."
+        return
+    fi
 fi
 
 echo
