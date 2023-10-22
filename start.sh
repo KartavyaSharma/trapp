@@ -95,7 +95,7 @@ then
     cecho -c yellow -t "Install wget using \`brew install wget\` on macOS or \`sudo apt-get install wget\` on Linux."
     quit "wget was not found. Please install wget to use trapp."
 else
-    cecho -c green -t "wget found!"
+    cecho -c green -t "WGET found!"
 fi
 
 # Check if gum is installed
@@ -264,7 +264,7 @@ else
     python3 scripts/utils/install_chrome_driver.py
     # Check if the script ran successfully
     if [ $? -ne 0 ]; then
-        rm -rf bin/chrome-driver
+        # rm -rf bin/chrome-driver
         quit "scripts/utils/install_chrome_driver.py failed. Please check the logs for more information."
         return
     fi

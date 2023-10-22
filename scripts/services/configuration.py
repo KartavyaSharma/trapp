@@ -19,6 +19,7 @@ class ConfigurationContainer:
 
     def __init__(self, platform: Platform):
         self.platform = platform
+        self.authenticated = False
 
     def inject_driver(self, driver: webdriver.Chrome) -> None:
         """

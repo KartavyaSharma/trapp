@@ -5,7 +5,6 @@ import pathlib
 import threading
 import sys
 
-from multiprocessing import Queue
 from . import configuration, scraper
 
 # Added to make the utils module available to the script
@@ -34,7 +33,7 @@ class AutoService:
         # Define engines
         config = configuration_builder.build(url)
         scraper_engine_no_headless = scraper_builder.build(
-            # opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS
+            opts=['--incognito']
         )
         # Run scraper
         scraper_engine_no_headless.run(config)
