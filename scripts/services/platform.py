@@ -22,10 +22,6 @@ class Platform:
     def login_url(self):
         raise NotImplementedError
 
-    # @property
-    # def driver(self):
-    #     self.driver = None # Default driver value
-
     @property
     def job_entry_url(self):
         self.jobs_url = self.base_url + "jobs" # Might not exist, default value
@@ -49,13 +45,6 @@ class Platform:
         Set driver for platform
         """
         self.driver = driver
-
-    # @driver.setter
-    # def driver(self, driver):
-    #     """
-    #     Set driver for platform
-    #     """
-    #     self.driver = driver
 
     def init(self):
         """
