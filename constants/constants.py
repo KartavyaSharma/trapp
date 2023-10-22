@@ -73,8 +73,10 @@ NY = [*GUM_CHOOSE] + ['NO', 'YES']
 MAX_COL_WIDTH = 40
 
 #### Platform Constants ####
-LINKEDIN = "linkedin"
-HANDSHAKE = "handshake"
+PLATFORM_MAP = {
+    "linkedin": "linkedin",
+    "joinhandshake": "handshake"
+}
 
 #### Auth Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"

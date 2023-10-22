@@ -8,6 +8,7 @@ import validators
 import constants.constants as constants
 import scripts.services.scraper as scraper
 
+from scripts.services.auto import AutoService
 from datetime import *
 from os import system
 
@@ -403,7 +404,7 @@ def auto():
     # Run scraper module
     print("Running scraper...")
     try:
-        df_single_entry = scraper.main(url)
+        df = AutoService.run(url)        
     except Exception as e:
         print(e)
         return

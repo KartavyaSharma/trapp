@@ -1,8 +1,6 @@
-import pandas
-
-import scripts.services.vault as vault
 import constants.constants as constants
 
+from . import configuration
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -10,6 +8,10 @@ from typing import Any
 
 
 class ScraperEngine:
+    """
+    Selenium Chrome driver wrapper class. Creates a Chrome driver instance
+    with custom options and runs selenium on a given URL with a config.
+    """
 
     def __init__(self, options: Options, driver: webdriver.Chrome = None):
         """
@@ -28,25 +30,41 @@ class ScraperEngine:
         """
         Create Chrome driver instance
         """
-        if not self.driver:
-            self.driver = webdriver.Chrome(
-                options=self.options, service=self.service
-            )
-        return self.driver
+        self.driver = webdriver.Chrome(
+            options=self.options, service=self.service
+        )
 
-    def run(self, url: str, config: any = None) -> None:
+    def run(self, config: configuration.ConfigurationContainer = None) -> None:
         """
-        @param config: Configuration object for scraper (cookies etc.)
+        @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
-        self.driver.get(url)
+        config.inject_driver(self.driver)
+        config.platform.init()
+        config.platform.go_to_base_url()
 
 
 class ScraperBuilder:
+    """
+    Factory class for creating Chrome driver instances with custom options.
+    Entry point through the build() method.
+
+    Example usage:
+    builder = ScraperBuilder()
+    scraper = builder.build()
+    scraper.run("<url>")
+
+    Example usage to run w/o headless mode:
+    builder = ScraperBuilder()
+    scraper_no_headless = builder.build(opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS)
+    scraper_no_headless.run("<url>")
+    """
 
     def setup_options(self, default=True, opts: list[str] = [], user_opts: Options = None) -> Options:
         """
         @param default: Whether to use default options
         @param opts: List of options to add to Chrome driver
+        @param user_opts: User defined options
+        @return: Options instance
         """
         if user_opts:
             return user_opts
@@ -60,30 +78,9 @@ class ScraperBuilder:
     def build(self, opts: list[str] = []) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
+        @return: ScraperEngine instance
         """
         options = self.setup_options(default=not bool(opts), opts=opts)
-        engine = ScraperEngine(options)
+        engine = ScraperEngine(options=options)
         engine.create_driver()
         return engine
-
-
-class ConfigurationBuilder:
-    pass
-
-
-def main(url: str) -> pandas.DataFrame:
-    # Build scraper
-    builder = ScraperBuilder()
-    scraper = builder.build()  # Build scraper
-    scraper.run(url)  # Run scraper
-    # Build no headless scraper
-    scraper_no_headless = builder.build(opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS)
-    scraper_no_headless.run(url)  # Run scraper
-    # Build incognito scraper
-    scraper_incognito = builder.build(opts=["--incognito"])
-    scraper_incognito.run(url)  # Run scraper
-    # Build maximized scraper
-    scraper_maximized = builder.build(opts=["--start-maximized"])
-    scraper_maximized.run(url)  # Run scraper
-
-    
