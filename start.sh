@@ -82,7 +82,13 @@ else
     cecho -c green -t "All dependencies are present!"
 fi
 
-# Check if wget2 is installed
+# Check if logs directory exists
+if ! test -d "logs"; then
+    cecho -c yellow -t "Creating logs directory..."
+    mkdir logs
+fi
+
+# Check if wget is installed
 if ! (command -v wget) > /dev/null
 then
     cecho -c red -t "wget was not found."
@@ -290,6 +296,7 @@ for arg in "$@"; do
         rm -rf env
         rm -rf bin
         rm -rf bat
+        rm -rf logs
         echo
         ARGFLAG=3
         ;;

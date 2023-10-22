@@ -43,7 +43,7 @@ class ConfigurationBuilder:
         for url_part in platform_root.split("."):
             if url_part in constants.PLATFORM_MAP:
                 return builder.build(constants.PLATFORM_MAP[url_part], url)
-        raise InvalidURLError
+        raise InvalidURLError(url)
 
     def build(self, url: str) -> ConfigurationContainer:
         """
