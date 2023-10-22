@@ -6,16 +6,22 @@ class NotAuthenticatedError(Exception):
     """
     Error raised when a user is not authenticated. Or no auth configuration exists.
     """
-    pass
+    msg = "Forbidden: not authenticated"
+    def __init__(self) -> None:
+        super().__init__(self.msg)
 
 class InvalidURLError(Exception):
     """
     Error raised when a URL is invalid.
     """
-    pass
+    msg = "Invalid URL. No matching platform found."
+    def __init__(self) -> None:
+        super().__init__(self.msg)
 
 class NoDriverSetError(Exception):
     """
     Error raised when no driver is set in a platform.
     """
-    pass
+    msg = "No driver set on selected platform."
+    def __init__(self) -> None:
+        super().__init__(self.msg)

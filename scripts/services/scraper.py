@@ -40,7 +40,7 @@ class ScraperEngine:
         """
         config.inject_driver(self.driver)
         config.platform.init()
-        config.platform.go_to_base_url()
+        config.platform.go_to_base_url() # TODO: Remove this and add auth workflow
 
 
 class ScraperBuilder:
