@@ -13,6 +13,14 @@ class Platform:
     def login_url(self):
         raise NotImplementedError
 
+    @property
+    def scraper_engine(self):
+        pass
+
+    @property
+    def job_entry_url(self):
+        self.jobs_url = self.base_url + "jobs"
+
     @abc.abstractclassmethod
     def login(self):
         """

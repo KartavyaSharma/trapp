@@ -51,15 +51,13 @@ def get_chrome_driver_url(version: str) -> str:
     # Check if cache file exists
     if not os.path.exists(constants.CHROME_DRIVER_VERSIONS_CACHE):
         set_chrome_driver_cache()
-    cache_file = json.loads(
-        open(constants.CHROME_DRIVER_VERSIONS_CACHE, "r").read())
+    cache_file = json.loads(open(constants.CHROME_DRIVER_VERSIONS_CACHE, "r").read())
     timestamp = versions['timestamp']
     cached_timestamp = cache_file['timestamp']
     if timestamp != cached_timestamp:
         set_chrome_driver_cache(versions, version)
         # Refresh cache file
-        cache_file = json.loads(
-            open(constants.CHROME_DRIVER_VERSIONS_CACHE, "r").read())
+        cache_file = json.loads(open(constants.CHROME_DRIVER_VERSIONS_CACHE, "r").read())
         return cache_file['url']
     else:
         return cache_file['url']

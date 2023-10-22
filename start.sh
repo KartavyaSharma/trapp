@@ -111,7 +111,7 @@ if ! command -v ./bin/gum &>/dev/null; then
     cecho -c green -t "Installed gum!"
     echo "Cleaning up..."
     rm $(basename "$url")
-    find . ! -name 'gum' -name '.' -name '..' -type f -exec rm -f {} +
+    find . ! -name 'gum' -type f -exec rm -f {} +
     find . ! -name 'gum' -name '.' -name '..' -type d -exec rm -rf {} +
     cd ..
 else
@@ -204,6 +204,12 @@ fi
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
     architecture=$(uname -m)
+    # Make sure architecture is x86_64
+    if [[ "$architecture" == "x86_64" ]]; then
+        architecture="amd64"
+    else
+        quit "Invalid architecture: $architecture. trapp is only supported on x86_64 and versions of Darwin and Linux and arm64 versions of Darwin."
+    fi
     if ! (command -v google-chrome) > /dev/null
     then
         cecho -c yellow -t "Google Chrome was not found. Installing..."
@@ -211,9 +217,9 @@ if [[ "$arch" == "Linux" ]]; then
         mkdir bin/chrome && cd bin/chrome
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_$architecture.deb
         # install
-        sudo apt install ./google-chrome-stable_current_amd64.deb
+        sudo apt install ./google-chrome-stable_current_$architecture.deb
         # remove installer
-        rm google-chrome-stable_current_amd64.deb
+        rm google-chrome-stable_current_$architecture.deb
         cd ../..
         # Make sure chrome is installed
         chrome_ver=$(google-chrome --version)
