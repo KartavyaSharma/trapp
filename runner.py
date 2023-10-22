@@ -395,19 +395,34 @@ def auto():
         ))
         if url == "Q":
             quit()
-        # Validate URL
-        if not validators.url(url):
-            print("Invalid URL. Please try again.")
-            continue
+        # Check if there are multiple urls
+        if url.find(",") != -1:
+            urls = url.split(",")
+            if not all(urls) or not all(validators.url(url) for url in urls):
+                print("Invalid URL found. Please try again.")
+                continue
+            else:
+                print(f'{constants.OKGREEN}Multiple URLs found. Running scraper on all URLs...{constants.ENDC}')
+                try:
+                    df = AutoService.batch_run(urls)
+                    file_preview(df)
+                    break
+                except Exception as e:
+                    print(e)
+                    return
         else:
-            success_flag = False
-    # Run scraper module
-    print("Running scraper...")
-    try:
-        df = AutoService.run(url)        
-    except Exception as e:
-        print(e)
-        return
+            # Validate URL
+            if not validators.url(url):
+                print("Invalid URL. Please try again.")
+                continue
+            else:
+                # Run scraper module
+                print("Running scraper...")
+                try:
+                    df = AutoService.run(url)        
+                except Exception as e:
+                    print(e)
+                    return
 
 
 def quit():
