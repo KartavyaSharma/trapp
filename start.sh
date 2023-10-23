@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Print welcome message
+python3 ./scripts/utils/welcome.py
+
 # Make a temporary alias for echo
 alias cecho=$(realpath ./scripts/shell/echo.sh)
 # Make echo executable
@@ -88,38 +91,6 @@ if ! test -d "logs"; then
     mkdir logs
 fi
 
-# If arch is Darwin check if brew is installed
-arch=$(uname -s)
-if [[ $arch == "Darwin" ]]
-then
-    if ! (command -v brew) > /dev/null
-    then
-        cecho -c yellow -t "brew was not found. Installing..."
-        # Install brew
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    else
-        cecho -c green -t "Homebrew found!"
-    fi
-fi
-
-# Check if wget is installed
-if ! (command -v wget) > /dev/null
-then
-    cecho -c red -t "wget was not found. Installing..."
-    if [[ $arch == "Darwin" ]]
-    then
-        brew install wget
-    elif [[ $arch == "Linux" ]]
-    then
-        sudo apt-get install wget
-    else
-        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        return
-    fi
-else
-    cecho -c green -t "WGET found!"
-fi
-
 # Check if gum is installed
 if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
@@ -148,6 +119,67 @@ else
     else
         cecho -c green -t "Gum library detected!"
     fi
+fi
+
+# If arch is Darwin check if brew is installed
+arch=$(uname -s)
+if [[ $arch == "Darwin" ]]
+then
+    if ! (command -v brew) > /dev/null
+    then
+        cecho -c yellow -t "brew was not found. Do you want to install it? (Y/n)"
+        install_brew_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_brew_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing brew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        else
+            cecho -c yellow -t "brew was not installed. Please install brew manually to use trapp."
+        fi
+    else
+        cecho -c green -t "Homebrew found!"
+    fi
+
+    check_openssl=$(brew list openssl@1.1)
+    if [[ "$check_openssl" == "" ]]
+    then
+        cecho -c yellow -t "openssl@1.1 was not found. Do you want to install it? (Y/n)"
+        install_openssl_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_openssl_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing openssl@1.1..."
+            brew install openssl@1.1
+        else
+            cecho -c yellow -t "openssl@1.1 was not installed. Please install openssl@1.1 manually to use trapp."
+        fi
+    else
+        cecho -c green -t "OPENSSL@1.1 found!"
+    fi
+fi
+
+# Check if wget is installed
+if ! (command -v wget) > /dev/null
+then
+    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
+    install_wget_choice=$(./bin/gum choose "YES" "NO")
+    if [[ "$install_wget_choice" == "YES" ]];
+    then
+        cecho -c yellow -t "Installing wget..."
+        if [[ $arch == "Darwin" ]]
+        then
+            brew install wget
+        elif [[ $arch == "Linux" ]]
+        then
+            sudo apt-get install wget
+        else
+            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+            return
+        fi
+    else
+        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
+    fi
+else
+    cecho -c green -t "WGET found!"
 fi
 
 # Set a flag so that the "WOW, ..." print does not run every time.
@@ -189,10 +221,20 @@ fi
 # Check if docker is installed and running
 if ! (command -v docker) > /dev/null
 then
-    cecho -c yellow -t "Docker was not found. Installing..."
+    cecho -c yellow -t "Docker was not found."
     arch=$(uname -s)
     if [[ $arch == "Darwin" ]]; then
-        brew install --cask docker
+        # Ask user to install Docker
+        cecho -c yellow -t "Docker was not found, do you want to install it using Homebrew?"
+        install_docker_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_docker_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing Docker..."
+            brew install --cask docker
+        else
+            quit "Docker was not installed. Please install Docker manually to use trapp."
+            return
+        fi
         cecho -c green -t "Docker installed!"
         # Check if colima is installed
         colima_ver="0.5.6"

@@ -5,7 +5,6 @@ from . import vault
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from typing import Any
 
 
 class ScraperEngine:
@@ -25,7 +24,7 @@ class ScraperEngine:
         self.service = Service(executable_path=constants.CHROME_DRIVER_EXECUTABLE)
         self.headed_support = headed_support
 
-    def __getattribute__(self, __name: str) -> Any:
+    def __getattribute__(self, __name: str) -> any:
         if __name != "service":
             return super().__getattribute__(__name)
 
@@ -40,14 +39,14 @@ class ScraperEngine:
                 options=self.options, service=self.service
             )
 
-    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: Any = None) -> None:
+    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: any = None) -> None:
         """
         @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
         config.inject_driver(driver=self.driver)
         config.platform.init()
         # Check if authenticated
-        if not vault.Vault.isAuthenticated(config.platform):
+        if not vault.Vault.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
             vault.Vault.authenticate(config.platform, auth_engine=auth_engine)
         return config.platform.scrape_job()
 
@@ -84,7 +83,7 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True, custom_driver: any = None) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
@@ -92,5 +91,5 @@ class ScraperBuilder:
         options = self.setup_options(default=not bool(opts), opts=opts)
         engine = ScraperEngine(options=options, headed_support=headed_support)
         if not delay_driver_build:
-            engine.create_driver(custom_driver==custom_driver)
+            engine.create_driver()
         return engine

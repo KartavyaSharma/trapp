@@ -31,13 +31,15 @@ class Entry:
         df_dict["Portal Link"] = self.link
         df_dict["Notes"] = self.notes
         df = pd.DataFrame(df_dict, index=[0])
-        return df 
+        return df
 
     def validate(self):
         assert self.status in status.Status
         self.status = self.status.value
         try:
-            self.date_applied = datetime.datetime.strftime(self.date_applied, "%m/%d/%Y")
+            self.date_applied = datetime.datetime.strftime(
+                self.date_applied, "%m/%d/%Y"
+            )
         except Exception as e:
             print(e)
             return

@@ -3,7 +3,7 @@ import pathlib
 
 import constants.constants as constants
 
-from . import platform
+from ..models import platform
 from scripts.utils.errors import *
 
 class Vault:
@@ -21,12 +21,17 @@ class Vault:
         pass
 
     @staticmethod
-    def isAuthenticated(platform: platform.Platform) -> bool:
+    def isAuthenticated(platform: platform.Platform, headed_support:bool = True) -> bool:
         """
         Check if user has saved auth state for platform
         """
         file_path = pathlib.Path(constants.CHROME_DRIVER_COOKIE_FILE.replace("<platform>", platform.name.lower()))
-        return file_path.is_file()
+        if not file_path.exists():
+            if not headed_support:
+                platform.non_headed_auth_instruction()
+                raise NoHeadedSupportError(platform.name)
+            return False
+        return True
 
     @staticmethod
     def authenticate(platform: platform.Platform, auth_engine: any = None) -> None:
@@ -34,7 +39,7 @@ class Vault:
             raise NotImplementedError
         auth_engine.create_driver()
         platform.set_auth_driver(auth_engine.driver)
-        platform.login(headed=auth_engine.headed_support)
+        platform.login()
 
     @staticmethod
     def isPresent() -> bool:
@@ -42,7 +47,3 @@ class Vault:
         Check if Vault is present on the system
         """
         return os.path.exists(constants.VAULT_PATH)
-
-
-def main():
-    pass

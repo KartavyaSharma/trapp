@@ -390,6 +390,7 @@ def auto():
         ))
         if url == "Q":
             quit()
+        service = AutoService()
         # Check if there are multiple urls
         if url.find(",") != -1:
             urls = url.split(",")
@@ -399,7 +400,7 @@ def auto():
             else:
                 print(f'{constants.OKGREEN}Multiple URLs found. Running scraper on all URLs...{constants.ENDC}')
                 try:
-                    df = AutoService.batch_run(urls)
+                    df = AutoService.batch_run(urls, gui_support=service.gui_support)
                     finish_auto_service(df)
                     break
                 except Exception as e:
@@ -414,7 +415,7 @@ def auto():
                 # Run scraper module
                 print("Running scraper...")
                 try:
-                    df = AutoService.run(url)        
+                    df = AutoService.run(url, gui_support=service.gui_support)        
                     finish_auto_service(df)
                     break
                 except Exception as e:
