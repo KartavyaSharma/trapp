@@ -59,7 +59,7 @@ def check_xvfb() -> bool:
     """
     if os.uname().sysname != "Darwin":
         check_xvfb = subprocess.check_output(
-            ["type", "Xvfb"],
+            ["type", "xvfb"],
             stderr=subprocess.DEVNULL,
             universal_newlines=True,
             shell=True
@@ -72,35 +72,31 @@ def check_xvfb() -> bool:
         subprocess.check_call(
             ["sudo", "apt-get", "install", "xvfb"],
             stderr=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL
         )
         # Install firefox dependency 
         subprocess.check_call(
             ["sudo", "apt-get", "install", "firefox"],
             stderr=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL
         )
         # Verify xvfb installation
         check_xvfb = subprocess.check_output(
-            ["ps", "-ef", "|", "grep", "Xvfb"],
+            ["ps", "-ef", "|", "grep", "xvfb"],
             stderr=subprocess.DEVNULL,
             universal_newlines=True,
             shell=True
         )
-        if "Xvfb" not in check_xvfb:
+        if "xvfb" not in check_xvfb:
             return False
         print("You are running on a server, addtional dependencies are required")
         input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
         subprocess.check_call(
             ["sudo", "apt-get", "install", "xserver-xephyr", "tigervnc-standalone-server", "x11-utils", "gnumeric"],
             stderr=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL
         )
         print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
         subprocess.check_call(
             ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
             stderr=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL
         )
     return True
         
