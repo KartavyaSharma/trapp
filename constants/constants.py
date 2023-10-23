@@ -121,3 +121,6 @@ LOG_TMP_FILENAME = f"{PROJECT_ROOT}/logs/run_error.log"
 LOG_FILEMODE = "a"
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(message)s"
 LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
+
+#### xvfb Constants ####
+XVFB_CACHE_FLAG = f"{PROJECT_ROOT}/.cache/xvfb"

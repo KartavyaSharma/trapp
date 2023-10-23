@@ -1,5 +1,7 @@
+import constants.constants as constants
 import multiprocessing
 import os
+import pathlib
 import traceback
 import logging
 import re
@@ -64,7 +66,7 @@ def check_xvfb() -> bool:
             universal_newlines=True,
             shell=True
         )
-        if "xvfb-run is /usr/bin/xvfb-run\n" in check_xvfb:
+        if "/usr/bin/xvfb-run\n" in check_xvfb:
             return
         print("xvfb not installed, installing...")
         time.sleep(3)
@@ -85,19 +87,26 @@ def check_xvfb() -> bool:
             universal_newlines=True,
             shell=True
         )
-        if "xvfb-run is /usr/bin/xvfb-run\n" in check_xvfb:
+        if "/usr/bin/xvfb-run\n" in check_xvfb:
             raise Exception("xvfb installation failed")
-        print("You are running on a server, addtional dependencies are required")
-        input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
-        subprocess.check_call(
-            ["sudo", "apt-get", "install", "xserver-xephyr", "tigervnc-standalone-server", "x11-utils", "gnumeric"],
-            stderr=subprocess.DEVNULL,
-        )
-        print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
-        subprocess.check_call(
-            ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
-            stderr=subprocess.DEVNULL,
-        )
+        cache_file_path = pathlib.Path(constants.XVFB_CACHE_FLAG)
+        if not cache_file_path.is_file():
+            print("You are running on a server, addtional dependencies are required")
+            input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
+            subprocess.check_call(
+                ["sudo", "apt-get", "install", "xserver-xephyr", "tigervnc-standalone-server", "x11-utils", "gnumeric"],
+                stderr=subprocess.DEVNULL,
+            )
+            print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
+            subprocess.check_call(
+                ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
+                stderr=subprocess.DEVNULL,
+            )
+            # Create xvfb cache file
+            subprocess.check_call(
+                ["touch", f"{constants.XVFB_CACHE_FLAG}"],
+                stderr=subprocess.DEVNULL,
+            )
     return True
         
 
