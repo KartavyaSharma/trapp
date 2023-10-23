@@ -66,29 +66,28 @@ def check_xvfb() -> bool:
             universal_newlines=True,
             shell=True
         )
-        if "/usr/bin/xvfb-run\n" in check_xvfb:
-            return
-        print("xvfb not installed, installing...")
-        time.sleep(3)
-        # Install xvfb
-        subprocess.check_call(
-            ["sudo", "apt-get", "install", "xvfb"],
-            stderr=subprocess.DEVNULL,
-        )
-        # Install firefox dependency 
-        subprocess.check_call(
-            ["sudo", "apt-get", "install", "firefox"],
-            stderr=subprocess.DEVNULL,
-        )
-        # Verify xvfb installation
-        check_xvfb = subprocess.check_output(
-            ["which xvfb-run"],
-            stderr=subprocess.DEVNULL,
-            universal_newlines=True,
-            shell=True
-        )
-        if "/usr/bin/xvfb-run\n" in check_xvfb:
-            raise Exception("xvfb installation failed")
+        if not "/usr/bin/xvfb-run\n" in check_xvfb:
+            print("xvfb not installed, installing...")
+            time.sleep(3)
+            # Install xvfb
+            subprocess.check_call(
+                ["sudo", "apt-get", "install", "xvfb"],
+                stderr=subprocess.DEVNULL,
+            )
+            # Install firefox dependency 
+            subprocess.check_call(
+                ["sudo", "apt-get", "install", "firefox"],
+                stderr=subprocess.DEVNULL,
+            )
+            # Verify xvfb installation
+            check_xvfb = subprocess.check_output(
+                ["which xvfb-run"],
+                stderr=subprocess.DEVNULL,
+                universal_newlines=True,
+                shell=True
+            )
+            if "/usr/bin/xvfb-run\n" in check_xvfb:
+                raise Exception("xvfb installation failed")
         cache_file_path = pathlib.Path(constants.XVFB_CACHE_FLAG)
         if not cache_file_path.is_file():
             print("You are running on a server, addtional dependencies are required")

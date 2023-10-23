@@ -8,6 +8,8 @@ import sys
 
 from . import configuration, scraper
 from scripts.models import entry, status
+from selenium import webdriver
+from pyvirtualdisplay import Display
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
@@ -34,6 +36,8 @@ class AutoService:
         if not gui_support:
             print("GUI not supported on this system, check for additional dependencies")
             check_xvfb()
+            display = Display(visible=0, size=(800, 600))
+            display.start()
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()
@@ -41,10 +45,13 @@ class AutoService:
         config = configuration_builder.build(url)
         scraper_engine = scraper_builder.build()
         # Partially build the auth engine
+        auth_opts = constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [*constants.CHROME_DRIVER_SERVER_OPTS]
+        auth_driver = webdriver.Firefox() if not gui_support else None
         auth_engine = scraper_builder.build(
-            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [*constants.CHROME_DRIVER_SERVER_OPTS], # Run in non-headless mode 
+            opts=auth_opts, # Run in non-headless mode 
             delay_driver_build=True,
-            headed_support=gui_support
+            headed_support=gui_support,
+            custom_driver=auth_driver
         )
         # Run scraper
         (title, company, location, post_url) = scraper_engine.run(config, auth_engine=auth_engine)
@@ -58,6 +65,9 @@ class AutoService:
             link=post_url,
             notes=f"{location}"
         )
+
+        if not gui_support:
+            display.stop()
 
         # Get dataframe
         return new_entry.create_dataframe()

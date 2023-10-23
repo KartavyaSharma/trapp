@@ -29,13 +29,16 @@ class ScraperEngine:
         if __name != "service":
             return super().__getattribute__(__name)
 
-    def create_driver(self) -> None:
+    def create_driver(self, custom_driver: any = None) -> None:
         """
         Create Chrome driver instance
         """
-        self.driver = webdriver.Chrome(
-            options=self.options, service=self.service
-        )
+        if custom_driver:
+            self.driver = custom_driver
+        else:
+            self.driver = webdriver.Chrome(
+                options=self.options, service=self.service
+            )
 
     def run(self, config: configuration.ConfigurationContainer = None, auth_engine: Any = None) -> None:
         """
@@ -81,7 +84,7 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True, custom_driver: any = None) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
@@ -89,5 +92,5 @@ class ScraperBuilder:
         options = self.setup_options(default=not bool(opts), opts=opts)
         engine = ScraperEngine(options=options, headed_support=headed_support)
         if not delay_driver_build:
-            engine.create_driver()
+            engine.create_driver(custom_driver==custom_driver)
         return engine
