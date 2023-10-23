@@ -39,7 +39,7 @@ class AutoService:
         scraper_engine = scraper_builder.build()
         # Partially build the auth engine
         auth_engine = scraper_builder.build(
-            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [], # Run in non-headless mode 
+            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [*constants.CHROME_DRIVER_SERVER_OPTS], # Run in non-headless mode 
             delay_driver_build=True,
             headed_support=gui_support
         )
