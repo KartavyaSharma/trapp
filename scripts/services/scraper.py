@@ -42,7 +42,7 @@ class ScraperEngine:
         config.platform.init()
         # if not config.authenticated:
         #     config.platform.login()
-        config.platform.scrape_job()
+        return config.platform.scrape_job()
 
 
 class ScraperBuilder:

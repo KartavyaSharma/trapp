@@ -1,4 +1,5 @@
 import constants.constants as constants
+import datetime
 import multiprocessing
 import pandas as pd
 import pathlib
@@ -6,6 +7,7 @@ import threading
 import sys
 
 from . import configuration, scraper
+from scripts.models import entry, status
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
@@ -32,24 +34,23 @@ class AutoService:
         scraper_builder = scraper.ScraperBuilder()
         # Define engines
         config = configuration_builder.build(url)
-        scraper_engine_no_headless = scraper_builder.build(
-            opts=['--incognito']
-        )
+        scraper_engine_no_headless = scraper_builder.build()
         # Run scraper
-        scraper_engine_no_headless.run(config)
+        (title, company, location) = scraper_engine_no_headless.run(config)
+        
+        # Create entry
+        new_entry = entry.Entry(
+            company=company,
+            position=title,
+            date_applied=datetime.datetime.now(),
+            status=status.Status.INIT,
+            link=url,
+            notes=f"{location}"
+        )
 
-        # TODO If result queue is defined, add result to queue
-        # result_queue.put(pd.DataFrame([])) 
-        # Dummy data
-        df_dict = {key: None for key in constants.COLUMN_NAMES}
-        df_dict["Company"] = "LinkedIn"
-        df_dict["Position"] = "Software Engineer"
-        df_dict["Date Applied"] = "01/01/2021"
-        df_dict["Status"] = "Applied"
-        df_dict["Portal Link"] = "https://www.linkedin.com/jobs/view/123456789/"
-        df_dict["Notes"] = ""
-        df = pd.DataFrame(df_dict, index=[0])
-        return df
+        # Get dataframe
+        return new_entry.create_dataframe()
+
 
     @staticmethod
     def batch_run(urls: list[str]) -> pd.DataFrame:
@@ -71,9 +72,7 @@ class AutoService:
         pool.close()
         pool.join()
 
-
         for result in results:
-            # Check if any exceptions were raised by checking the existance of constants.LOG_TMP_FILENAME
             try:
                 r = result.get()
             except Exception as e:

@@ -8,6 +8,7 @@ import validators
 import constants.constants as constants
 import scripts.services.scraper as scraper
 
+from scripts.models import entry, status
 from scripts.services.auto import AutoService
 from datetime import *
 from os import system
@@ -125,13 +126,6 @@ def add():
             stdout=subprocess.PIPE,
             shell=False
         ))
-        try:
-            date_object = datetime.strptime(date_applied, "%m/%d/%Y")
-            formatted_date = date_object.strftime("%m/%d/%Y")
-        except Exception as e:
-            print(e)
-            return
-    date_applied = formatted_date
     # Ask user for status
     print("Choose current status:")
     current_status = filter(subprocess.run(
@@ -165,15 +159,16 @@ def add():
         shell=False
     ))
 
-    # Create dataframe from dictionary
-    df_dict = {key: None for key in constants.COLUMN_NAMES}
-    df_dict["Company"] = company_name
-    df_dict["Position"] = position
-    df_dict["Date Applied"] = date_applied
-    df_dict["Status"] = current_status
-    df_dict["Portal Link"] = portal_link
-    df_dict["Notes"] = notes
-    df = pd.DataFrame(df_dict, index=[0])
+    # Create entry  
+    new_entry = entry.Entry(
+        company=company_name,
+        position=position,
+        date_applied=date_applied,
+        status=status.Status(current_status),
+        link=portal_link,
+        notes=notes
+    )
+    df = new_entry.create_dataframe()
     # Append dataframe to CSV
     df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
     print("Job entry added!")
@@ -301,7 +296,7 @@ def delete(df, original_df, original_index):
         stdout=subprocess.PIPE,
         shell=False
     ))
-    if delete_choice == "Yes":
+    if delete_choice == "YES":
         # Delete row from dataframe
         original_df = original_df.drop(original_index)
         # Write to CSV
@@ -405,7 +400,21 @@ def auto():
                 print(f'{constants.OKGREEN}Multiple URLs found. Running scraper on all URLs...{constants.ENDC}')
                 try:
                     df = AutoService.batch_run(urls)
-                    file_preview(df)
+                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entries!{constants.ENDC}')
+                    print("Here are the entries:")
+                    print(df)
+                    print("Does this look correct? Confirming will write entries to file.")
+                    confirm_choice = filter(subprocess.run(
+                        [*constants.YN],
+                        stdout=subprocess.PIPE,
+                        shell=False
+                    ))
+                    if confirm_choice == "YES":
+                        # Concatenate with existing CSV
+                        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+                        print("Entries written to file!")
+                    else:
+                        print("Entries not written to file.\nIf you found errors for a specific entry, remove that url and try again.\nOr accept the entries and edit them manually")
                     break
                 except Exception as e:
                     print(e)
@@ -420,7 +429,21 @@ def auto():
                 print("Running scraper...")
                 try:
                     df = AutoService.run(url)        
-                    file_preview(df)
+                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entries!{constants.ENDC}')
+                    print("Here is the entry:")
+                    print(df)
+                    print("Does this look correct? Confirming will write entry to file.")
+                    confirm_choice = filter(subprocess.run(
+                        [*constants.YN],
+                        stdout=subprocess.PIPE,
+                        shell=False
+                    ))
+                    if confirm_choice == "YES":
+                        # Append to CSV
+                        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+                        print("Entry written to file!")
+                    else:
+                        print("Entry not written to file.")
                     break
                 except Exception as e:
                     print(e)

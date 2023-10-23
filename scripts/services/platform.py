@@ -1,5 +1,5 @@
-import constants.constants as constants
 import abc
+import constants.constants as constants
 import pickle
 import time
 
@@ -111,10 +111,22 @@ class Platform:
         cookies = pickle.load(open(constants.CHROME_DRIVER_COOKIE_FILE, "rb"))
         self.driver.add_cookie(cookies)
 
+    def init_scrape(self):
+        """
+        Setup scrape
+        """
+        # Load cookies
+        self.go_to_base_url()
+        time.sleep(2)
+        self.load_cookies()  # Load cookies
+        self.clean_url()
+        self.go_to_url()
+        time.sleep(3)
+
 
 class LinkenIn(Platform):
     name = "LinkedIn"
-    base_url = "https://www.linkedin.com/"
+    base_url = "https://www.linkedin.com"
     login_url = "https://www.linkedin.com/login"
 
     def __init__(self, url: str):
@@ -131,14 +143,18 @@ class LinkenIn(Platform):
         )
         self.save_cookies()  # Save cookies
 
-    def scrape_job(self):
-        # Load cookies
-        self.go_to_base_url()
-        time.sleep(2)
-        self.load_cookies()  # Load cookies
-        self.clean_url()
-        self.go_to_url()
-        time.sleep(10)
+    def scrape_job(self) -> tuple[str, str, str]:
+        self.init_scrape() # Assumes we are at job entry URL
+        # Get job post title
+        title = self.driver.find_element(By.CSS_SELECTOR, ".t-24").text
+        post_info = self.driver.find_element(
+            By.CSS_SELECTOR,
+            # Returns <company name> · <location> <date posted> · <# of applicants>
+            ".job-details-jobs-unified-top-card__primary-description > div" 
+        ).text
+        company = post_info.split("·")[0].strip()
+        location = post_info.split("·")[1].split("  ")[0].strip()
+        return (title, company, location)
 
     def clean_url(self):
         if "jobs" not in self.url or "view" not in self.url:
@@ -169,7 +185,7 @@ class LinkenIn(Platform):
 
 class Handshake(Platform):
     name = "Handshake"
-    base_url = "https://app.joinhandshake.com/"
+    base_url = "https://app.joinhandshake.com"
     login_url = "https://app.joinhandshake.com/login"
 
     def __init__(self, url: str):
