@@ -29,6 +29,8 @@ class AutoService:
         @param result_queue: Queue to store multiprocessing results in (optional)
         @return: Pandas DataFrame containing a single row job entry 
         """
+        # Check if GUI is supported
+        gui_support = has_gui()
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()
@@ -37,8 +39,9 @@ class AutoService:
         scraper_engine = scraper_builder.build()
         # Partially build the auth engine
         auth_engine = scraper_builder.build(
-            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if has_gui() else [], # Run in non-headless mode 
-            delay_driver_build=True
+            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [], # Run in non-headless mode 
+            delay_driver_build=True,
+            headed_support=gui_support
         )
         # Run scraper
         (title, company, location, post_url) = scraper_engine.run(config, auth_engine=auth_engine)

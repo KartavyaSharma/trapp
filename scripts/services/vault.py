@@ -34,7 +34,7 @@ class Vault:
             raise NotImplementedError
         auth_engine.create_driver()
         platform.set_auth_driver(auth_engine.driver)
-        platform.login()
+        platform.login(headed=auth_engine.headed_support)
 
     @staticmethod
     def isPresent() -> bool:

@@ -14,7 +14,7 @@ class ScraperEngine:
     with custom options and runs selenium on a given URL with a config.
     """
 
-    def __init__(self, options: Options, driver: webdriver.Chrome = None):
+    def __init__(self, options: Options, driver: webdriver.Chrome = None, headed_support: bool = True):
         """
         @param options: Options to pass to Chrome driver
         @param driver: Existing Chrome driver instance
@@ -22,6 +22,7 @@ class ScraperEngine:
         self.options = options
         self.driver = driver
         self.service = Service(executable_path=constants.CHROME_DRIVER_EXECUTABLE)
+        self.headed_support = headed_support
 
     def __getattribute__(self, __name: str) -> Any:
         if __name != "service":
@@ -79,13 +80,13 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
         """
         options = self.setup_options(default=not bool(opts), opts=opts)
-        engine = ScraperEngine(options=options)
+        engine = ScraperEngine(options=options, headed_support=headed_support)
         if not delay_driver_build:
             engine.create_driver()
         return engine

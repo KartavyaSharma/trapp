@@ -39,7 +39,7 @@ class Platform:
         self.jobs_url = self.base_url + "jobs"  # Might not exist, default value
 
     @abc.abstractclassmethod
-    def login(self, email: str = None, password: str = None):
+    def login(self, headed: bool = True):
         """
         Selenium <platform> login workflow
         """
@@ -162,7 +162,7 @@ class LinkenIn(Platform):
     def __init__(self, url: str):
         super().__init__(url)
 
-    def login(self, headed: bool = False):
+    def login(self, headed: bool = True):
         self.set_curr_driver(self.auth_driver) # Set current driver as auth driver
         self.go_to_login_url()
         if not headed:
