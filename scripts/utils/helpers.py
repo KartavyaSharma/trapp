@@ -1,10 +1,58 @@
 import multiprocessing
+import os
 import traceback
 import logging
 import re
+import subprocess
 
 from . import logger
 from multiprocessing.pool import ThreadPool as Pool
+
+
+def has_gui() -> bool:
+    """
+    Check if running on a GUI
+
+    @return: True if running on a GUI, False otherwise
+    """
+    # If system uname -s is Darwin, then we are on macOS
+    if os.uname().sysname == "Darwin":
+        return True
+    env = [
+        bool(os.environ.get("DISPLAY", False)),
+        bool(os.environ.get("WAYLAND_DISPLAY", False)),
+        bool(os.environ.get("MIR_SOCKET", False))
+    ]
+    if_env = any(env)
+    check_xorg = subprocess.check_output(
+        ["type", "Xorg"],
+        stderr=subprocess.DEVNULL,
+        universal_newlines=True,
+        shell=True
+    )
+    if check_xorg == "Xorg is /usr/bin/Xorg\n":
+        return True
+    # Check /usr/share/xsessions
+    check_xsessions = subprocess.check_output(
+        ["\ls", "/usr/share/xsessions"],
+        stderr=subprocess.DEVNULL,
+        universal_newlines=True,
+        shell=True
+    )
+    if not "No such file or directory" in check_xsessions:
+        return True
+    check_dir = subprocess.check_output(
+        ["\ls", "/usr/bin/*session"],
+        stderr=subprocess.DEVNULL,
+        universal_newlines=True,
+        shell=True
+    )
+    # If check_dir has only /usr/bin/byobu-select-session  /usr/bin/dbus-run-session, then we are on a server
+    if check_dir == "/usr/bin/byobu-select-session  /usr/bin/dbus-run-session\n":
+        return False
+    elif "No such file or directory" not in check_dir:
+        return True
+    return if_env
 
 
 def get_root_from_url(url: str) -> str:
@@ -33,7 +81,9 @@ class LogExceptions(object):
         except Exception as e:
             # Here we add some debugging help. If multiprocessing's
             # debugging is on, it will arrange to log the traceback
-            logger.LoggerBuilder.build(log_level=logging.ERROR).error(traceback.format_exc())
+            logger.LoggerBuilder.build(
+                log_level=logging.ERROR).error(traceback.format_exc()
+            )
             LogExceptions.error(e)
             # Re-raise the original exception so the Pool worker can
             # clean up

@@ -162,20 +162,31 @@ class LinkenIn(Platform):
     def __init__(self, url: str):
         super().__init__(url)
 
-    def login(self):
+    def login(self, headed: bool = False):
         self.set_curr_driver(self.auth_driver) # Set current driver as auth driver
         self.go_to_login_url()
-        wait = WebDriverWait(self.curr_driver, 30)
-        wait.until(
-            presence_of_element_located(
-                # the `My Network` button
-                (By.CSS_SELECTOR, ".global-nav__primary-item:nth-child(2) path")
+        if not headed:
+            self.headless_login()
+        else:
+            wait = WebDriverWait(self.curr_driver, 120)
+            wait.until(
+                presence_of_element_located(
+                    # the `My Network` button
+                    (By.CSS_SELECTOR, ".global-nav__primary-item:nth-child(2) path")
+                )
             )
-        )
         self.save_cookies()  # Save cookies
         time.sleep(5)
         self.clean()
         self.set_curr_driver(self.driver) # Set current driver as main driver
+
+    def headless_login(self):
+        print("You are now in headless mode. Please enter your LinkedIn credentials.")
+        email = input("Email: ")
+        password = input("Password: ")
+        self.curr_driver.find_element(By.ID, "username").send_keys(email)
+        self.curr_driver.find_element(By.ID, "password").send_keys(password)
+        self.curr_driver.find_element(By.CSS_SELECTOR, ".btn__primary--large").click()
 
     def scrape_job(self) -> tuple[str, str, str]:
         self.init_scrape() # Assumes we are at job entry URL

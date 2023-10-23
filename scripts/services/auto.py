@@ -12,7 +12,7 @@ from scripts.models import entry, status
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.helpers import LoggingPool
+from scripts.utils.helpers import LoggingPool, has_gui
 
 class AutoService:
     """
@@ -37,7 +37,7 @@ class AutoService:
         scraper_engine = scraper_builder.build()
         # Partially build the auth engine
         auth_engine = scraper_builder.build(
-            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS, # Run in non-headless mode
+            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS if has_gui() else [], # Run in non-headless mode 
             delay_driver_build=True
         )
         # Run scraper
