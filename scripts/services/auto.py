@@ -9,7 +9,6 @@ import sys
 from . import configuration, scraper
 from scripts.models import entry, status
 from selenium import webdriver
-from pyvirtualdisplay import Display
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
@@ -36,6 +35,7 @@ class AutoService:
         if not gui_support:
             print("GUI not supported on this system, check for additional dependencies")
             check_xvfb()
+            from pyvirtualdisplay import Display
             display = Display(visible=0, size=(800, 600))
             display.start()
         # Define builders
