@@ -88,6 +88,16 @@ if ! test -d "logs"; then
     mkdir logs
 fi
 
+# Check if brew is installed
+if ! (command -v brew) > /dev/null
+then
+    cecho -c yellow -t "brew was not found. Installing..."
+    # Install brew
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+    cecho -c green -t "Homebrew found!"
+fi
+
 # Check if wget is installed
 if ! (command -v wget) > /dev/null
 then
@@ -167,40 +177,81 @@ fi
 # Check if docker is installed and running
 if ! (command -v docker) > /dev/null
 then
-    quit "Docker was not found. Please install Docker to use trapp."
-    return
-fi
-
-colima_ver="0.5.6"
-# Check if colima is installed
-if ! (command -v colima) > /dev/null
-then
-    cecho -c yellow -t "colima was not found. Installing..."
-    # download binary
-    mkdir bin/colima && cd bin/colima
-    curl -LO https://github.com/abiosoft/colima/releases/download/v$colima_ver/colima-$(uname)-$(uname -m)
-    # if usr/local/bin requires sudo, prompt for password
-    if [ -w "/usr/local/bin" ]
-    then
-        cecho -c yellow -t "Installing colima to /usr/local/bin..."
-        # install in $PATH
-        install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+    cecho -c yellow -t "Docker was not found. Installing..."
+    arch=$(uname -s)
+    if [[ $arch == "Darwin" ]]; then
+        brew install --cask docker
+        cecho -c green -t "Docker installed!"
+        # Check if colima is installed
+        colima_ver="0.5.6"
+        if ! (command -v colima) > /dev/null
+        then
+            cecho -c yellow -t "colima was not found. Installing..."
+            # download binary
+            mkdir bin/colima && cd bin/colima
+            curl -LO https://github.com/abiosoft/colima/releases/download/v$colima_ver/colima-$(uname)-$(uname -m)
+            # Check if usr/local/bin is exists, if not create it
+            if ! test -d "/usr/local/bin"; then
+                cecho -c yellow -t "Creating /usr/local/bin..."
+                sudo mkdir /usr/local/bin
+            fi
+            # if usr/local/bin requires sudo, prompt for password
+            if [ -w "/usr/local/bin" ]
+            then
+                cecho -c yellow -t "Installing colima to /usr/local/bin..."
+                # install in $PATH
+                install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+            else
+                cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..." 
+                sleep 2
+                # install in $PATH
+                sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+            fi
+            cd ..
+        else
+            cecho -c green -t "Colima found!"
+        fi
+    elif [[ $arch == "Linux" ]]; then
+        # Installing docker using the convenience script
+        curl -fsSL https://get.docker.com -o ./bin/get-docker.sh
+        cecho -c yellow -t "Installing docker... (This requires sudo)"
+        sleep(3)
+        sudo sh ./bin/get-docker.sh
+        sudo usermod -aG docker ${USER}
+        su - ${USER}
+        if [ ! $(groups) =~ "docker" ]; then
+            quit "Failed to add user to docker group!"
+            return
+        fi
+        # Test if docker is working as it should
+        docker run hello-world
+        if [ $? -ne 0 ]; then
+            quit "Docker failed hello-world test!"
+            return
+        fi
+        cecho -c green -t "Docker installed!"
     else
-        cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..." 
-        sleep 2
-        # install in $PATH
-        sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+        return
     fi
-    cd ..
-else
-    cecho -c green -t "Colima found!"
 fi
 
 if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]
 then
-    cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
-    # start colima
-    colima start
+    arch=$(uname -s)
+    if [[ $arch == "Darwin" ]]
+    then
+        cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
+        # start colima
+        colima start
+    elif [[ $arch == "Linux" ]]
+    then
+        cecho -c yellow -t "Docker runtime not detected. Starting runtime (docker engine)..."
+        sudo service docker start
+    else
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+        return
+    fi
 else
     cecho -c green -t "Docker runtime found!"
 fi

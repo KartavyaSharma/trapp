@@ -10,6 +10,9 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 
 
 class Platform:
+    """
+    Abstract base class for platform implementations
+    """
 
     __metaclass__ = abc.ABCMeta
 

@@ -25,7 +25,8 @@ CHOICE_MAP = {
 
 ##### File Constants #####
 SOURCE_CSV = "job_applications.csv"
-COLUMN_NAMES = ["Company", "Position", "Date Applied", "Status", "Portal Link", "Notes"]
+COLUMN_NAMES = ["Company", "Position",
+                "Date Applied", "Status", "Portal Link", "Notes"]
 
 ##### Input Constants #####
 INPUT_COMPANY_NAME = "Input company name"
