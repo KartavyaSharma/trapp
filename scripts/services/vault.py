@@ -39,7 +39,7 @@ class Vault:
             raise NotImplementedError
         auth_engine.create_driver()
         platform.set_auth_driver(auth_engine.driver)
-        platform.login(headed=auth_engine.headed_support)
+        platform.login()
 
     @staticmethod
     def isPresent() -> bool:
@@ -47,7 +47,3 @@ class Vault:
         Check if Vault is present on the system
         """
         return os.path.exists(constants.VAULT_PATH)
-
-
-def main():
-    pass

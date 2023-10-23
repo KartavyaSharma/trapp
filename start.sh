@@ -202,10 +202,20 @@ fi
 # Check if docker is installed and running
 if ! (command -v docker) > /dev/null
 then
-    cecho -c yellow -t "Docker was not found. Installing..."
+    cecho -c yellow -t "Docker was not found."
     arch=$(uname -s)
     if [[ $arch == "Darwin" ]]; then
-        brew install --cask docker
+        # Ask user to install Docker
+        cecho -c yellow -t "Docker was not found, do you want to install it using Homebrew?"
+        install_docker_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_docker_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing Docker..."
+            brew install --cask docker
+        else
+            quit "Docker was not installed. Please install Docker manually to use trapp."
+            return
+        fi
         cecho -c green -t "Docker installed!"
         # Check if colima is installed
         colima_ver="0.5.6"
