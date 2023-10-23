@@ -5,7 +5,6 @@ from . import vault
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from typing import Any
 
 
 class ScraperEngine:
@@ -25,7 +24,7 @@ class ScraperEngine:
         self.service = Service(executable_path=constants.CHROME_DRIVER_EXECUTABLE)
         self.headed_support = headed_support
 
-    def __getattribute__(self, __name: str) -> Any:
+    def __getattribute__(self, __name: str) -> any:
         if __name != "service":
             return super().__getattribute__(__name)
 
@@ -40,7 +39,7 @@ class ScraperEngine:
                 options=self.options, service=self.service
             )
 
-    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: Any = None) -> None:
+    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: any = None) -> None:
         """
         @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
@@ -84,7 +83,7 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = None) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
