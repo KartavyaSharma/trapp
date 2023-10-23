@@ -103,7 +103,8 @@ CHROME_DRIVER_EXECUTABLE = f"{PROJECT_ROOT}/bin/chrome-driver/chromedriver-{CHRO
 
 CHROME_DRIVER_DEFAULT_OPTS = ["--headless"]
 CHROME_DRIVER_NO_HEADLESS_OPTS = ["--no-headless"]
-CHROME_DRIVER_COOKIE_FILE = f"{PROJECT_ROOT}/.cache/chrome_driver_cookies.pkl"
+CHROME_DRIVER_INCOGNITO_OPTS = ["--incognito"]
+CHROME_DRIVER_COOKIE_FILE = f"{PROJECT_ROOT}/.cache/chrome_driver_<platform>.pkl"
 
 #### Vault Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"

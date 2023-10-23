@@ -16,6 +16,8 @@ class Platform:
     def __init__(self, url: str):
         self.url = url
         self.driver = None
+        self.auth_driver = None
+        self.curr_driver = None
 
     @property
     def name(self):
@@ -66,6 +68,18 @@ class Platform:
         Set driver for platform
         """
         self.driver = driver
+    
+    def set_auth_driver(self, driver):
+        """
+        Set authentication driver for platform
+        """
+        self.auth_driver = driver
+
+    def set_curr_driver(self, driver):
+        """
+        Set current driver for platform
+        """
+        self.curr_driver = driver
 
     def init(self):
         """
@@ -92,29 +106,30 @@ class Platform:
         """
         Go to base URL
         """
-        self.driver.get(self.base_url)
+        self.curr_driver.get(self.base_url)
 
     def go_to_login_url(self):
         """
         Go to login URL
         """
-        self.driver.get(self.login_url)
+        self.curr_driver.get(self.login_url)
 
     def go_to_url(self):
         """
         Go to URL
         """
-        self.driver.get(self.url)
+        self.curr_driver.get(self.url)
 
     def load_cookies(self):
         print("Restoring auth state...")
-        cookies = pickle.load(open(constants.CHROME_DRIVER_COOKIE_FILE, "rb"))
+        cookies = pickle.load(open(self.get_cookie_file(), "rb"))
         self.driver.add_cookie(cookies)
 
     def init_scrape(self):
         """
         Setup scrape
         """
+        self.set_curr_driver(self.driver) # Set current driver as main driver
         # Load cookies
         self.go_to_base_url()
         time.sleep(2)
@@ -122,6 +137,18 @@ class Platform:
         self.clean_url()
         self.go_to_url()
         time.sleep(3)
+    
+    def get_cookie_file(self):
+        """
+        Get cookie file path
+        """
+        return constants.CHROME_DRIVER_COOKIE_FILE.split("<platform>")[0] + self.name.lower() + ".pkl"
+    
+    def clean(self):
+        """
+        Kill current driver
+        """
+        self.curr_driver.close()
 
 
 class LinkenIn(Platform):
@@ -133,8 +160,9 @@ class LinkenIn(Platform):
         super().__init__(url)
 
     def login(self):
+        self.set_curr_driver(self.auth_driver) # Set current driver as auth driver
         self.go_to_login_url()
-        wait = WebDriverWait(self.driver, 30)
+        wait = WebDriverWait(self.curr_driver, 30)
         wait.until(
             presence_of_element_located(
                 # the `My Network` button
@@ -142,12 +170,15 @@ class LinkenIn(Platform):
             )
         )
         self.save_cookies()  # Save cookies
+        time.sleep(5)
+        self.clean()
+        self.set_curr_driver(self.driver) # Set current driver as main driver
 
     def scrape_job(self) -> tuple[str, str, str]:
         self.init_scrape() # Assumes we are at job entry URL
         # Get job post title
-        title = self.driver.find_element(By.CSS_SELECTOR, ".t-24").text
-        post_info = self.driver.find_element(
+        title = self.curr_driver.find_element(By.CSS_SELECTOR, ".t-24").text
+        post_info = self.curr_driver.find_element(
             By.CSS_SELECTOR,
             # Returns <company name> · <location> <date posted> · <# of applicants>
             ".job-details-jobs-unified-top-card__primary-description > div" 
@@ -169,7 +200,7 @@ class LinkenIn(Platform):
         """
         print("Saving auth state...")
         time.sleep(10)
-        cookies = self.driver.get_cookies()
+        cookies = self.curr_driver.get_cookies()
         for cookie in cookies:
             if (cookie['name'] == 'li_at'):
                 cookie['domain'] = '.linkedin.com'
@@ -179,7 +210,7 @@ class LinkenIn(Platform):
                     'domain': '.linkedin.com'
                 }
                 break
-        pickle.dump(x, open(constants.CHROME_DRIVER_COOKIE_FILE, "wb"))
+        pickle.dump(x, open(self.get_cookie_file(), "wb"))
         print('Auth state saved!')
 
 

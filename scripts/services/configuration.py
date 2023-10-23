@@ -5,12 +5,11 @@ import constants.constants as constants
 from selenium import webdriver
 from .platform import PlatformBuilder, Platform
 
-# Added to make the utils module available to the script 
+# Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.errors import InvalidURLError
 from scripts.utils.helpers import get_root_from_url
-
+from scripts.utils.errors import InvalidURLError
 
 class ConfigurationContainer:
     """
@@ -19,7 +18,6 @@ class ConfigurationContainer:
 
     def __init__(self, platform: Platform):
         self.platform = platform
-        self.authenticated = False
 
     def inject_driver(self, driver: webdriver.Chrome) -> None:
         """

@@ -1,6 +1,7 @@
 import constants.constants as constants
 
 from . import configuration
+from . import vault
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -34,14 +35,15 @@ class ScraperEngine:
             options=self.options, service=self.service
         )
 
-    def run(self, config: configuration.ConfigurationContainer = None) -> None:
+    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: Any = None) -> None:
         """
         @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
-        config.inject_driver(self.driver)
+        config.inject_driver(driver=self.driver)
         config.platform.init()
-        # if not config.authenticated:
-        #     config.platform.login()
+        # Check if authenticated
+        if not vault.Vault.isAuthenticated(config.platform):
+            vault.Vault.authenticate(config.platform, auth_engine=auth_engine)
         return config.platform.scrape_job()
 
 
@@ -77,12 +79,13 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = []) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
         """
         options = self.setup_options(default=not bool(opts), opts=opts)
         engine = ScraperEngine(options=options)
-        engine.create_driver()
+        if not delay_driver_build:
+            engine.create_driver()
         return engine

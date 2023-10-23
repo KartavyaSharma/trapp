@@ -32,11 +32,16 @@ class AutoService:
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()
-        # Define engines
+        # Create configuration and scraper engine
         config = configuration_builder.build(url)
-        scraper_engine_no_headless = scraper_builder.build()
+        scraper_engine = scraper_builder.build()
+        # Partially build the auth engine
+        auth_engine = scraper_builder.build(
+            opts=constants.CHROME_DRIVER_NO_HEADLESS_OPTS, # Run in non-headless mode
+            delay_driver_build=True
+        )
         # Run scraper
-        (title, company, location) = scraper_engine_no_headless.run(config)
+        (title, company, location) = scraper_engine.run(config, auth_engine=auth_engine)
         
         # Create entry
         new_entry = entry.Entry(
