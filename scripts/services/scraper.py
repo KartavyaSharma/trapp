@@ -18,6 +18,7 @@ class ScraperEngine:
         """
         @param options: Options to pass to Chrome driver
         @param driver: Existing Chrome driver instance
+        @param headed_support: Whether system supports headed mode
         """
         self.options = options
         self.driver = driver

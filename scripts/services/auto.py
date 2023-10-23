@@ -12,7 +12,7 @@ from scripts.models import entry, status
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.helpers import LoggingPool, has_gui
+from scripts.utils.helpers import LoggingPool, has_gui, check_xvfb
 
 class AutoService:
     """
@@ -31,6 +31,9 @@ class AutoService:
         """
         # Check if GUI is supported
         gui_support = has_gui()
+        if not gui_support:
+            print("GUI not supported on this system, check for additional dependencies")
+            check_xvfb()
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()

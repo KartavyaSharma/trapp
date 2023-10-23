@@ -4,6 +4,7 @@ import traceback
 import logging
 import re
 import subprocess
+import time
 
 from . import logger
 from multiprocessing.pool import ThreadPool as Pool
@@ -18,12 +19,6 @@ def has_gui() -> bool:
     # If system uname -s is Darwin, then we are on macOS
     if os.uname().sysname == "Darwin":
         return True
-    env = [
-        bool(os.environ.get("DISPLAY", False)),
-        bool(os.environ.get("WAYLAND_DISPLAY", False)),
-        bool(os.environ.get("MIR_SOCKET", False))
-    ]
-    if_env = any(env)
     check_xorg = subprocess.check_output(
         ["type", "Xorg"],
         stderr=subprocess.DEVNULL,
@@ -52,8 +47,60 @@ def has_gui() -> bool:
         return False
     elif "No such file or directory" not in check_dir:
         return True
-    return if_env
+    return False
 
+
+def check_xvfb() -> bool:
+    """
+    Check if xvfb is installed, if not, install it
+    """
+    if os.uname().sysname != "Darwin":
+        check_xvfb = subprocess.check_output(
+            ["type", "Xvfb"],
+            stderr=subprocess.DEVNULL,
+            universal_newlines=True,
+            shell=True
+        )
+        if check_xvfb == "Xvfb is /usr/bin/Xvfb\n":
+            return
+        print("xvfb not installed, installing...")
+        time.sleep(3)
+        # Install xvfb
+        subprocess.check_call(
+            ["sudo", "apt-get", "install", "xvfb"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL
+        )
+        # Install firefox dependency 
+        subprocess.check_call(
+            ["sudo", "apt-get", "install", "firefox"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL
+        )
+        # Verify xvfb installation
+        check_xvfb = subprocess.check_output(
+            ["ps", "-ef", "|", "grep", "Xvfb"],
+            stderr=subprocess.DEVNULL,
+            universal_newlines=True,
+            shell=True
+        )
+        if "Xvfb" not in check_xvfb:
+            return False
+        print("You are running on a server, addtional dependencies are required")
+        input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
+        subprocess.check_call(
+            ["sudo", "apt-get", "install", "xserver-xephyr", "tigervnc-standalone-server", "x11-utils", "gnumeric"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL
+        )
+        print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
+        subprocess.check_call(
+            ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
+            stderr=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL
+        )
+    return True
+        
 
 def get_root_from_url(url: str) -> str:
     """
