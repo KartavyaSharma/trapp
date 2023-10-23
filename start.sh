@@ -88,22 +88,34 @@ if ! test -d "logs"; then
     mkdir logs
 fi
 
-# Check if brew is installed
-if ! (command -v brew) > /dev/null
+# If arch is Darwin check if brew is installed
+arch=$(uname -s)
+if [[ $arch == "Darwin" ]]
 then
-    cecho -c yellow -t "brew was not found. Installing..."
-    # Install brew
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-else
-    cecho -c green -t "Homebrew found!"
+    if ! (command -v brew) > /dev/null
+    then
+        cecho -c yellow -t "brew was not found. Installing..."
+        # Install brew
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    else
+        cecho -c green -t "Homebrew found!"
+    fi
 fi
 
 # Check if wget is installed
 if ! (command -v wget) > /dev/null
 then
-    cecho -c red -t "wget was not found."
-    cecho -c yellow -t "Install wget using \`brew install wget\` on macOS or \`sudo apt-get install wget\` on Linux."
-    quit "wget was not found. Please install wget to use trapp."
+    cecho -c red -t "wget was not found. Installing..."
+    if [[ $arch == "Darwin" ]]
+    then
+        brew install wget
+    elif [[ $arch == "Linux" ]]
+    then
+        sudo apt-get install wget
+    else
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+        return
+    fi
 else
     cecho -c green -t "WGET found!"
 fi
@@ -260,35 +272,28 @@ fi
 # Check if arch is linux
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
-    architecture=$(uname -m)
-    # Make sure architecture is x86_64
-    if [[ "$architecture" == "x86_64" ]]; then
-        architecture="amd64"
-    else
-        quit "Invalid architecture: $architecture. trapp is only supported on x86_64 and versions of Darwin and Linux and arm64 versions of Darwin."
-    fi
-    if ! (command -v google-chrome) > /dev/null
+    chrome_ver=$(google-chrome --version)
+    if [[ "$chrome_ver" == "" ]];
     then
-        cecho -c yellow -t "Google Chrome was not found. Installing..."
-        # download binary
-        mkdir bin/chrome && cd bin/chrome
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_$architecture.deb
-        # install
-        sudo apt install ./google-chrome-stable_current_$architecture.deb
-        # remove installer
-        rm google-chrome-stable_current_$architecture.deb
-        cd ../..
-        # Make sure chrome is installed
-        chrome_ver=$(google-chrome --version)
-        if [[ "$chrome_ver" == "" ]];
+        # Ask user to install Google Chrome
+        cecho -c yellow -t "Google Chrome was not found, do you want to install it using Homebrew?"
+        install_chrome_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_chrome_choice" == "YES" ]];
         then
-            # Ask user to install Google Chrome
-            cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
+            cecho -c yellow -t "Google Chrome was not found. Installing..."
+            sudo apt update
+            sudo apt install -y unzip xvfb libxi6 libgconf-2-4
+            sudo apt install default-jdk
+            sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add 
+            sudo bash -c "echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google-chrome.list" 
+            sudo apt -y update 
+            sudo apt -y install google-chrome-stable
+            chrome_ver=$(google-chrome --version)
         else
-            export TRAPP_CHROME_VER=$chrome_ver
-            cecho -c green -t "Chrome installed successfully!"
+            cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
         fi
     else
+        export TRAPP_CHROME_VER=$chrome_ver
         cecho -c green -t "Google Chrome found!"
     fi
 elif [[ "$arch" == "Darwin" ]]; then
@@ -296,7 +301,16 @@ elif [[ "$arch" == "Darwin" ]]; then
     if [[ "$chrome_ver" == "" ]];
     then
         # Ask user to install Google Chrome
-        cecho -c yellow -t "Google Chrome was not found. Please install Google Chrome to use autofill."
+        cecho -c yellow -t "Google Chrome was not found, do you want to install it using Homebrew?"
+        install_chrome_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_chrome_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing Google Chrome..."
+            brew install --cask google-chrome
+            chrome_ver=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version)
+        else
+            cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
+        fi
     else
         export TRAPP_CHROME_VER=$chrome_ver
         cecho -c green -t "Google Chrome found!"
@@ -304,6 +318,16 @@ elif [[ "$arch" == "Darwin" ]]; then
 else
     quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     return
+fi
+
+# Check post-install
+if [[ "$chrome_ver" == "" ]];
+then
+    # Ask user to install Google Chrome
+    cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
+else
+    export TRAPP_CHROME_VER=$chrome_ver
+    cecho -c green -t "Chrome installed successfully!"
 fi
 
 # Check if chrome-driver is installed in bin/chrome-driver
