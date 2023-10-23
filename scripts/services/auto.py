@@ -41,7 +41,7 @@ class AutoService:
             delay_driver_build=True
         )
         # Run scraper
-        (title, company, location) = scraper_engine.run(config, auth_engine=auth_engine)
+        (title, company, location, post_url) = scraper_engine.run(config, auth_engine=auth_engine)
         
         # Create entry
         new_entry = entry.Entry(
@@ -49,7 +49,7 @@ class AutoService:
             position=title,
             date_applied=datetime.datetime.now(),
             status=status.Status.INIT,
-            link=url,
+            link=post_url,
             notes=f"{location}"
         )
 

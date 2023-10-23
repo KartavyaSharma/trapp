@@ -185,7 +185,7 @@ class LinkenIn(Platform):
         ).text
         company = post_info.split("·")[0].strip()
         location = post_info.split("·")[1].split("  ")[0].strip()
-        return (title, company, location)
+        return (title, company, location, self.url)
 
     def clean_url(self):
         if "jobs" not in self.url or "view" not in self.url:

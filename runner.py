@@ -400,21 +400,7 @@ def auto():
                 print(f'{constants.OKGREEN}Multiple URLs found. Running scraper on all URLs...{constants.ENDC}')
                 try:
                     df = AutoService.batch_run(urls)
-                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entries!{constants.ENDC}')
-                    print("Here are the entries:")
-                    print(df)
-                    print("Does this look correct? Confirming will write entries to file.")
-                    confirm_choice = filter(subprocess.run(
-                        [*constants.YN],
-                        stdout=subprocess.PIPE,
-                        shell=False
-                    ))
-                    if confirm_choice == "YES":
-                        # Concatenate with existing CSV
-                        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
-                        print("Entries written to file!")
-                    else:
-                        print("Entries not written to file.\nIf you found errors for a specific entry, remove that url and try again.\nOr accept the entries and edit them manually")
+                    finish_auto_service(df)
                     break
                 except Exception as e:
                     print(e)
@@ -429,21 +415,7 @@ def auto():
                 print("Running scraper...")
                 try:
                     df = AutoService.run(url)        
-                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entry!{constants.ENDC}')
-                    print("Here is the entry:")
-                    print(df)
-                    print("Does this look correct? Confirming will write entry to file.")
-                    confirm_choice = filter(subprocess.run(
-                        [*constants.YN],
-                        stdout=subprocess.PIPE,
-                        shell=False
-                    ))
-                    if confirm_choice == "YES":
-                        # Append to CSV
-                        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
-                        print("Entry written to file!")
-                    else:
-                        print("Entry not written to file.")
+                    finish_auto_service(df)
                     break
                 except Exception as e:
                     print(e)
@@ -468,6 +440,25 @@ def get_terminal_width():
         return size
     except curses.error:
         return None
+
+
+def finish_auto_service(df):
+    print("===== Scraper Results =====")
+    print(f'{constants.OKGREEN}Scraped {len(df.index)} job(s)!{constants.ENDC}')
+    print(df)
+    print("===== End of Results =====")
+    print("Does this look correct? Confirming will write entry to file.")
+    confirm_choice = filter(subprocess.run(
+        [*constants.YN],
+        stdout=subprocess.PIPE,
+        shell=False
+    ))
+    if confirm_choice == "YES":
+        # Append to CSV
+        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+        print("Entry written to file!")
+    else:
+        print("Entry not written to file.\nIf you found errors in the generated entries, they can be manually edited after being committed to the CSV file.")
 
 
 def file_preview(df, ptf_flag=False):
