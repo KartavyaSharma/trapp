@@ -5,7 +5,7 @@ import os
 PROJECT_ROOT = f"{pathlib.Path(__file__).parent.resolve()}/.."
 
 ##### Select Menu Constants #####
-AUTO = "Automatically generate entry from url"
+AUTO = "Automatically generate entry from url (beta)"
 ADD = "Add new job application"
 EDIT = "Edit existing job application"
 VIEW = "View all job applications"
@@ -14,7 +14,7 @@ BKP = "Start Backup Daemon"
 PRT = "Print to file"
 
 CHOICE_MAP = {
-    "Automatically generate entry from url": "auto",
+    "Automatically generate entry from url (beta)": "auto",
     "Add new job application": "add",
     "Edit existing job application": "edit",
     "View all job applications": "view",

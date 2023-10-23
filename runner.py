@@ -429,7 +429,7 @@ def auto():
                 print("Running scraper...")
                 try:
                     df = AutoService.run(url)        
-                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entries!{constants.ENDC}')
+                    print(f'{constants.OKGREEN}Scraped {len(df.index)} entry!{constants.ENDC}')
                     print("Here is the entry:")
                     print(df)
                     print("Does this look correct? Confirming will write entry to file.")
