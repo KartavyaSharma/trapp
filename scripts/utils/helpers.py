@@ -28,14 +28,17 @@ def has_gui() -> bool:
     if check_xorg == "Xorg is /usr/bin/Xorg\n":
         return True
     # Check /usr/share/xsessions
-    check_xsessions = subprocess.check_output(
-        ["\ls", "/usr/share/xsessions"],
-        stderr=subprocess.DEVNULL,
-        universal_newlines=True,
-        shell=True
-    )
-    if not "No such file or directory" in check_xsessions:
-        return True
+    try:
+        check_xsessions = subprocess.check_output(
+            ["\ls /usr/share/xsessions"],
+            stderr=subprocess.DEVNULL,
+            universal_newlines=True,
+            shell=True
+        )
+    except Exception as e:
+        return False
+    # if not "No such file or directory" in check_xsessions:
+    #     return True
     check_dir = subprocess.check_output(
         ["\ls", "/usr/bin/*session"],
         stderr=subprocess.DEVNULL,
