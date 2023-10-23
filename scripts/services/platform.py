@@ -155,7 +155,7 @@ class Platform:
         """
         self.curr_driver.close()
     
-    def non_headed_auth_inst(self):
+    def non_headed_auth_instruction(self):
         """
         Instructions for authenticating <platform> on non-headed systems
         """
@@ -234,7 +234,7 @@ class LinkenIn(Platform):
         pickle.dump(x, open(self.get_cookie_file(), "wb"))
         print('Auth state saved!')
 
-    def non_headed_auth_inst(self):
+    def non_headed_auth_instruction(self):
         print("Please authenticate linkedin account manually.")
 
 

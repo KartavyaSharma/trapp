@@ -28,7 +28,7 @@ class Vault:
         file_path = pathlib.Path(constants.CHROME_DRIVER_COOKIE_FILE.replace("<platform>", platform.name.lower()))
         if not file_path.exists():
             if not headed_support:
-                platform.non_headed_auth_inst()
+                platform.non_headed_auth_instruction()
                 raise NoHeadedSupportError(platform.name)
             return False
         return True
