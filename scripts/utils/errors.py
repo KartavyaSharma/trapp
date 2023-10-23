@@ -33,6 +33,17 @@ class NoDriverSetError(Exception):
         super().__init__(self.msg)
 
 
+class NoHeadedSupportError(Exception):
+    """
+    Error raised when a platform does not support headed mode.
+    """
+    msg = "No headed support for selected platform."
+
+    def __init__(self, msg) -> None:
+        self.msg = f"NoHeadedSupportError: {msg}"
+        super().__init__(self.msg)
+
+
 def get_error_types() -> any:
     """
     Get error types from errors module

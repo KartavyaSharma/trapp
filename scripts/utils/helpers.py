@@ -1,12 +1,9 @@
-import constants.constants as constants
 import multiprocessing
 import os
-import pathlib
 import traceback
 import logging
 import re
 import subprocess
-import time
 
 from . import logger
 from multiprocessing.pool import ThreadPool as Pool
@@ -53,61 +50,7 @@ def has_gui() -> bool:
     elif "No such file or directory" not in check_dir:
         return True
     return False
-
-
-def check_xvfb() -> bool:
-    """
-    Check if xvfb is installed, if not, install it
-    """
-    if os.uname().sysname != "Darwin":
-        check_xvfb = subprocess.check_output(
-            ["which xvfb-run"],
-            stderr=subprocess.DEVNULL,
-            universal_newlines=True,
-            shell=True
-        )
-        if not "/usr/bin/xvfb-run\n" in check_xvfb:
-            print("xvfb not installed, installing...")
-            time.sleep(3)
-            # Install xvfb
-            subprocess.check_call(
-                ["sudo", "apt-get", "install", "xvfb"],
-                stderr=subprocess.DEVNULL,
-            )
-            # Install firefox dependency 
-            subprocess.check_call(
-                ["sudo", "apt-get", "install", "firefox"],
-                stderr=subprocess.DEVNULL,
-            )
-            # Verify xvfb installation
-            check_xvfb = subprocess.check_output(
-                ["which xvfb-run"],
-                stderr=subprocess.DEVNULL,
-                universal_newlines=True,
-                shell=True
-            )
-            if "/usr/bin/xvfb-run\n" in check_xvfb:
-                raise Exception("xvfb installation failed")
-        cache_file_path = pathlib.Path(constants.XVFB_CACHE_FLAG)
-        if not cache_file_path.is_file():
-            print("You are running on a server, addtional dependencies are required")
-            input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
-            subprocess.check_call(
-                ["sudo", "apt-get", "install", "xserver-xephyr", "tigervnc-standalone-server", "x11-utils", "gnumeric"],
-                stderr=subprocess.DEVNULL,
-            )
-            print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
-            subprocess.check_call(
-                ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
-                stderr=subprocess.DEVNULL,
-            )
-            # Create xvfb cache file
-            subprocess.check_call(
-                ["touch", f"{constants.XVFB_CACHE_FLAG}"],
-                stderr=subprocess.DEVNULL,
-            )
-    return True
-        
+ 
 
 def get_root_from_url(url: str) -> str:
     """

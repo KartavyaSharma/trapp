@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 
 
 class Platform:
@@ -153,6 +154,12 @@ class Platform:
         Kill current driver
         """
         self.curr_driver.close()
+    
+    def non_headed_auth_inst(self):
+        """
+        Instructions for authenticating <platform> on non-headed systems
+        """
+        raise NotImplementedError
 
 class LinkenIn(Platform):
     name = "LinkedIn"
@@ -162,13 +169,15 @@ class LinkenIn(Platform):
     def __init__(self, url: str):
         super().__init__(url)
 
-    def login(self, headed: bool = True):
+    def login(self):
         self.set_curr_driver(self.auth_driver) # Set current driver as auth driver
         self.go_to_login_url()
-        if not headed:
-            self.headless_login()
-        # Check if id=input__email_verification_pin exists
-        if self.curr_driver.find_elements(By.ID, "input__email_verification_pin").isDisplayed():
+        wait = WebDriverWait(self.curr_driver, 120)
+        if wait.until(
+            presence_of_element_located(
+                (By.ID, "input__email_verification_pin") # the `possible verify page`
+            )
+        ):
             print("Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email.")
             verification_code = input("Enter verification code: ")
             self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(verification_code)
@@ -185,15 +194,6 @@ class LinkenIn(Platform):
         time.sleep(5)
         self.clean()
         self.set_curr_driver(self.driver) # Set current driver as main driver
-
-    def headless_login(self):
-        print("You are now in headless mode. Please enter your LinkedIn credentials.")
-        email = input("Email: ")
-        password = input("Password: ")
-        self.curr_driver.find_element(By.ID, "username").send_keys(email)
-        self.curr_driver.find_element(By.ID, "password").send_keys(password)
-        self.curr_driver.find_element(By.CSS_SELECTOR, ".btn__primary--large").click()
-        time.sleep(3)
 
     def scrape_job(self) -> tuple[str, str, str]:
         self.init_scrape() # Assumes we are at job entry URL
@@ -234,6 +234,9 @@ class LinkenIn(Platform):
         pickle.dump(x, open(self.get_cookie_file(), "wb"))
         print('Auth state saved!')
 
+    def non_headed_auth_inst(self):
+        print("Please authenticate linkedin account manually.")
+
 
 class Handshake(Platform):
     name = "Handshake"
@@ -248,6 +251,9 @@ class Handshake(Platform):
 
     def scrape_job(self):
         pass
+
+    def non_headed_auth_inst(self):
+        print("Please authenticate linkedin account manually.")
 
 
 class PlatformBuilder:

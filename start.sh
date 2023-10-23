@@ -94,9 +94,15 @@ if [[ $arch == "Darwin" ]]
 then
     if ! (command -v brew) > /dev/null
     then
-        cecho -c yellow -t "brew was not found. Installing..."
-        # Install brew
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        cecho -c yellow -t "brew was not found. Do you want to install it? (Y/n)"
+        install_brew_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_brew_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing brew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        else
+            cecho -c yellow -t "brew was not installed. Please install brew manually to use trapp."
+        fi
     else
         cecho -c green -t "Homebrew found!"
     fi
@@ -105,16 +111,23 @@ fi
 # Check if wget is installed
 if ! (command -v wget) > /dev/null
 then
-    cecho -c red -t "wget was not found. Installing..."
-    if [[ $arch == "Darwin" ]]
+    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
+    install_wget_choice=$(./bin/gum choose "YES" "NO")
+    if [[ "$install_wget_choice" == "YES" ]];
     then
-        brew install wget
-    elif [[ $arch == "Linux" ]]
-    then
-        sudo apt-get install wget
+        cecho -c yellow -t "Installing wget..."
+        if [[ $arch == "Darwin" ]]
+        then
+            brew install wget
+        elif [[ $arch == "Linux" ]]
+        then
+            sudo apt-get install wget
+        else
+            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+            return
+        fi
     else
-        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        return
+        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
     fi
 else
     cecho -c green -t "WGET found!"

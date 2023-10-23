@@ -21,12 +21,17 @@ class Vault:
         pass
 
     @staticmethod
-    def isAuthenticated(platform: platform.Platform) -> bool:
+    def isAuthenticated(platform: platform.Platform, headed_support:bool = True) -> bool:
         """
         Check if user has saved auth state for platform
         """
         file_path = pathlib.Path(constants.CHROME_DRIVER_COOKIE_FILE.replace("<platform>", platform.name.lower()))
-        return file_path.is_file()
+        if not file_path.exists():
+            if not headed_support:
+                platform.non_headed_auth_inst()
+                raise NoHeadedSupportError(platform.name)
+            return False
+        return True
 
     @staticmethod
     def authenticate(platform: platform.Platform, auth_engine: any = None) -> None:
