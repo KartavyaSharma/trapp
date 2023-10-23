@@ -7,6 +7,7 @@ from scripts.utils.errors import NoDriverSetError, InvalidURLError
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
+from selenium.webdriver.common.keys import Keys
 
 
 class Platform:
@@ -166,14 +167,20 @@ class LinkenIn(Platform):
         self.go_to_login_url()
         if not headed:
             self.headless_login()
-        else:
-            wait = WebDriverWait(self.curr_driver, 120)
-            wait.until(
-                presence_of_element_located(
-                    # the `My Network` button
-                    (By.CSS_SELECTOR, ".global-nav__primary-item:nth-child(2) path")
-                )
+        # Check if id=input__email_verification_pin exists
+        if self.curr_driver.find_elements(By.ID, "input__email_verification_pin").isDisplayed():
+            print("Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email.")
+            verification_code = input("Enter verification code: ")
+            self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(verification_code)
+            # Press enter to submit verification code
+            self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(Keys.ENTER)
+        wait = WebDriverWait(self.curr_driver, 120)
+        wait.until(
+            presence_of_element_located(
+                # the `My Network` button
+                (By.CSS_SELECTOR, ".global-nav__primary-item:nth-child(2) path")
             )
+        )
         self.save_cookies()  # Save cookies
         time.sleep(5)
         self.clean()
@@ -186,6 +193,7 @@ class LinkenIn(Platform):
         self.curr_driver.find_element(By.ID, "username").send_keys(email)
         self.curr_driver.find_element(By.ID, "password").send_keys(password)
         self.curr_driver.find_element(By.CSS_SELECTOR, ".btn__primary--large").click()
+        time.sleep(3)
 
     def scrape_job(self) -> tuple[str, str, str]:
         self.init_scrape() # Assumes we are at job entry URL

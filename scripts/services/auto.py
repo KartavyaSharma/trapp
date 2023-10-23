@@ -45,13 +45,11 @@ class AutoService:
         config = configuration_builder.build(url)
         scraper_engine = scraper_builder.build()
         # Partially build the auth engine
-        auth_opts = constants.CHROME_DRIVER_NO_HEADLESS_OPTS if gui_support else [*constants.CHROME_DRIVER_SERVER_OPTS]
-        auth_driver = webdriver.Firefox() if not gui_support else None
+        auth_opts = constants.CHROME_DRIVER_NO_HEADLESS_OPTS 
         auth_engine = scraper_builder.build(
             opts=auth_opts, # Run in non-headless mode 
             delay_driver_build=True,
             headed_support=gui_support,
-            custom_driver=auth_driver
         )
         # Run scraper
         (title, company, location, post_url) = scraper_engine.run(config, auth_engine=auth_engine)
