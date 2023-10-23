@@ -9,11 +9,12 @@ import sys
 
 from . import configuration, scraper
 from scripts.models import entry, status
+from selenium import webdriver
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.helpers import LoggingPool, has_gui 
+from scripts.utils.helpers import LoggingPool, has_gui, check_xvfb
 
 class AutoService(object):
     """
@@ -26,11 +27,21 @@ class AutoService(object):
     def __init__(self):
         # Check if GUI is supported
         self.gui_support = has_gui()
+        if not self.gui_support:
+            print("GUI not supported on this system, checking for additional dependencies")
+            check_xvfb()
+            from pyvirtualdisplay import Display
+            self.display = Display(visible=0, size=(800, 600))
+            self.display.start()
 
     def __getattribute__(self, __name: str) -> Any:
         if __name != "thread_local":
             return super().__getattribute__(__name)
     
+    def __del__(self):
+        if not self.gui_support:
+            self.display.stop()
+
     @staticmethod
     def run(url: str, gui_support: bool = True) -> pd.DataFrame:
         """
