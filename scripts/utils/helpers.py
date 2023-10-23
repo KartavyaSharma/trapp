@@ -59,12 +59,12 @@ def check_xvfb() -> bool:
     """
     if os.uname().sysname != "Darwin":
         check_xvfb = subprocess.check_output(
-            ["type", "xvfb"],
+            ["type", "xvfb-run"],
             stderr=subprocess.DEVNULL,
             universal_newlines=True,
             shell=True
         )
-        if check_xvfb == "Xvfb is /usr/bin/Xvfb\n":
+        if check_xvfb == "xvfb-run is /usr/bin/xvfb-run\n":
             return
         print("xvfb not installed, installing...")
         time.sleep(3)
@@ -80,13 +80,13 @@ def check_xvfb() -> bool:
         )
         # Verify xvfb installation
         check_xvfb = subprocess.check_output(
-            ["ps", "-ef", "|", "grep", "xvfb"],
+            ["type", "xvfb-run"],
             stderr=subprocess.DEVNULL,
             universal_newlines=True,
             shell=True
         )
-        if "xvfb" not in check_xvfb:
-            return False
+        if check_xvfb != "xvfb-run is /usr/bin/xvfb-run\n":
+            raise Exception("xvfb installation failed")
         print("You are running on a server, addtional dependencies are required")
         input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
         subprocess.check_call(

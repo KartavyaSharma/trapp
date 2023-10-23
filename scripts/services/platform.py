@@ -153,7 +153,6 @@ class Platform:
         """
         self.curr_driver.close()
 
-
 class LinkenIn(Platform):
     name = "LinkedIn"
     base_url = "https://www.linkedin.com"
