@@ -52,6 +52,7 @@ class AutoService(object):
         @param result_queue: Queue to store multiprocessing results in (optional)
         @return: Pandas DataFrame containing a single row job entry 
         """
+        print(gui_support)
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()
