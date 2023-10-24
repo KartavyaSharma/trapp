@@ -14,7 +14,8 @@ from selenium import webdriver
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.helpers import LoggingPool, has_gui, check_xvfb
+from scripts.utils.helpers import has_gui, check_xvfb
+from scripts.utils.threader import LoggingPool
 
 class AutoService(object):
     """
@@ -30,7 +31,9 @@ class AutoService(object):
         if not self.gui_support:
             print("GUI not supported on this system, checking for additional dependencies")
             check_xvfb()
+            ####### DO NOT REMOVE CONDITIONAL IMPORT #######
             from pyvirtualdisplay import Display # Should be installed in check_xvfb()
+            ################################################
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
 
@@ -85,6 +88,10 @@ class AutoService(object):
         @param urls: List of URLs to scrape job application data from
         @return: Pandas DataFrame containing multiple job entries
         """
+        # Remove possible duplicates
+        if len(urls) != len(set(urls)):
+            print("Duplicate URLs detected, removing duplicates...")
+        urls = set(urls)
         # Enable logging
         multiprocessing.log_to_stderr()
         # Define worker pool

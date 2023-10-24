@@ -46,7 +46,7 @@ class ScraperEngine:
         config.inject_driver(driver=self.driver)
         config.platform.init()
         # Check if authenticated
-        if not vault.Vault.isAuthenticated(config.platform, headed_support=self.headed_support):
+        if not vault.Vault.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
             vault.Vault.authenticate(config.platform, auth_engine=auth_engine)
         return config.platform.scrape_job()
 
@@ -83,7 +83,7 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = None) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
