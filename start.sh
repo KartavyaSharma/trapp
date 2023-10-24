@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Print welcome message
+python3 ./scripts/utils/welcome.py
+
 # Make a temporary alias for echo
 alias cecho=$(realpath ./scripts/shell/echo.sh)
 # Make echo executable
