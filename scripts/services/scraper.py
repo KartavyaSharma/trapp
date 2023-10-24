@@ -83,7 +83,7 @@ class ScraperBuilder:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = None) -> ScraperEngine:
+    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
