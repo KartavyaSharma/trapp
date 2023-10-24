@@ -44,6 +44,16 @@ class NoHeadedSupportError(Exception):
         super().__init__(self.msg)
 
 
+class UnexpectedPageStateError(Exception):
+    """
+    Error raised when the scraper encounters an unexpected page state.
+    """
+
+    def __init__(self, msg) -> None:
+        self.msg = f"Unexpected page state encountered for {msg}"
+        super().__init__(self.msg)
+
+
 def get_error_types() -> any:
     """
     Get error types from errors module

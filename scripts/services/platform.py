@@ -3,11 +3,12 @@ import constants.constants as constants
 import pickle
 import time
 
-from scripts.utils.errors import NoDriverSetError, InvalidURLError
+from scripts.utils.errors import NoDriverSetError, InvalidURLError, UnexpectedPageStateError
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support.expected_conditions import presence_of_element_located
+from selenium.webdriver.support.expected_conditions import presence_of_element_located, invisibility_of_element_located
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 
 
 class Platform:
@@ -127,7 +128,7 @@ class Platform:
     def load_cookies(self):
         print("Restoring auth state...")
         cookies = pickle.load(open(self.get_cookie_file(), "rb"))
-        self.driver.add_cookie(cookies)
+        self.curr_driver.add_cookie(cookies)
 
     def init_scrape(self):
         """
@@ -172,25 +173,35 @@ class LinkenIn(Platform):
         self.set_curr_driver(self.auth_driver) # Set current driver as auth driver
         self.go_to_login_url()
         wait = WebDriverWait(self.curr_driver, 120)
-        if wait.until(
-            presence_of_element_located(
-                (By.ID, "input__email_verification_pin") # the `possible verify page`
+        wait.until(
+            invisibility_of_element_located(
+                (By.LINK_TEXT, "Forgot password?") # the `Forgot password?` link
             )
-        ):
-            print("Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email.")
-            verification_code = input("Enter verification code: ")
-            self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(verification_code)
-            # Press enter to submit verification code
-            self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(Keys.ENTER)
-        wait = WebDriverWait(self.curr_driver, 120)
+        )
+        wait = WebDriverWait(self.curr_driver, 5)
+        try:
+            if wait.until(
+                presence_of_element_located(
+                    (By.ID, "input__email_verification_pin") # the `possible verify page`
+                )
+            ):
+                print("Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email.")
+                verification_code = input("Enter verification code: ")
+                self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(verification_code)
+                # Press enter to submit verification code
+                self.curr_driver.find_element(By.ID, "input__email_verification_pin").send_keys(Keys.ENTER)
+        except TimeoutException:
+            pass
         wait.until(
             presence_of_element_located(
                 # the `My Network` button
                 (By.CSS_SELECTOR, ".global-nav__primary-item:nth-child(2) path")
             )
         )
-        self.save_cookies()  # Save cookies
         time.sleep(5)
+        # Make sure title of current page contains "Feed"
+        assert "Feed" in self.curr_driver.title, UnexpectedPageStateError(self.curr_driver.url)
+        self.save_cookies()  # Save cookies
         self.clean()
         self.set_curr_driver(self.driver) # Set current driver as main driver
 
@@ -219,7 +230,6 @@ class LinkenIn(Platform):
         Save Selenium auth state for LinkedIn to disk
         """
         print("Saving auth state...")
-        time.sleep(10)
         cookies = self.curr_driver.get_cookies()
         for cookie in cookies:
             if (cookie['name'] == 'li_at'):
