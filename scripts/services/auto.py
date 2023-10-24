@@ -14,7 +14,8 @@ from selenium import webdriver
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.helpers import LoggingPool, has_gui, check_xvfb
+from scripts.utils.helpers import has_gui, check_xvfb
+from scripts.utils.threader import LoggingPool
 
 class AutoService(object):
     """
@@ -49,7 +50,6 @@ class AutoService(object):
         @param result_queue: Queue to store multiprocessing results in (optional)
         @return: Pandas DataFrame containing a single row job entry 
         """
-        print(gui_support)
         # Define builders
         configuration_builder = configuration.ConfigurationBuilder()
         scraper_builder = scraper.ScraperBuilder()
@@ -86,6 +86,10 @@ class AutoService(object):
         @param urls: List of URLs to scrape job application data from
         @return: Pandas DataFrame containing multiple job entries
         """
+        # Remove possible duplicates
+        if len(urls) != len(set(urls)):
+            print("Duplicate URLs detected, removing duplicates...")
+        urls = set(urls)
         # Enable logging
         multiprocessing.log_to_stderr()
         # Define worker pool
