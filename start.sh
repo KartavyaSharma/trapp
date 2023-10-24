@@ -106,6 +106,21 @@ then
     else
         cecho -c green -t "Homebrew found!"
     fi
+
+    if ! (command -v brew list openssl@1.1) > /dev/null
+    then
+        cecho -c yellow -t "openssl@1.1 was not found. Do you want to install it? (Y/n)"
+        install_openssl_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_openssl_choice" == "YES" ]];
+        then
+            cecho -c yellow -t "Installing openssl@1.1..."
+            brew install openssl@1.1
+        else
+            cecho -c yellow -t "openssl@1.1 was not installed. Please install openssl@1.1 manually to use trapp."
+        fi
+    else
+        cecho -c green -t "openssl@1.1 found!"
+    fi
 fi
 
 # Check if wget is installed
