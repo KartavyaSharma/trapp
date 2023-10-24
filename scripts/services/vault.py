@@ -3,7 +3,7 @@ import pathlib
 
 import constants.constants as constants
 
-from . import platform
+from ..models import platform
 from scripts.utils.errors import *
 
 class Vault:
