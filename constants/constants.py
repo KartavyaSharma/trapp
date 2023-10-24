@@ -108,6 +108,9 @@ CHROME_DRIVER_INCOGNITO_OPTS = ["--incognito"]
 CHROME_DRIVER_SERVER_OPTS = ["--headless", "--no-sandbox", "start-maximized", "disable-infobars", "--disable-extensions"]
 CHROME_DRIVER_COOKIE_FILE = f"{PROJECT_ROOT}/.cache/chrome_driver_<platform>.pkl"
 
+#### Selenium Constants ####
+SELENIUM_TIMEOUT = 5
+
 #### Vault Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"
 
