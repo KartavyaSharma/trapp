@@ -30,7 +30,7 @@ class AutoService(object):
         if not self.gui_support:
             print("GUI not supported on this system, checking for additional dependencies")
             check_xvfb()
-            from pyvirtualdisplay import Display
+            from pyvirtualdisplay import Display # Should be installed in check_xvfb()
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
 
