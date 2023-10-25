@@ -1,9 +1,15 @@
 import redis
 import subprocess
 import os
+import pathlib
+import sys
 
 import constants.constants as constants
 
+# Added to make the utils module available to the script
+sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
+
+from scripts.utils.errors import ServiceAlreadyRunningError, ServiceNotRunningError
 
 class RedisService:
 
@@ -16,7 +22,7 @@ class RedisService:
         """
         # Check if Redis is running
         if not RedisService.status():
-            raise Exception("Redis is not running")
+            raise ServiceNotRunningError("Redis")
         # Return Redis client
         return redis.StrictRedis(
             host=constants.REDIS_HOST,
@@ -33,7 +39,7 @@ class RedisService:
         """
         # Make sure Redis is running
         if not RedisService.status():
-            raise Exception("Redis is not running")
+            raise ServiceNotRunningError("Redis")
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
             subprocess.call(f"docker exec \
                             -it {constants.REDIS_CONTAINER_NAME} \
@@ -59,7 +65,7 @@ class RedisService:
         """
         # Make sure Redis is not running
         if RedisService.status():
-            raise Exception("Redis is already running")
+            raise ServiceAlreadyRunningError("Redis")
         # Create docker volume for Redis data
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
             subprocess.call(f"docker volume create {constants.REDIS_DATA_DIR}",

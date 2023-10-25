@@ -1,4 +1,3 @@
-from typing import Any
 import constants.constants as constants
 import datetime
 import multiprocessing
@@ -13,6 +12,7 @@ from scripts.models import entry, status
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
+from scripts.utils.errors import ServiceAlreadyRunningError
 from scripts.utils.helpers import has_gui, check_xvfb
 from scripts.utils.threader import LoggingPool
 
@@ -37,7 +37,7 @@ class AutoService(object):
             self.display.start()  
         self.start_redis()
 
-    def __getattribute__(self, __name: str) -> Any:
+    def __getattribute__(self, __name: str) -> any:
         if __name != "thread_local":
             return super().__getattribute__(__name)
     
@@ -130,11 +130,10 @@ class AutoService(object):
         Start Redis service
         """
         print("Starting Redis service...")
-        service = redis.RedisService("redis")
+        service = redis.RedisService(password="redis")
         self.service = service
         try:
             service.init()
-        except Exception as e:
+        except ServiceAlreadyRunningError as e:
             print(e)
-            print("Redis service already running")
         assert service.status(), "Redis service not running"

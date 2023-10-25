@@ -6,7 +6,7 @@ import constants.constants as constants
 from ..models import platform
 from scripts.utils.errors import *
 
-class Vault:
+class VaultService:
 
     def __init__(self):
         pass

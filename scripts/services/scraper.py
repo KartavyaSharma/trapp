@@ -46,8 +46,8 @@ class ScraperEngine:
         config.inject_driver(driver=self.driver)
         config.platform.init()
         # Check if authenticated
-        if not vault.Vault.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
-            vault.Vault.authenticate(config.platform, auth_engine=auth_engine)
+        if not vault.VaultService.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
+            vault.VaultService.authenticate(config.platform, auth_engine=auth_engine)
         return config.platform.scrape_job()
 
 

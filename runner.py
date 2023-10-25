@@ -30,12 +30,12 @@ def main():
             print(e)
             return
     else:
-        print("Source file job_applications.csv found. What do you want to do?")
+        print(f"{constants.OKGREEN}Source file job_applications.csv found{constants.ENDC}.\nWhat do you want to do?")
     # Ask user what they want to do
     try:
-        subprocess.run(
-            ["echo", "Choose utility to run:"]
-        )
+        # subprocess.run(
+        #     ["echo", "Choose utility to run:"]
+        # )
         opts = [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.AUTO, constants.QUIT] if \
             f"{os.uname().sysname} {os.uname().machine}" != "Linux arm64" else \
             [constants.VIEW, constants.ADD, constants.EDIT,

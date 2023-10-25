@@ -54,6 +54,26 @@ class UnexpectedPageStateError(Exception):
         super().__init__(self.msg)
 
 
+class ServiceAlreadyRunningError(Exception):
+    """
+    Error raised when a service is already running.
+    """
+
+    def __init__(self, msg) -> None:
+        self.msg = f"Service already running: {msg}"
+        super().__init__(self.msg)
+
+
+class ServiceNotRunningError(Exception):
+    """
+    Error raised when a service is not running.
+    """
+
+    def __init__(self, msg) -> None:
+        self.msg = f"Service not running: {msg}"
+        super().__init__(self.msg)
+
+
 def get_error_types() -> any:
     """
     Get error types from errors module
