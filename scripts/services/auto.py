@@ -129,11 +129,11 @@ class AutoService(object):
         """
         Start Redis service
         """
-        print("Starting Redis service...")
-        service = redis.RedisService(password="redis")
-        self.service = service
+        print("Starting Redis service...", end=' ')
+        self.service = redis.RedisService(password="redis")
         try:
-            service.init()
+            self.service.init()
         except ServiceAlreadyRunningError as e:
             print(e)
-        assert service.status(), "Redis service not running"
+        assert self.service.status(), "Redis service not running"
+        print(f"{constants.OKGREEN}OK{constants.ENDC}")

@@ -53,7 +53,7 @@ def verify_headless_support() -> bool:
     Check if xvfb is installed, if not, install it
     """
     if os.uname().sysname != "Darwin":
-        print("Checking for xvfb...")
+        print("Checking for xvfb...", end=' ')
         check_xvfb = subprocess.check_output(
             ["which xvfb-run"],
             stderr=subprocess.DEVNULL,
@@ -80,8 +80,10 @@ def verify_headless_support() -> bool:
                 universal_newlines=True,
                 shell=True
             )
-            if "/usr/bin/xvfb-run\n" in check_xvfb:
-                raise Exception("xvfb installation failed")
+        if "/usr/bin/xvfb-run\n" in check_xvfb:
+            raise Exception("xvfb installation failed")
+        else:
+            print(f"{constants.OKGREEN}OK{constants.ENDC}")
         cache_file_path = pathlib.Path(constants.XVFB_CACHE_FLAG)
         if not cache_file_path.is_file():
             print(f"{constants.WARNING}You are running on an headless server, addtional dependencies are required{constants.ENDC}")
