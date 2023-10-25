@@ -80,7 +80,7 @@ def verify_headless_support() -> bool:
                 universal_newlines=True,
                 shell=True
             )
-        if "/usr/bin/xvfb-run\n" in check_xvfb:
+        if not "/usr/bin/xvfb-run\n" in check_xvfb:
             raise Exception("xvfb installation failed")
         else:
             print(f"{constants.OKGREEN}OK{constants.ENDC}")
