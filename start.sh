@@ -3,10 +3,11 @@
 # Print welcome message
 python3 ./scripts/utils/welcome.py
 
-# Make a temporary alias for echo
-alias cecho=$(realpath ./scripts/shell/echo.sh)
-# Make echo executable
-chmod +x ./scripts/shell/echo.sh
+cecho_path=$(realpath ./scripts/shell/echo.sh)
+chmod +x $cecho_path
+cecho () {
+    ${cecho_path} "$@"
+}
 
 quit () {
     error=$@
@@ -16,7 +17,6 @@ quit () {
     unset gum_binary_links
     unset url
     unset ARGFLAG
-    unalias cecho
     deactivate
     if [[ "$error" != "" ]]; then
         cecho -c red -t "Program exited with error. Deactivating virtual environment..."
@@ -269,7 +269,7 @@ then
         # Installing docker using the convenience script
         curl -fsSL https://get.docker.com -o ./bin/get-docker.sh
         cecho -c yellow -t "Installing docker... (This requires sudo)"
-        sleep(3)
+        sleep 3
         sudo sh ./bin/get-docker.sh
         sudo usermod -aG docker ${USER}
         su - ${USER}
@@ -409,7 +409,7 @@ for arg in "$@"; do
         ;;
     -c | --clean)
         echo "Cleaning up..."
-        echo "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
+        echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
         rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp 
         echo "Removing preview files..."
         # Delete any preview files with the .preview extension

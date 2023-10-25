@@ -7,9 +7,8 @@ import pathlib
 import threading
 import sys
 
-from . import configuration, scraper
+from . import configuration, scraper, redis
 from scripts.models import entry, status
-from selenium import webdriver
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
@@ -35,7 +34,8 @@ class AutoService(object):
             from pyvirtualdisplay import Display # Should be installed in check_xvfb()
             ################################################
             self.display = Display(visible=0, size=(800, 600))
-            self.display.start()
+            self.display.start()  
+        self.start_redis()
 
     def __getattribute__(self, __name: str) -> Any:
         if __name != "thread_local":
@@ -44,6 +44,8 @@ class AutoService(object):
     def __del__(self):
         if not self.gui_support:
             self.display.stop()
+        print("Stopping Redis service...")
+        self.service.stop()
 
     @staticmethod
     def run(url: str, gui_support: bool = True) -> pd.DataFrame:
@@ -75,7 +77,7 @@ class AutoService(object):
             date_applied=datetime.datetime.now(),
             status=status.Status.INIT,
             link=post_url,
-            notes=f"{location}"
+            notes=f"Addtional Information:{location}"
         )
 
         # Get dataframe
@@ -122,3 +124,17 @@ class AutoService(object):
 
         # Return results
         return pd.concat(final, ignore_index=True)
+    
+    def start_redis(self) -> None:
+        """
+        Start Redis service
+        """
+        print("Starting Redis service...")
+        service = redis.RedisService("redis")
+        self.service = service
+        try:
+            service.init()
+        except Exception as e:
+            print(e)
+            print("Redis service already running")
+        assert service.status(), "Redis service not running"
