@@ -43,7 +43,7 @@ class Platform:
         raise NotImplementedError
 
     @abc.abstractclassmethod
-    def scrape_job(self):
+    def scrape(self):
         """
         Selenium <platform> scrape job workflow
         """
@@ -123,6 +123,7 @@ class Platform:
         """
         Setup scrape
         """
+        self.init()  # Init platform
         self.set_curr_driver(self.driver)  # Set current driver as main driver
         # Load cookies
         self.go_to_base_url()

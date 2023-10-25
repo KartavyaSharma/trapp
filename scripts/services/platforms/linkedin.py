@@ -67,7 +67,7 @@ class LinkenIn(Platform):
         self.clean()
         self.set_curr_driver(self.driver)  # Set current driver as main driver
 
-    def scrape_job(self) -> tuple[str, str, str]:
+    def scrape(self) -> tuple[str, str, str]:
         self.init_scrape()  # Assumes we are at job entry URL
         # Get job post title
         title = self.curr_driver.find_element(By.CSS_SELECTOR, ".t-24").text

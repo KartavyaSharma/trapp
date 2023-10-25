@@ -17,7 +17,7 @@ class Handshake(Platform):
     def login(self):
         pass
 
-    def scrape_job(self):
+    def scrape(self):
         pass
 
     def non_headed_auth_inst(self):
