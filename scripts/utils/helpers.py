@@ -48,11 +48,12 @@ def has_gui() -> bool:
     return False
 
 
-def check_xvfb() -> bool:
+def verify_headless_support() -> bool:
     """
     Check if xvfb is installed, if not, install it
     """
     if os.uname().sysname != "Darwin":
+        print("Checking for xvfb...")
         check_xvfb = subprocess.check_output(
             ["which xvfb-run"],
             stderr=subprocess.DEVNULL,
@@ -83,14 +84,15 @@ def check_xvfb() -> bool:
                 raise Exception("xvfb installation failed")
         cache_file_path = pathlib.Path(constants.XVFB_CACHE_FLAG)
         if not cache_file_path.is_file():
-            print("You are running on a server, addtional dependencies are required")
-            input("Installing xserver-xephyr tigervnc-standalone-server x11-utils and gnumeric, press enter to continue...")
+            print(f"{constants.WARNING}You are running on an headless server, addtional dependencies are required{constants.ENDC}")
+            print("The following packages will be installed:\nxserver-xephyr\ntigervnc-standalone-server\nx11-utils\ngnumeric")
             subprocess.check_call(
                 ["sudo", "apt-get", "install", "xserver-xephyr",
                     "tigervnc-standalone-server", "x11-utils", "gnumeric"],
                 stderr=subprocess.DEVNULL,
             )
-            print("Installing additional python dependencies pyvirtualdisplay pillow and EasyProcess")
+            print(f"{constants.WARNING}Additional python dependencies are required.{constants.ENDC}")
+            print("The following packages will be installed:\npyvirtualdisplay\npillow\nEasyProcess")
             subprocess.check_call(
                 ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
                 stderr=subprocess.DEVNULL,

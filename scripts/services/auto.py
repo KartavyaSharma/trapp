@@ -13,7 +13,7 @@ from scripts.models import entry, status
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
 from scripts.utils.errors import ServiceAlreadyRunningError
-from scripts.utils.helpers import has_gui, check_xvfb
+from scripts.utils.helpers import has_gui, verify_headless_support 
 from scripts.utils.threader import LoggingPool
 
 class AutoService(object):
@@ -28,10 +28,10 @@ class AutoService(object):
         # Check if GUI is supported
         self.gui_support = has_gui()
         if not self.gui_support:
-            print("GUI not supported on this system, checking for additional dependencies")
-            check_xvfb()
+            print(f"{constants.WARNING}GUI support not detected, running in headless mode...{constants.ENDC}")
+            verify_headless_support()
             ####### DO NOT REMOVE CONDITIONAL IMPORT #######
-            from pyvirtualdisplay import Display # Should be installed in check_xvfb()
+            from pyvirtualdisplay import Display # Should be installed in verify_headless_support()
             ################################################
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()  
