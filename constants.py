@@ -2,7 +2,7 @@ import pathlib
 import os
 
 #### Project Root ####
-PROJECT_ROOT = f"{pathlib.Path(__file__).parent.resolve()}/.."
+PROJECT_ROOT = f"{pathlib.Path(__file__).parent.resolve()}"
 
 ##### Select Menu Constants #####
 AUTO = "Automatically generate entry from url (beta)"
@@ -34,8 +34,9 @@ INPUT_POSITION = "Input position"
 INPUT_DATE_APPLIED = "Input date applied (DD/MM/YYYY)"
 INPUT_PORTAL_LINK = "Input portal link"
 INPUT_NOTES = "Input notes"
-INPUT_JOB_POSTING_URL = "Input job posting URL"
-QUIT_INPUT = "Type Q to quit"
+INPUT_JOB_POSTING_URL = "Enter upto 5 comma separated urls."
+INPUT_QUIT = "Type Q to quit."
+INPUT_MASS_ADD = "Type M for > 5 urls."
 
 ##### Status Constants #####
 STATUS_INIT = "Applied"
@@ -56,19 +57,21 @@ DEFAULT_COLUMN_CHOOSE = "Default"
 
 ##### COLORS #####
 OKGREEN = '\033[1;32m'
+INFOBLUE = '\033[1;34m'
 WARNING = '\033[1;33m'
 FAIL = '\033[1;31m'
 ENDC = '\033[0m'
 
 ##### Command Constants #####
+GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
 GUM_CHOOSE = ['./bin/gum', 'choose']
 GUM_INPUT_W_PLACEHOLDER = ['./bin/gum', 'input', '--placeholder']
-GUM_FILTER = ['./bin/gum', 'filter']
+GUM_FILTER = ['./bin/gum', 'filter', '--fuzzy', '--no-limit', '--sort']
 
 BAT = "./bin/bat/bin/bat"
 
-YN = [*GUM_CHOOSE] + ['YES', 'NO']
-NY = [*GUM_CHOOSE] + ['NO', 'YES']
+YN = ['YES', 'NO']
+NY = ['NO', 'YES']
 
 ##### Display Constants #####
 MAX_COL_WIDTH = 40
@@ -115,7 +118,7 @@ SELENIUM_TIMEOUT = 5
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"
 
 #### Multiprocessing Constants ####
-MAX_WORKERS = 4
+MAX_WORKERS = 10
 
 #### Logging Constants ####
 LOG_FILENAME = f"{PROJECT_ROOT}/logs/trapp.log"

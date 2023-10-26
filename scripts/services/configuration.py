@@ -1,6 +1,6 @@
+import constants
 import pathlib
 import sys
-import constants.constants as constants
 
 from selenium import webdriver
 from ..models.platform import Platform

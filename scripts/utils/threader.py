@@ -2,7 +2,7 @@ import multiprocessing
 import traceback
 import logging
 
-from . import logger
+from . import logger, errors
 from multiprocessing.pool import ThreadPool as Pool
 
 class LogExceptions(object):
@@ -20,13 +20,14 @@ class LogExceptions(object):
         except Exception as e:
             # Here we add some debugging help. If multiprocessing's
             # debugging is on, it will arrange to log the traceback
-            logger.LoggerBuilder.build(
-                log_level=logging.ERROR
-            ).error(traceback.format_exc())
-            LogExceptions.error(e)
+            log_engine = logger.LoggerBuilder.build(log_level=logging.ERROR)
+            log_engine.error(traceback.format_exc())
+            log_engine.error("Exception in worker process: %s" % e)
+            # LogExceptions.error(e)
             # Re-raise the original exception so the Pool worker can
             # clean up
             raise
+            # raise errors.PoolException(e)
 
         # It was fine, give a normal answer
         return result

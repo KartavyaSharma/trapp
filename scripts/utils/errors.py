@@ -19,6 +19,7 @@ class InvalidURLError(Exception):
     """
 
     def __init__(self, msg) -> None:
+        self.url = msg
         self.msg = f"Invalid URL found! No matching platform.\n\tURL: {msg}"
         super().__init__(self.msg)
 
@@ -72,6 +73,26 @@ class ServiceNotRunningError(Exception):
     def __init__(self, msg) -> None:
         self.msg = f"Service not running: {msg}"
         super().__init__(self.msg)
+
+class AutoServiceError(Exception):
+    """
+    Wrapper class for errors raised by auto service
+    """
+
+    def __init__(self, msg, err, url) -> None:
+        self.msg = f"{msg}: {err}"
+        self.url = url
+        super().__init__(self.msg)
+
+
+class PoolException(Exception):
+    """
+    Wrapper around exceptions raised by thread pool
+    """
+
+    def __init__(self, err) -> None:
+        self.err = err
+        super().__init__()
 
 
 def get_error_types() -> any:

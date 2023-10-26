@@ -1,14 +1,14 @@
+import constants
 import redis
-import subprocess
 import os
 import pathlib
 import sys
 
-import constants.constants as constants
 
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
+from scripts.utils.subprocess import SubprocessService
 from scripts.utils.errors import ServiceAlreadyRunningError, ServiceNotRunningError
 
 class RedisService:
@@ -41,23 +41,32 @@ class RedisService:
         if not RedisService.status():
             raise ServiceNotRunningError("Redis")
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
-            subprocess.call(f"docker exec \
-                            -it {constants.REDIS_CONTAINER_NAME} \
-                            /bin/sh -c 'export REDISCLI_AUTH={self.password}; redis-cli flushall; unset REDISCLI_AUTH'",
-                            shell=True, stdout=log, stderr=log
-                            )
+            SubprocessService(
+                [
+                    f"docker exec \
+                    -it {constants.REDIS_CONTAINER_NAME} \
+                    /bin/sh -c 'export REDISCLI_AUTH={self.password}; redis-cli flushall; unset REDISCLI_AUTH'"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
 
     def stop(self) -> None:
         # Clear Redis database
         self.flush()
         # Stop Redis service, remove container and volume
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
-            subprocess.call(
-                f"docker rm -f {constants.REDIS_CONTAINER_NAME}",
-                shell=True, stdout=log, stderr=log)
-            subprocess.call(
-                f"docker volume rm {constants.REDIS_DATA_DIR}",
-                shell=True, stdout=log, stderr=log)
+            SubprocessService(
+                [
+                    f"docker rm -f {constants.REDIS_CONTAINER_NAME}"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
+            SubprocessService(
+                [
+                    f"docker volume rm {constants.REDIS_DATA_DIR}"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
 
     def init(self) -> None:
         """
@@ -68,17 +77,25 @@ class RedisService:
             raise ServiceAlreadyRunningError("Redis")
         # Create docker volume for Redis data
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
-            subprocess.call(f"docker volume create {constants.REDIS_DATA_DIR}",
-                            shell=True, stdout=log, stderr=log)
-            subprocess.call(f"docker run -d \
-                            -h redis \
-                            -e REDIS_PASSWORD=redis \
-                            -v {constants.REDIS_DATA_DIR}:/data \
-                            -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
-                            --name {constants.REDIS_CONTAINER_NAME} \
-                            --restart always \
-                            redis:5.0.5-alpine3.9 /bin/sh -c 'redis-server --appendonly yes --requirepass {self.password}'",
-                            shell=True, stdout=log, stderr=log)
+            SubprocessService(
+                [
+                    f"docker volume create {constants.REDIS_DATA_DIR}"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
+            SubprocessService(
+                [
+                    f"docker run -d \
+                    -h redis \
+                    -e REDIS_PASSWORD=redis \
+                    -v {constants.REDIS_DATA_DIR}:/data \
+                    -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
+                    --name {constants.REDIS_CONTAINER_NAME} \
+                    --restart always \
+                    redis:5.0.5-alpine3.9 /bin/sh -c 'redis-server --appendonly yes --requirepass {self.password}'"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
 
     @staticmethod
     def status() -> bool:
@@ -86,8 +103,12 @@ class RedisService:
         Check if Redis is running
         """
         with open(f"{constants.REDIS_STATUS_TMP}", "w") as log:
-            subprocess.call("docker inspect -f '{{.State.Running}}' " + f"{constants.REDIS_CONTAINER_NAME}",
-                            shell=True, stdout=log, stderr=log)
+            SubprocessService(
+                [
+                    "docker inspect -f '{{.State.Running}}' " + f"{constants.REDIS_CONTAINER_NAME}"
+                ],
+                {"stdout": log, "stderr": log, "shell": True}
+            ).call()
         with open(f"{constants.REDIS_STATUS_TMP}", "r") as log:
             status = log.read().strip()
         # Remove temporary file

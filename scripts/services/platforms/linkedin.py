@@ -1,5 +1,4 @@
-from scripts.models.platform import Platform
-import constants.constants as constants
+import constants as constants
 import pathlib
 import sys
 import time
@@ -14,6 +13,7 @@ from selenium.common.exceptions import TimeoutException
 # Make the platform module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
+from scripts.models.platform import Platform
 
 class LinkenIn(Platform):
     name = "LinkedIn"
@@ -24,9 +24,6 @@ class LinkenIn(Platform):
         super().__init__(url)
 
     def login(self):
-        # Set current driver as auth driver
-        self.set_curr_driver(self.auth_driver)
-        self.go_to_login_url()
         wait = WebDriverWait(self.curr_driver, 120)  # Wait for user to login
         wait.until(
             invisibility_of_element_located(
@@ -63,12 +60,8 @@ class LinkenIn(Platform):
         assert "Feed" in self.curr_driver.title, UnexpectedPageStateError(
             self.curr_driver.url
         )
-        self.retrieve_auth_state()
-        self.clean()
-        self.set_curr_driver(self.driver)  # Set current driver as main driver
 
-    def scrape(self) -> tuple[str, str, str]:
-        self.init_scrape()  # Assumes we are at job entry URL
+    def scrape(self) -> tuple[str, str, str, str]:
         # Get job post title
         title = self.curr_driver.find_element(By.CSS_SELECTOR, ".t-24").text
         post_info = self.curr_driver.find_element(

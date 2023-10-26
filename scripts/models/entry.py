@@ -1,4 +1,4 @@
-import constants.constants as constants
+import constants 
 import datetime
 import pandas as pd
 
@@ -43,6 +43,6 @@ class Entry:
         except Exception as e:
             print(e)
             return
-        assert self.company is not None
-        assert self.position is not None
-        assert self.link is not None
+        assert self.company
+        assert self.position
+        assert self.link

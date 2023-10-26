@@ -1,4 +1,4 @@
-import constants.constants as constants
+import constants
 import logging
 
 
