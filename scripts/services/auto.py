@@ -72,7 +72,6 @@ class AutoService(object):
             from pyvirtualdisplay import (
                 Display,
             )  # Should be installed in verify_headless_support()
-
             ################################################
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
