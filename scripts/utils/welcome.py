@@ -12,7 +12,7 @@ art[7] ="   \____/ \__|      \_______|$$  ____/ $$  ____/                   "
 art[8] ="                             $$ |      $$ |                        "
 art[9] ="                             $$ |      $$ |                        "
 art[10] ="                             \__|      \__|                       "
-print("Welcome to...", end="\n\n")
+print("Starting...", end="\n\n")
 for line in art:
     print(line)
 print("\033[0m")

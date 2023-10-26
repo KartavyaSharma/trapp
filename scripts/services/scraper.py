@@ -1,7 +1,6 @@
-import constants.constants as constants
+import constants
 
-from . import configuration
-from . import vault
+from . import configuration, vault
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -43,12 +42,12 @@ class ScraperEngine:
         """
         @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
+        print(f"Scraping {config.platform.url}...")
         config.inject_driver(driver=self.driver)
-        config.platform.init()
         # Check if authenticated
-        if not vault.Vault.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
-            vault.Vault.authenticate(config.platform, auth_engine=auth_engine)
-        return config.platform.scrape_job()
+        if not vault.VaultService.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
+            vault.VaultService.authenticate(config.platform, auth_engine=auth_engine)
+        return config.platform.scrape_wrapper()
 
 
 class ScraperBuilder:

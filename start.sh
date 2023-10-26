@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#^ Dynamically find bash path
 
 # Print welcome message
 python3 ./scripts/utils/welcome.py
@@ -271,8 +272,9 @@ then
         cecho -c yellow -t "Installing docker... (This requires sudo)"
         sleep 3
         sudo sh ./bin/get-docker.sh
+        sudo groupadd docker
         sudo usermod -aG docker ${USER}
-        su - ${USER}
+        su - ${USER} # Refresh user group
         if [ ! $(groups) =~ "docker" ]; then
             quit "Failed to add user to docker group!"
             return
@@ -446,7 +448,6 @@ for arg in "$@"; do
     esac
 done
 if [ $ARGFLAG -eq 0 ]; then
-    cecho -c green -t "Running program..."
     python3 runner.py
 elif [ $ARGFLAG -eq 1 ]; then
     chmod +x ./scripts/shell/bkp_daemon.sh

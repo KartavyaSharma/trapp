@@ -1,0 +1,6 @@
+If you were scraping from a large number of URLs
+in batch, then it is possible some of the selenium
+drivers running concurrently might be laggy, causing
+the scraper to give up too soon and timeout. Rerunning
+the scrapers should, in most cases, be enough
+to get around this problem

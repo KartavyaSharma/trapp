@@ -1,12 +1,12 @@
 import os
 import pathlib
 
-import constants.constants as constants
+import constants
 
 from ..models import platform
 from scripts.utils.errors import *
 
-class Vault:
+class VaultService:
 
     def __init__(self):
         pass
@@ -39,7 +39,7 @@ class Vault:
             raise NotImplementedError
         auth_engine.create_driver()
         platform.set_auth_driver(auth_engine.driver)
-        platform.login()
+        platform.login_wrapper()
 
     @staticmethod
     def isPresent() -> bool:
