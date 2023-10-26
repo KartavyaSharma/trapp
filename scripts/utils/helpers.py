@@ -22,8 +22,7 @@ def has_gui() -> bool:
     # If system uname -s is Darwin, then we are on macOS
     if os.uname().sysname == "Darwin":
         return True
-    check_xorg = sp.SubprocessService(["type", "Xorg"], OPTS).check_output().filter()
-    check_xorg = sp.SubprocessService(["type", "Xorg"], OPTS).check_output().filter()
+    check_xorg = sp.SubprocessService(["type", "Xorg"], OPTS).check_output()
     if check_xorg == "Xorg is /usr/bin/Xorg\n":
         return True
     # Check /usr/share/xsessions
@@ -35,7 +34,7 @@ def has_gui() -> bool:
         return False
     # if not "No such file or directory" in check_xsessions:
     #     return True
-    check_dir = sp.SubprocessService(["\ls", "/usr/bin/*session"], OPTS).check_output().filter()
+    check_dir = sp.SubprocessService(["\ls", "/usr/bin/*session"], OPTS).check_output()
     # If check_dir has only /usr/bin/byobu-select-session  /usr/bin/dbus-run-session, then we are on a server
     if check_dir == "/usr/bin/byobu-select-session  /usr/bin/dbus-run-session\n":
         return False
@@ -50,7 +49,7 @@ def verify_headless_support() -> bool:
     """
     if os.uname().sysname != "Darwin":
         print("Checking for xvfb...", end=" ")
-        check_xvfb = sp.SubprocessService(["which xvfb-run"], OPTS).check_output().filter()
+        check_xvfb = sp.SubprocessService(["which xvfb-run"], OPTS).check_output()
         if not "/usr/bin/xvfb-run\n" in check_xvfb:
             print("xvfb not installed, installing...")
             time.sleep(3)
@@ -69,7 +68,7 @@ def verify_headless_support() -> bool:
                 ["sudo", "apt-get", "install", "firefox"], {"stderr": subprocess.DEVNULL}
             ).check_call()
             # Verify xvfb installation
-            check_xvfb = sp.SubprocessService(["which xvfb-run"], OPTS).check_output().filter()
+            check_xvfb = sp.SubprocessService(["which xvfb-run"], OPTS).check_output()
         if not "/usr/bin/xvfb-run\n" in check_xvfb:
             raise Exception("xvfb installation failed")
         else:
