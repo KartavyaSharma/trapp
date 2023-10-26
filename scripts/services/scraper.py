@@ -12,7 +12,12 @@ class ScraperEngine:
     with custom options and runs selenium on a given URL with a config.
     """
 
-    def __init__(self, options: Options, driver: webdriver.Chrome = None, headed_support: bool = True):
+    def __init__(
+        self,
+        options: Options,
+        driver: webdriver.Chrome = None,
+        headed_support: bool = True,
+    ):
         """
         @param options: Options to pass to Chrome driver
         @param driver: Existing Chrome driver instance
@@ -34,18 +39,22 @@ class ScraperEngine:
         if custom_driver:
             self.driver = custom_driver
         else:
-            self.driver = webdriver.Chrome(
-                options=self.options, service=self.service
-            )
+            self.driver = webdriver.Chrome(options=self.options, service=self.service)
 
-    def run(self, config: configuration.ConfigurationContainer = None, auth_engine: any = None) -> None:
+    def run(
+        self,
+        config: configuration.ConfigurationContainer = None,
+        auth_engine: any = None,
+    ) -> None:
         """
         @param config: Configuration object for scraper containing the platform, cookies, etc.
         """
         print(f"Scraping {config.platform.url}...")
         config.inject_driver(driver=self.driver)
         # Check if authenticated
-        if not vault.VaultService.isAuthenticated(config.platform, headed_support=auth_engine.headed_support):
+        if not vault.VaultService.isAuthenticated(
+            config.platform, headed_support=auth_engine.headed_support
+        ):
             vault.VaultService.authenticate(config.platform, auth_engine=auth_engine)
         return config.platform.scrape_wrapper()
 
@@ -66,7 +75,9 @@ class ScraperBuilder:
     scraper_no_headless.run("<url>")
     """
 
-    def setup_options(self, default=True, opts: list[str] = [], user_opts: Options = None) -> Options:
+    def setup_options(
+        self, default=True, opts: list[str] = [], user_opts: Options = None
+    ) -> Options:
         """
         @param default: Whether to use default options
         @param opts: List of options to add to Chrome driver
@@ -75,14 +86,19 @@ class ScraperBuilder:
         """
         if user_opts:
             return user_opts
-        options = Options() 
+        options = Options()
         opts = opts if not default else [*constants.CHROME_DRIVER_DEFAULT_OPTS]
         if opts != constants.CHROME_DRIVER_NO_HEADLESS_OPTS:
             for arg in opts:
                 options.add_argument(arg)
         return options
 
-    def build(self, opts: list[str] = [], delay_driver_build: bool = False, headed_support: bool = True) -> ScraperEngine:
+    def build(
+        self,
+        opts: list[str] = [],
+        delay_driver_build: bool = False,
+        headed_support: bool = True,
+    ) -> ScraperEngine:
         """
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance

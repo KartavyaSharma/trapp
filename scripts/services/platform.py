@@ -9,15 +9,13 @@ sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
 from scripts.models.platform import Platform
 
+
 class PlatformBuilder:
     """
     Build platform instances
     """
 
-    platforms = {
-        "LinkedIn".lower(): LinkenIn,
-        "Handshake".lower(): Handshake
-    }
+    platforms = {"LinkedIn".lower(): LinkenIn, "Handshake".lower(): Handshake}
 
     @staticmethod
     def build(platform_name: str, url: str) -> Platform:

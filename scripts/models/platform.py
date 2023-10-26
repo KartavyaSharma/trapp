@@ -1,5 +1,5 @@
 import abc
-import constants as constants
+import constants
 import pickle
 import time
 
@@ -97,7 +97,7 @@ class Platform:
         # Set current driver as auth driver
         self.set_curr_driver(self.auth_driver)
         self.go_to_login_url()
-        self.login() # Login
+        self.login()  # Login
         self.retrieve_auth_state()
         self.clean()
         self.set_curr_driver(self.driver)  # Set current driver as main driver
@@ -126,7 +126,7 @@ class Platform:
         """
         Gets cookies and saves them to disk
         """
-        print("Saving auth state...", end=' ')
+        print("Saving auth state...", end=" ")
         cookies = self.curr_driver.get_cookies()
         cookies_to_save = self.save_cookies(cookies=cookies)
         pickle.dump(cookies_to_save, open(self.get_cookie_file(), "wb"))
@@ -140,7 +140,11 @@ class Platform:
         """
         Get cookie file path
         """
-        return constants.CHROME_DRIVER_COOKIE_FILE.split("<platform>")[0] + self.name.lower() + ".pkl"
+        return (
+            constants.CHROME_DRIVER_COOKIE_FILE.split("<platform>")[0]
+            + self.name.lower()
+            + ".pkl"
+        )
 
     def go_to_base_url(self):
         """
@@ -164,7 +168,7 @@ class Platform:
         """
         Kill current driver
         """
-        self.curr_driver.close() 
+        self.curr_driver.close()
 
     def non_headed_auth_instruction(self):
         """

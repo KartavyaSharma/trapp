@@ -2,6 +2,7 @@ import constants
 
 from . import subprocess as sp
 
+
 class Gum:
     """
     Wrapper class for the gum binary
@@ -28,5 +29,3 @@ class Gum:
         if placeholder:
             opts = [f"--placeholder={placeholder}"] + ([*opts] if opts else [])
         return sp.SubprocessService([f"{Gum.path}", "input", *opts]).run().filter()
-
-

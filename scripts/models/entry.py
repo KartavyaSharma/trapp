@@ -1,4 +1,4 @@
-import constants 
+import constants
 import datetime
 import pandas as pd
 
@@ -6,14 +6,15 @@ from . import status
 
 
 class Entry:
-    def __init__(self,
-                 company: str,
-                 position: str,
-                 date_applied: datetime.datetime,
-                 status: status.Status,
-                 link: str,
-                 notes: str
-                 ):
+    def __init__(
+        self,
+        company: str,
+        position: str,
+        date_applied: datetime.datetime,
+        status: status.Status,
+        link: str,
+        notes: str,
+    ):
         self.company = company
         self.position = position
         self.date_applied = date_applied

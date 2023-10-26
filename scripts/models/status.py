@@ -1,7 +1,7 @@
 from enum import Enum, EnumMeta
 
+
 class MethaStatus(EnumMeta):
-    
     def __contains__(cls, item):
         try:
             cls(item)
@@ -9,8 +9,10 @@ class MethaStatus(EnumMeta):
             return False
         return True
 
+
 class BaseStatus(Enum, metaclass=EnumMeta):
     pass
+
 
 class Status(BaseStatus):
     INIT = "Applied"

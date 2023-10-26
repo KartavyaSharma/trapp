@@ -20,13 +20,12 @@ CHOICE_MAP = {
     "View all job applications": "view",
     "Quit": "quit",
     "Start Backup Daemon": "bkp",
-    "Print to file": "print"
+    "Print to file": "print",
 }
 
 ##### File Constants #####
 SOURCE_CSV = "job_applications.csv"
-COLUMN_NAMES = ["Company", "Position",
-                "Date Applied", "Status", "Portal Link", "Notes"]
+COLUMN_NAMES = ["Company", "Position", "Date Applied", "Status", "Portal Link", "Notes"]
 
 ##### Input Constants #####
 INPUT_COMPANY_NAME = "Input company name"
@@ -56,31 +55,28 @@ BKP_FLAG = "wbkp"
 DEFAULT_COLUMN_CHOOSE = "Default"
 
 ##### COLORS #####
-OKGREEN = '\033[1;32m'
-INFOBLUE = '\033[1;34m'
-WARNING = '\033[1;33m'
-FAIL = '\033[1;31m'
-ENDC = '\033[0m'
+OKGREEN = "\033[1;32m"
+INFOBLUE = "\033[1;34m"
+WARNING = "\033[1;33m"
+FAIL = "\033[1;31m"
+ENDC = "\033[0m"
 
 ##### Command Constants #####
 GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
-GUM_CHOOSE = ['./bin/gum', 'choose']
-GUM_INPUT_W_PLACEHOLDER = ['./bin/gum', 'input', '--placeholder']
-GUM_FILTER = ['./bin/gum', 'filter', '--fuzzy', '--no-limit', '--sort']
+GUM_CHOOSE = ["./bin/gum", "choose"]
+GUM_INPUT_W_PLACEHOLDER = ["./bin/gum", "input", "--placeholder"]
+GUM_FILTER = ["./bin/gum", "filter", "--fuzzy", "--no-limit", "--sort"]
 
 BAT = "./bin/bat/bin/bat"
 
-YN = ['YES', 'NO']
-NY = ['NO', 'YES']
+YN = ["YES", "NO"]
+NY = ["NO", "YES"]
 
 ##### Display Constants #####
 MAX_COL_WIDTH = 40
 
 #### Platform Constants ####
-PLATFORM_MAP = {
-    "linkedin": "linkedin",
-    "joinhandshake": "handshake"
-}
+PLATFORM_MAP = {"linkedin": "linkedin", "joinhandshake": "handshake"}
 
 #### Auth Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"
@@ -108,7 +104,13 @@ CHROME_DRIVER_EXECUTABLE = f"{PROJECT_ROOT}/bin/chrome-driver/chromedriver-{CHRO
 CHROME_DRIVER_DEFAULT_OPTS = ["--headless"]
 CHROME_DRIVER_NO_HEADLESS_OPTS = ["--no-headless"]
 CHROME_DRIVER_INCOGNITO_OPTS = ["--incognito"]
-CHROME_DRIVER_SERVER_OPTS = ["--headless", "--no-sandbox", "start-maximized", "disable-infobars", "--disable-extensions"]
+CHROME_DRIVER_SERVER_OPTS = [
+    "--headless",
+    "--no-sandbox",
+    "start-maximized",
+    "disable-infobars",
+    "--disable-extensions",
+]
 CHROME_DRIVER_COOKIE_FILE = f"{PROJECT_ROOT}/.cache/chrome_driver_<platform>.pkl"
 
 #### Selenium Constants ####

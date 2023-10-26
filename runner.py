@@ -12,17 +12,25 @@ from scripts.models import entry, status
 from scripts.services.auto import AutoService
 from scripts.utils.subprocess import SubprocessService
 from scripts.utils.gum import Gum
-from scripts.utils.helpers import get_terminal_width, file_preview, load_urls_from_file, print_tabbed_doc_string
+from scripts.utils.helpers import (
+    get_terminal_width,
+    file_preview,
+    load_urls_from_file,
+    print_tabbed_doc_string,
+)
 
 global bkp_flag
 bkp_flag = False
 
+
 def main():
     # Set pandas config to print columns with max width
-    pd.set_option('display.max_colwidth', constants.MAX_COL_WIDTH)
+    pd.set_option("display.max_colwidth", constants.MAX_COL_WIDTH)
     # Check if source CSV file exists
     if os.path.isfile(constants.SOURCE_CSV) == False:
-        print("Source CSV file does not exist. Creating new file named job_applications.csv...")
+        print(
+            "Source CSV file does not exist. Creating new file named job_applications.csv..."
+        )
         try:
             df = pd.DataFrame(columns=constants.COLUMN_NAMES)
             df.to_csv(constants.SOURCE_CSV, index=False)
@@ -30,12 +38,29 @@ def main():
             print(e)
             return
     else:
-        print(f"{constants.OKGREEN}Source file job_applications.csv found{constants.ENDC}.\nWhat do you want to do?")
+        print(
+            f"{constants.OKGREEN}Source file job_applications.csv found{constants.ENDC}.\nWhat do you want to do?"
+        )
     # Ask user what they want to do
     try:
-        opts = [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.AUTO, constants.QUIT] if \
-            f"{os.uname().sysname} {os.uname().machine}" != "Linux arm64" else \
-            [constants.VIEW, constants.ADD, constants.EDIT, constants.PRT, constants.QUIT]
+        opts = (
+            [
+                constants.VIEW,
+                constants.ADD,
+                constants.EDIT,
+                constants.PRT,
+                constants.AUTO,
+                constants.QUIT,
+            ]
+            if f"{os.uname().sysname} {os.uname().machine}" != "Linux arm64"
+            else [
+                constants.VIEW,
+                constants.ADD,
+                constants.EDIT,
+                constants.PRT,
+                constants.QUIT,
+            ]
+        )
         choice = Gum.choose([*opts])
         menu_choice(constants.CHOICE_MAP[choice])()
     except Exception as e:
@@ -47,13 +72,13 @@ def main():
 # Switch case for menu choice
 def menu_choice(choice):
     switcher = {
-        'view': view,
-        'add': add,
-        'edit': edit,
-        'quit': quit,
-        'bkp': bkp,
-        'auto': auto,
-        'print': print_to_file,
+        "view": view,
+        "add": add,
+        "edit": edit,
+        "quit": quit,
+        "bkp": bkp,
+        "auto": auto,
+        "print": print_to_file,
     }
     func = switcher.get(choice, lambda: "Invalid choice")
     return func
@@ -71,7 +96,9 @@ def view():
     sort_choice = Gum.choose([*constants.NY])
     # Have a default sort option
     if sort_choice == "YES":
-        print(f"{constants.OKGREEN}Choose option to sort by a specific column, if any. Otherwise, select `default`.{constants.ENDC}")
+        print(
+            f"{constants.OKGREEN}Choose option to sort by a specific column, if any. Otherwise, select `default`.{constants.ENDC}"
+        )
         choices = constants.COLUMN_NAMES
         sort_column = Gum.choose([*choices])
         # Sort dataframe
@@ -99,17 +126,19 @@ def add():
     print("Choose current status:")
     current_status = Gum.choose(
         [
-            constants.STATUS_INIT, 
-            constants.STATUS_ASSESSMENT, 
-            constants.STATUS_INTERVIEW, 
-            constants.STATUS_OFFER, 
-            constants.STATUS_REJECTED
+            constants.STATUS_INIT,
+            constants.STATUS_ASSESSMENT,
+            constants.STATUS_INTERVIEW,
+            constants.STATUS_OFFER,
+            constants.STATUS_REJECTED,
         ]
     )
     # Ask user for portal link
     success_flag = True
     while success_flag:
-        portal_link = Gum.input([constants.INPUT_PORTAL_LINK + f". {constants.INPUT_QUIT}"])
+        portal_link = Gum.input(
+            [constants.INPUT_PORTAL_LINK + f". {constants.INPUT_QUIT}"]
+        )
         if portal_link == "Q":
             quit()
         # Validate portal link
@@ -120,18 +149,18 @@ def add():
             success_flag = False
     # Ask user for notes
     notes = Gum.input(placeholder=constants.INPUT_NOTES)
-    # Create entry  
+    # Create entry
     new_entry = entry.Entry(
         company=company_name,
         position=position,
         date_applied=date_applied,
         status=status.Status(current_status),
         link=portal_link,
-        notes=notes
+        notes=notes,
     )
     df = new_entry.create_dataframe()
     # Append dataframe to CSV
-    df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+    df.to_csv(constants.SOURCE_CSV, mode="a", header=False, index=False)
     print("Job entry added!")
 
 
@@ -145,47 +174,40 @@ def edit():
     while success_flag:
         # Ask user to choose job entry
         column = subprocess.Popen(
-            ['column', '-s,', '-t', f'{constants.SOURCE_CSV}'],
+            ["column", "-s,", "-t", f"{constants.SOURCE_CSV}"],
             stdout=subprocess.PIPE,
-            shell=False
+            shell=False,
         )
         less = subprocess.Popen(
-            ['less', '-#2', '-N', '-S'],
-            stdin=column.stdout,
-            stdout=subprocess.PIPE
+            ["less", "-#2", "-N", "-S"], stdin=column.stdout, stdout=subprocess.PIPE
         )
         column.stdout.close()
         gum = subprocess.Popen(
-            [*constants.GUM_FILTER],
-            stdin=less.stdout,
-            stdout=subprocess.PIPE
+            [*constants.GUM_FILTER], stdin=less.stdout, stdout=subprocess.PIPE
         )
         less.stdout.close()
-        output = gum.communicate()[0].decode('utf-8')
-        echo_output = subprocess.Popen(
-            ['echo', f'{output}'],
-            stdout=subprocess.PIPE
-        )
+        output = gum.communicate()[0].decode("utf-8")
+        echo_output = subprocess.Popen(["echo", f"{output}"], stdout=subprocess.PIPE)
         awk_check = subprocess.Popen(
-            ['awk', '-F', '[[:space:]][[:space:]]+', '{print $1}'],
+            ["awk", "-F", "[[:space:]][[:space:]]+", "{print $1}"],
             stdin=echo_output.stdout,
-            stdout=subprocess.PIPE
+            stdout=subprocess.PIPE,
         )
         echo_output.stdout.close()
-        check_out = awk_check.communicate()[0].decode('utf-8').strip()
+        check_out = awk_check.communicate()[0].decode("utf-8").strip()
         if check_out == "Company":
-            print(f'{constants.FAIL}You cannot edit a column header!{constants.ENDC}')
-            print('Do you want to try again?')
+            print(f"{constants.FAIL}You cannot edit a column header!{constants.ENDC}")
+            print("Do you want to try again?")
             retry_choice = Gum.choose([*constants.YN])
             if retry_choice == "YES":
                 continue
             else:
                 return
         elif check_out == constants.DEFAULT_COLUMN_CHOOSE:
-            print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
+            print(f"{constants.FAIL}No entry was chosen!{constants.ENDC}")
             continue
         elif check_out is None:
-            print(f'{constants.FAIL}No entry was chosen!{constants.ENDC}')
+            print(f"{constants.FAIL}No entry was chosen!{constants.ENDC}")
             continue
         else:
             success_flag = False
@@ -196,12 +218,15 @@ def edit():
     # original_index = df.index[df['Company'] == check_out].tolist()[0]
     df = df.loc[df[constants.COLUMN_NAMES[0]] == check_out]
     original_index = df.index.values[0]
-    print(f'{constants.OKGREEN}Here are the entries that match your search:{constants.ENDC}')
+    print(
+        f"{constants.OKGREEN}Here are the entries that match your search:{constants.ENDC}"
+    )
     # If there are multiple rows, ask user to choose one
     if len(df.index) > 1:
         print(df)
         print(
-            f'{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}')
+            f"{constants.WARNING}Multiple entries found. Please choose one:{constants.ENDC}"
+        )
         terminal_width = get_terminal_width()
         if terminal_width == None:
             terminal_width = 80
@@ -212,24 +237,20 @@ def edit():
             trunc_row_str = row_str[:terminal_width]
             dup_companies.append(trunc_row_str)
         company_row = subprocess.Popen(
-            [*constants.GUM_CHOOSE] + dup_companies,
-            stdout=subprocess.PIPE,
-            shell=False
+            [*constants.GUM_CHOOSE] + dup_companies, stdout=subprocess.PIPE, shell=False
         )
         position = subprocess.Popen(
-            ['awk', '-F', '\t', '{print $2}'],
+            ["awk", "-F", "\t", "{print $2}"],
             stdin=company_row.stdout,
-            stdout=subprocess.PIPE
+            stdout=subprocess.PIPE,
         )
         company_row.stdout.close()
-        position_output = position.communicate()[0].decode('utf-8').strip()
-        intermidiate_index = df.index[
-            df['Position'] == position_output
-        ].tolist()[0]
-        df = df.loc[df['Position'] == position_output]
+        position_output = position.communicate()[0].decode("utf-8").strip()
+        intermidiate_index = df.index[df["Position"] == position_output].tolist()[0]
+        df = df.loc[df["Position"] == position_output]
         original_index = original_index + intermidiate_index - 1
     elif len(df.index) == 0:
-        print(f'{constants.FAIL}No entries found!{constants.ENDC}')
+        print(f"{constants.FAIL}No entries found!{constants.ENDC}")
         return
     # print(original_df.iloc[[original_index]])
     old_df = df.copy()
@@ -264,14 +285,14 @@ def update(df, original_df, original_index, old_df):
         print("Choose new status:")
         current_status = Gum.choose(
             [
-                constants.STATUS_INIT, 
-                constants.STATUS_ASSESSMENT, 
+                constants.STATUS_INIT,
+                constants.STATUS_ASSESSMENT,
                 constants.STATUS_INTERVIEW,
-                constants.STATUS_OFFER, 
-                constants.STATUS_REJECTED
+                constants.STATUS_OFFER,
+                constants.STATUS_REJECTED,
             ]
         )
-        df['Status'] = current_status
+        df["Status"] = current_status
     elif update_choice == "Other":
         print("Choose column to update:")
         column_choice = Gum.choose([*constants.COLUMN_NAMES])
@@ -283,9 +304,7 @@ def update(df, original_df, original_index, old_df):
         df[column_choice] = new_value
     # Confirm changes
     print("Confirm changes?")
-    confirm_choice = SubprocessService(
-        [*constants.YN]
-    ).run()
+    confirm_choice = SubprocessService([*constants.YN]).run()
     if confirm_choice == "Yes":
         # Update CSV
         original_df.loc[original_index] = df.iloc[0]
@@ -294,16 +313,16 @@ def update(df, original_df, original_index, old_df):
     else:
         print("Changes not saved.")
     # Print old and new entries
-    print(f'{constants.OKGREEN}Old entry:{constants.ENDC}')
+    print(f"{constants.OKGREEN}Old entry:{constants.ENDC}")
     print(old_df)
-    print(f'{constants.OKGREEN}New entry:{constants.ENDC}')
+    print(f"{constants.OKGREEN}New entry:{constants.ENDC}")
     print(df)
 
 
 def bkp():
     if not bkp_flag:
         print(
-            f'{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}'
+            f"{constants.FAIL}Backup process flag was not passed. Invalid operation.{constants.ENDC}"
         )
         sys.exit(1)
     print("Placeholder backup function. TODO")
@@ -320,12 +339,14 @@ def print_to_file():
 
 def auto():
     # breakpoint()
-    service = AutoService() # Initialize AutoService
+    service = AutoService()  # Initialize AutoService
     # Ask user for job posting URL
     success_flag = True
     while success_flag:
         url = Gum.input(
-            placeholder=f"{constants.INPUT_JOB_POSTING_URL} " + f"{constants.INPUT_QUIT} " + f"{constants.INPUT_MASS_ADD}"
+            placeholder=f"{constants.INPUT_JOB_POSTING_URL} "
+            + f"{constants.INPUT_QUIT} "
+            + f"{constants.INPUT_MASS_ADD}"
         )
         if url == "Q":
             quit()
@@ -338,7 +359,7 @@ def auto():
             print("Invalid URL found. Please try again.")
             continue
         success_flag = False
-        print(f'{constants.OKGREEN}Cooking...{constants.ENDC}', end=' ')
+        print(f"{constants.OKGREEN}Cooking...{constants.ENDC}", end=" ")
         Console().print(":man_cook:")
         dfs = []
         while True:
@@ -346,7 +367,9 @@ def auto():
                 df, failed_urls = service.batch_run(urls)
                 dfs.append(df)
                 if failed_urls:
-                    print_tabbed_doc_string(f"{constants.PROJECT_ROOT}/docs/shell/scrape_fail.txt")
+                    print_tabbed_doc_string(
+                        f"{constants.PROJECT_ROOT}/docs/shell/scrape_fail.txt"
+                    )
                     print(f"Do you want to retry {len(failed_urls)} failed URL(s)?")
                     retry_choice = Gum.choose([*constants.YN])
                     if retry_choice == "YES":
@@ -362,23 +385,25 @@ def auto():
 
 
 def quit():
-    print(f'{constants.OKGREEN}Exiting...{constants.ENDC}')
+    print(f"{constants.OKGREEN}Exiting...{constants.ENDC}")
     sys.exit(0)
 
 
 def finish_auto_service(df):
     print("===== Scraper Results =====")
-    print(f'{constants.OKGREEN}Scraped {len(df.index)} job(s)!{constants.ENDC}')
+    print(f"{constants.OKGREEN}Scraped {len(df.index)} job(s)!{constants.ENDC}")
     print(df)
     print("===== End of Results =====")
     print("Does this look correct? Confirming will write entry to file.")
     confirm_choice = Gum.choose([*constants.YN])
     if confirm_choice == "YES":
         # Append to CSV
-        df.to_csv(constants.SOURCE_CSV, mode='a', header=False, index=False)
+        df.to_csv(constants.SOURCE_CSV, mode="a", header=False, index=False)
         print("Entry written to file!")
     else:
-        print("Entry not written to file.\nIf you found errors in the generated entries, they can be manually edited after being committed to the CSV file.")
+        print(
+            "Entry not written to file.\nIf you found errors in the generated entries, they can be manually edited after being committed to the CSV file."
+        )
 
 
 if __name__ == "__main__":

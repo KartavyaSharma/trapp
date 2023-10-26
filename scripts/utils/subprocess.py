@@ -6,10 +6,7 @@ class SubprocessService:
     Wrapper class for the subprocess module
     """
 
-    DEFAULT_OPTS = {
-        "stdout": subprocess.PIPE,
-        "shell": False
-    }
+    DEFAULT_OPTS = {"stdout": subprocess.PIPE, "shell": False}
 
     def __init__(self, command: list[str], options: dict = None):
         self.command = command
@@ -61,4 +58,4 @@ class SubprocessService:
 
     @staticmethod
     def filter_output(subprocess_output):
-        return subprocess_output.stdout.decode('utf-8').strip()
+        return subprocess_output.stdout.decode("utf-8").strip()

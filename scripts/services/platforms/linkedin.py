@@ -6,7 +6,10 @@ import time
 from scripts.utils.errors import InvalidURLError, UnexpectedPageStateError
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support.expected_conditions import presence_of_element_located, invisibility_of_element_located
+from selenium.webdriver.support.expected_conditions import (
+    presence_of_element_located,
+    invisibility_of_element_located,
+)
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 
@@ -14,6 +17,7 @@ from selenium.common.exceptions import TimeoutException
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
 from scripts.models.platform import Platform
+
 
 class LinkenIn(Platform):
     name = "LinkedIn"
@@ -40,13 +44,16 @@ class LinkenIn(Platform):
                 )
             ):
                 print(
-                    "Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email.")
+                    "Linkedin detected suspicious activity on your account. Please enter the verification code sent to your email."
+                )
                 verification_code = input("Enter verification code: ")
                 self.curr_driver.find_element(
-                    By.ID, "input__email_verification_pin").send_keys(verification_code)
+                    By.ID, "input__email_verification_pin"
+                ).send_keys(verification_code)
                 # Press enter to submit verification code
                 self.curr_driver.find_element(
-                    By.ID, "input__email_verification_pin").send_keys(Keys.ENTER)
+                    By.ID, "input__email_verification_pin"
+                ).send_keys(Keys.ENTER)
         except TimeoutException:
             pass
         wait.until(
@@ -67,7 +74,7 @@ class LinkenIn(Platform):
         post_info = self.curr_driver.find_element(
             By.CSS_SELECTOR,
             # Returns <company name> · <location> <date posted> · <# of applicants>
-            ".job-details-jobs-unified-top-card__primary-description > div"
+            ".job-details-jobs-unified-top-card__primary-description > div",
         ).text
         company = post_info.split("·")[0].strip()
         location = post_info.split("·")[1].split("  ")[0].strip()
@@ -86,12 +93,12 @@ class LinkenIn(Platform):
         """
         x = None
         for cookie in cookies:
-            if (cookie['name'] == 'li_at'):
-                cookie['domain'] = '.linkedin.com'
+            if cookie["name"] == "li_at":
+                cookie["domain"] = ".linkedin.com"
                 x = {
-                    'name': 'li_at',
-                    'value': cookie['value'],
-                    'domain': '.linkedin.com'
+                    "name": "li_at",
+                    "value": cookie["value"],
+                    "domain": ".linkedin.com",
                 }
                 break
         return x

@@ -26,6 +26,7 @@ for requirement in requirements:
 
 if unsatisfied_requirements:
     raise Exception(
-        f"The following requirements are not satisfied: {', '.join(unsatisfied_requirements)}")
+        f"The following requirements are not satisfied: {', '.join(unsatisfied_requirements)}"
+    )
 else:
     print("All requirements are satisfied. Running the rest of the program...")

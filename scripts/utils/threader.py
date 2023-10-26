@@ -5,6 +5,7 @@ import logging
 from . import logger, errors
 from multiprocessing.pool import ThreadPool as Pool
 
+
 class LogExceptions(object):
 
     """

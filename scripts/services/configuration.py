@@ -12,6 +12,7 @@ sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 from scripts.utils.helpers import get_root_from_url
 from scripts.utils.errors import InvalidURLError
 
+
 class ConfigurationContainer:
     """
     Generates configurations for specific platforms

@@ -6,6 +6,7 @@ sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
 from scripts.models.platform import Platform
 
+
 class Handshake(Platform):
     name = "Handshake"
     base_url = "https://app.joinhandshake.com"

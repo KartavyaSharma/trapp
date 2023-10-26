@@ -6,8 +6,8 @@ import constants
 from ..models import platform
 from scripts.utils.errors import *
 
-class VaultService:
 
+class VaultService:
     def __init__(self):
         pass
 
@@ -21,11 +21,17 @@ class VaultService:
         pass
 
     @staticmethod
-    def isAuthenticated(platform: platform.Platform, headed_support:bool = True) -> bool:
+    def isAuthenticated(
+        platform: platform.Platform, headed_support: bool = True
+    ) -> bool:
         """
         Check if user has saved auth state for platform
         """
-        file_path = pathlib.Path(constants.CHROME_DRIVER_COOKIE_FILE.replace("<platform>", platform.name.lower()))
+        file_path = pathlib.Path(
+            constants.CHROME_DRIVER_COOKIE_FILE.replace(
+                "<platform>", platform.name.lower()
+            )
+        )
         if not file_path.exists():
             if not headed_support:
                 platform.non_headed_auth_instruction()
