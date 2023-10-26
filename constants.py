@@ -87,6 +87,7 @@ VAULT_PATH = f"{PROJECT_ROOT}/.vault"
 
 #### Redis Constants ####
 REDIS_HOST = "localhost"
+REDIS_TEST_PWD = "redis"
 REDIS_PORT = 6379
 REDIS_CONTAINER_NAME = "redis-trapp"
 REDIS_DATA_DIR = f"{REDIS_CONTAINER_NAME}-data"

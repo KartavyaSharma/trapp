@@ -87,7 +87,7 @@ class RedisService:
                 [
                     f"docker run -d \
                     -h redis \
-                    -e REDIS_PASSWORD=redis \
+                    -e REDIS_PASSWORD=${constants.REDIS_TEST_PWD} \
                     -v {constants.REDIS_DATA_DIR}:/data \
                     -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
                     --name {constants.REDIS_CONTAINER_NAME} \
