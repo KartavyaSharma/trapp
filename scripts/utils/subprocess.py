@@ -27,12 +27,12 @@ class SubprocessService:
         self.output = subprocess.call(self.command, **self.options)
         return self
 
-    def check_output(self) -> any:
+    def check_output(self, output: bool = False) -> any:
         """
         Run command in subprocess
         """
         self.output = subprocess.check_output(self.command, **self.options)
-        return self
+        return self if not output else self.output
 
     def check_call(self) -> any:
         """
