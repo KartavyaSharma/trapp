@@ -88,7 +88,7 @@ class RedisService:
                     -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
                     --name {constants.REDIS_CONTAINER_NAME} \
                     --restart always \
-                    redis:7.2.2-bookworm /bin/bash -c 'redis-server --appendonly --requirepass ${{REDIS_PASSWORD}}'"
+                    redis:7.2.2-bookworm /bin/bash -c 'redis-server --appendonly yes --requirepass ${{REDIS_PASSWORD}}'"
                 ],
                 {"stdout": log, "stderr": log, "shell": True},
             ).call()
