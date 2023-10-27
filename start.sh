@@ -369,7 +369,6 @@ then
     cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
 else
     export TRAPP_CHROME_VER=$chrome_ver
-    cecho -c green -t "Chrome installed successfully!"
 fi
 
 # Check if chrome-driver is installed in bin/chrome-driver
