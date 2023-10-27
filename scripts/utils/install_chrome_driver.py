@@ -1,4 +1,3 @@
-import constants
 import httpx
 import json
 import os
@@ -10,6 +9,8 @@ import logging
 
 # Make constants accessible to utils
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
+
+import constants
 
 from scripts.utils import logger
 

@@ -26,7 +26,7 @@ quit () {
         # Exit program
         cecho -c green -t "Program exited. Deactivating virtual environment..."
     fi
-    return
+    exit 1
 }
 
 # Check system architecture
@@ -64,7 +64,6 @@ if [[ "$VIRTUAL_ENV" == "" ]]; then
             source ./env/bin/activate
         else
             quit "$(env) folder exists, but activate file missing. Please delete the env folder and run ./start.sh again."
-            return
         fi
     else
         cecho -c yellow -t "Environment directory does not exist. Creating a new environment..."
@@ -102,7 +101,6 @@ then
             sudo apt-get install wget
         else
             quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-            return
         fi
     else
         cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
@@ -133,7 +131,6 @@ if ! command -v ./bin/gum &>/dev/null; then
         url="${gum_binary_links["$arch"]}"
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        return
     fi
     cecho -c yellow -t "Fetching gum binary..."
     mkdir bin && cd bin
@@ -241,7 +238,6 @@ then
             brew install --cask docker
         else
             quit "Docker was not installed. Please install Docker manually to use trapp."
-            return
         fi
         cecho -c green -t "Docker installed!"
         # Check if colima is installed
@@ -284,18 +280,15 @@ then
         su - ${USER} # Refresh user group
         if [ ! $(groups) =~ "docker" ]; then
             quit "Failed to add user to docker group!"
-            return
         fi
         # Test if docker is working as it should
         docker run hello-world
         if [ $? -ne 0 ]; then
             quit "Docker failed hello-world test!"
-            return
         fi
         cecho -c green -t "Docker installed!"
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        return
     fi
 fi
 
@@ -313,7 +306,6 @@ then
         sudo service docker start
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        return
     fi
 else
     cecho -c green -t "Docker runtime found!"
@@ -368,7 +360,6 @@ elif [[ "$arch" == "Darwin" ]]; then
     fi
 else
     quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-    return
 fi
 
 # Check post-install
@@ -392,7 +383,6 @@ else
     if [ $? -ne 0 ]; then
         # rm -rf bin/chrome-driver
         quit "scripts/utils/install_chrome_driver.py failed. Please check the logs for more information."
-        return
     fi
 fi
 
@@ -450,7 +440,6 @@ for arg in "$@"; do
         ;;
     *)
         quit "Invalid option: $arg"
-        return
         ;;
     esac
 done

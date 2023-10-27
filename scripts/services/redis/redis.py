@@ -9,7 +9,7 @@ import uuid
 # Added to make the utils module available to the script
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
-from scripts.utils.subprocess import SubprocessService
+from scripts.utils.process import SubprocessService
 from scripts.utils.errors import ServiceAlreadyRunningError, ServiceNotRunningError
 
 

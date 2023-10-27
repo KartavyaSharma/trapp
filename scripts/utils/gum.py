@@ -1,6 +1,6 @@
 import constants
 
-from . import subprocess as sp
+from . import process as sp
 
 
 class Gum:

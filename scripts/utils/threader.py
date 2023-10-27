@@ -2,7 +2,7 @@ import multiprocessing
 import traceback
 import logging
 
-from . import logger, errors
+from . import logger
 from multiprocessing.pool import ThreadPool as Pool
 
 

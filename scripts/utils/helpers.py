@@ -3,12 +3,11 @@ import curses
 import datetime
 import pathlib
 import os
-import sys
-import subprocess
 import re
+import subprocess
 import time
 
-from . import subprocess as sp
+from . import process as sp
 
 OPTS = {"stderr": subprocess.DEVNULL, "universal_newlines": True, "shell": True}
 

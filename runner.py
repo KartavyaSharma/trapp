@@ -10,7 +10,7 @@ from datetime import *
 from rich.console import Console
 from scripts.models import entry, status
 from scripts.services.auto import AutoService
-from scripts.utils.subprocess import SubprocessService
+from scripts.utils.process import SubprocessService
 from scripts.utils.gum import Gum
 from scripts.utils.helpers import (
     get_terminal_width,
