@@ -1,6 +1,7 @@
 import constants
 import datetime
 import multiprocessing
+import os
 import pandas as pd
 import pathlib
 import threading
@@ -84,7 +85,7 @@ class AutoService(object):
         Start Redis service
         """
         print("Starting Redis service...", end=" ")
-        self.service = redis.RedisService(password=f"{constants.REDIS_TEST_PWD}")
+        self.service = redis.RedisService(password=f"{os.getenv('REDIS_TRAPP_PWD', constants.REDIS_TEST_PWD)}")
         try:
             self.service.init()
         except ServiceAlreadyRunningError as e:
