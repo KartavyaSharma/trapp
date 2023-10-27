@@ -86,11 +86,43 @@ else
     cecho -c green -t "All dependencies are present!"
 fi
 
+# Check if wget is installed
+if ! (command -v wget) > /dev/null
+then
+    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
+    install_wget_choice=$(./bin/gum choose "YES" "NO")
+    if [[ "$install_wget_choice" == "YES" ]];
+    then
+        cecho -c yellow -t "Installing wget..."
+        if [[ $arch == "Darwin" ]]
+        then
+            brew install wget
+        elif [[ $arch == "Linux" ]]
+        then
+            sudo apt-get install wget
+        else
+            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+            return
+        fi
+    else
+        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
+    fi
+else
+    cecho -c green -t "WGET found!"
+fi
+
 # Check if logs directory exists
 if ! test -d "logs"; then
     cecho -c yellow -t "Creating logs directory..."
     mkdir logs
 fi
+
+# Check if the .cache directory exists
+if ! test -d ".cache"; then
+    cecho -c yellow -t "Creating .cache directory..."
+    mkdir .cache
+fi
+
 
 # Check if gum is installed
 if ! command -v ./bin/gum &>/dev/null; then
@@ -158,35 +190,10 @@ then
     fi
 fi
 
-# Check if wget is installed
-if ! (command -v wget) > /dev/null
-then
-    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
-    install_wget_choice=$(./bin/gum choose "YES" "NO")
-    if [[ "$install_wget_choice" == "YES" ]];
-    then
-        cecho -c yellow -t "Installing wget..."
-        if [[ $arch == "Darwin" ]]
-        then
-            brew install wget
-        elif [[ $arch == "Linux" ]]
-        then
-            sudo apt-get install wget
-        else
-            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-            return
-        fi
-    else
-        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
-    fi
-else
-    cecho -c green -t "WGET found!"
-fi
-
 # Set a flag so that the "WOW, ..." print does not run every time.
 if ! test -d ".cache"; then
     echo "Creating cache file..."
-    mkdir .cache && touch ./.cache/gum.flag && echo "1" >>./.cache/gum.flag
+    touch ./.cache/gum.flag && echo "1" >>./.cache/gum.flag
 fi
 
 # Bat binary path

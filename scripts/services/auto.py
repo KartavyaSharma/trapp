@@ -6,7 +6,9 @@ import pathlib
 import threading
 import sys
 
-from . import configuration, scraper, redis
+from .redis import redis
+
+from . import configuration, scraper
 from scripts.models import entry, status
 
 # Added to make the utils module available to the script
@@ -72,6 +74,7 @@ class AutoService(object):
             from pyvirtualdisplay import (
                 Display,
             )  # Should be installed in verify_headless_support()
+
             ################################################
             self.display = Display(visible=0, size=(800, 600))
             self.display.start()
@@ -81,7 +84,7 @@ class AutoService(object):
         Start Redis service
         """
         print("Starting Redis service...", end=" ")
-        self.service = redis.RedisService(password="redis")
+        self.service = redis.RedisService(password=f"{constants.REDIS_TEST_PWD}")
         try:
             self.service.init()
         except ServiceAlreadyRunningError as e:
@@ -111,7 +114,7 @@ class AutoService(object):
         """
         # Define builders
         # Create configuration and scraper engine
-        config = self.configuration_builder.build(url)
+        config = self.configuration_builder.build(url, self.service.connect())
         scraper_engine = self.scraper_builder.build()
         try:
             # Run scraper
@@ -173,7 +176,9 @@ class AutoService(object):
                         failed_urls.append(e.url)
                 else:
                     print(
-                        f"{constants.FAIL}Unknown error encountered! Check logs at {constants.LOG_FILENAME.replace(constants.PROJECT_ROOT, '')}{constants.ENDC}"
+                        f"{constants.FAIL}\
+                        Unknown error encountered! Check logs at {constants.LOG_FILENAME.replace(constants.PROJECT_ROOT, '')}\
+                        {constants.ENDC}"
                     )
                 continue
             if not isinstance(r, Exception):

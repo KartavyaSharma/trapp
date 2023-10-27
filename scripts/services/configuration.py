@@ -1,5 +1,6 @@
 import constants
 import pathlib
+import redis
 import sys
 
 from selenium import webdriver
@@ -18,8 +19,9 @@ class ConfigurationContainer:
     Generates configurations for specific platforms
     """
 
-    def __init__(self, platform: Platform):
+    def __init__(self, platform: Platform, redis: redis.StrictRedis):
         self.platform = platform
+        self.redis = redis
 
     def inject_driver(self, driver: webdriver.Chrome) -> None:
         """
@@ -46,8 +48,12 @@ class ConfigurationBuilder:
                 return builder.build(constants.PLATFORM_MAP[url_part], url)
         raise InvalidURLError(url)
 
-    def build(self, url: str) -> ConfigurationContainer:
+    def build(
+        self, url: str, redis_client: redis.StrictRedis = None
+    ) -> ConfigurationContainer:
         """
         Build configuration container
         """
-        return ConfigurationContainer(self.get_platform(url))
+        return ConfigurationContainer(
+            platform=self.get_platform(url), redis=redis_client
+        )

@@ -3,6 +3,7 @@ import redis
 import os
 import pathlib
 import sys
+import uuid
 
 
 # Added to make the utils module available to the script
@@ -27,10 +28,12 @@ class RedisService:
         return redis.StrictRedis(
             host=constants.REDIS_HOST,
             port=constants.REDIS_PORT,
-            db=0,
+            username=constants.REDIS_USERNAME,
             password=self.password,
-            errors="strict",
+            errors=constants.REDIS_ERRORS,
+            charset=constants.REDIS_CHARSET,
             decode_responses=True,
+            db=0,
         )
 
     def flush(self) -> None:
@@ -40,12 +43,11 @@ class RedisService:
         # Make sure Redis is running
         if not RedisService.status():
             raise ServiceNotRunningError("Redis")
+        # Flush Redis database
         with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
             SubprocessService(
                 [
-                    f"docker exec \
-                    -it {constants.REDIS_CONTAINER_NAME} \
-                    /bin/sh -c 'export REDISCLI_AUTH={self.password}; redis-cli flushall; unset REDISCLI_AUTH'"
+                    f"docker exec -it {constants.REDIS_CONTAINER_NAME} /bin/bash -c 'echo -e \"AUTH {self.password}\\nFLUSHALL\" | redis-cli'"
                 ],
                 {"stdout": log, "stderr": log, "shell": True},
             ).call()
@@ -81,12 +83,12 @@ class RedisService:
                 [
                     f"docker run -d \
                     -h redis \
-                    -e REDIS_PASSWORD=redis \
+                    -e REDIS_PASSWORD={self.password} \
                     -v {constants.REDIS_DATA_DIR}:/data \
                     -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
                     --name {constants.REDIS_CONTAINER_NAME} \
                     --restart always \
-                    redis:5.0.5-alpine3.9 /bin/sh -c 'redis-server --appendonly yes --requirepass {self.password}'"
+                    redis:7.2.2-bookworm /bin/bash -c 'redis-server --appendonly --requirepass ${{REDIS_PASSWORD}}'"
                 ],
                 {"stdout": log, "stderr": log, "shell": True},
             ).call()
@@ -96,7 +98,8 @@ class RedisService:
         """
         Check if Redis is running
         """
-        with open(f"{constants.REDIS_STATUS_TMP}", "w") as log:
+        filename = f"{constants.REDIS_STATUS_TMP}_{uuid.uuid4()}"
+        with open(filename, "w") as log:
             SubprocessService(
                 [
                     "docker inspect -f '{{.State.Running}}' "
@@ -104,10 +107,10 @@ class RedisService:
                 ],
                 {"stdout": log, "stderr": log, "shell": True},
             ).call()
-        with open(f"{constants.REDIS_STATUS_TMP}", "r") as log:
+        with open(filename, "r") as log:
             status = log.read().strip()
         # Remove temporary file
-        os.remove(f"{constants.REDIS_STATUS_TMP}")
+        os.remove(filename)
         if status == "true":
             return True
         return False
