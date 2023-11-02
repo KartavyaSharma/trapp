@@ -1,4 +1,4 @@
-import constants as constants
+import constants
 import pathlib
 import sys
 import time
@@ -91,17 +91,19 @@ class LinkenIn(Platform):
         """
         Save Selenium auth state for LinkedIn to disk
         """
-        x = None
+        cookie_objects = []
         for cookie in cookies:
             if cookie["name"] == "li_at":
                 cookie["domain"] = ".linkedin.com"
-                x = {
-                    "name": "li_at",
-                    "value": cookie["value"],
-                    "domain": ".linkedin.com",
-                }
+                cookie_objects.append(
+                    {
+                        "name": "li_at",
+                        "value": cookie["value"],
+                        "domain": ".linkedin.com",
+                    }
+                )
                 break
-        return x
+        return cookie_objects
 
     def non_headed_auth_instruction(self):
         print("Please authenticate linkedin account manually.")

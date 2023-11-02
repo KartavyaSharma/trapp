@@ -3,6 +3,7 @@ import constants
 import pickle
 import time
 
+from pathlib import Path
 from scripts.utils.errors import NoDriverSetError, AutoServiceError
 
 
@@ -127,24 +128,27 @@ class Platform:
         Gets cookies and saves them to disk
         """
         print("Saving auth state...", end=" ")
+        if not Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).exists():
+            Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).mkdir(parents=True, exist_ok=True)
         cookies = self.curr_driver.get_cookies()
         cookies_to_save = self.save_cookies(cookies=cookies)
-        pickle.dump(cookies_to_save, open(self.get_cookie_file(), "wb"))
+        for cookie_object in cookies_to_save:
+            pickle.dump(cookie_object, open(self.get_cookie_file(cookie_object), "wb"))
         print(f"{constants.OKGREEN}OK{constants.ENDC}")
 
     def load_cookies(self):
-        cookies = pickle.load(open(self.get_cookie_file(), "rb"))
-        self.curr_driver.add_cookie(cookies)
+        for file in Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).glob("*.pkl"):
+            cookie_object = pickle.load(open(file, "rb"))
+            self.curr_driver.add_cookie(cookie_object)            
 
-    def get_cookie_file(self):
+    def get_cookie_file(self, cookie_object: any = None):
         """
         Get cookie file path
         """
-        return (
-            constants.CHROME_DRIVER_COOKIE_FILE.split("<platform>")[0]
-            + self.name.lower()
-            + ".pkl"
-        )
+        file = constants.CHROME_DRIVER_COOKIE_DIR.replace(
+            "<platform>", self.name.lower()
+        ) + "/" + cookie_object["name"] + ".pkl"
+        return file
 
     def go_to_base_url(self):
         """

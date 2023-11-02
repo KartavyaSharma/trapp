@@ -1,16 +1,56 @@
 #!/usr/bin/env bash
 #^ Dynamically find bash path
 
+help() {
+    cat <<EOF
+trapp 1.0.0
+A tracker for your job applications
+
+Usage: ./start.sh [OPTIONS]
+
+OPTIONS:
+    -b, --wbkp
+        Run and start backup daemon
+    
+    -c, --clean
+        Clean up cache and daemon files
+
+    -s, --stop
+        Stop backup daemon
+    
+    -r, --restart
+        Restart backup daemon
+    
+    -t, --test
+        Test if backup daemon is running
+    
+    -f, --fix <service>
+        Fix any broken trapp service. Currently supported services:
+            colima
+            redis
+    
+    -h, --help
+        Print help and exit
+
+EOF
+}
+
+# Check if --help is passed as an argument
+if [[ "$1" == "--help" ]]; then
+    help
+    exit 0
+fi
+
 # Print welcome message
 python3 ./scripts/utils/welcome.py
 
 cecho_path=$(realpath ./scripts/shell/echo.sh)
 chmod +x $cecho_path
-cecho () {
+cecho() {
     ${cecho_path} "$@"
 }
 
-quit () {
+quit() {
     error=$@
     # Unset all variables
     unset arch
@@ -22,24 +62,26 @@ quit () {
     if [[ "$error" != "" ]]; then
         cecho -c red -t "Program exited with error. Deactivating virtual environment..."
         cecho -c red -t "Error: $error"
+        help
+        exit 1
     else
         # Exit program
         cecho -c green -t "Program exited. Deactivating virtual environment..."
     fi
-    exit 1
+    exit 0
 }
 
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
     cecho -c yellow -t "You are on Linux. Performing check for required Python packages..."
-    if command -v pip3 &> /dev/null; then
+    if command -v pip3 &>/dev/null; then
         cecho -c green -t "pip3 found!"
-    elif command -v pip &> /dev/null; then
+    elif command -v pip &>/dev/null; then
         cecho -c green -t "pip found!"
         alias pip3=pip
     else
-        cecho -c red -t "pip3 or pip not found. Likely because of a missing `ensurepip` module. This is required to create a virtual environment."
+        cecho -c red -t "pip3 or pip not found. Likely because of a missing $(ensurepip) module. This is required to create a virtual environment."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
         sudo apt-get install python3-venv python3-pip
     fi
@@ -85,43 +127,6 @@ else
     cecho -c green -t "All dependencies are present!"
 fi
 
-# Check if wget is installed
-if ! (command -v wget) > /dev/null
-then
-    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
-    install_wget_choice=$(./bin/gum choose "YES" "NO")
-    if [[ "$install_wget_choice" == "YES" ]];
-    then
-        cecho -c yellow -t "Installing wget..."
-        if [[ $arch == "Darwin" ]]
-        then
-            brew install wget
-        elif [[ $arch == "Linux" ]]
-        then
-            sudo apt-get install wget
-        else
-            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-        fi
-    else
-        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
-    fi
-else
-    cecho -c green -t "WGET found!"
-fi
-
-# Check if logs directory exists
-if ! test -d "logs"; then
-    cecho -c yellow -t "Creating logs directory..."
-    mkdir logs
-fi
-
-# Check if the .cache directory exists
-if ! test -d ".cache"; then
-    cecho -c yellow -t "Creating .cache directory..."
-    mkdir .cache
-fi
-
-
 # Check if gum is installed
 if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
@@ -151,16 +156,45 @@ else
     fi
 fi
 
+# Check if wget is installed
+if ! (command -v wget) >/dev/null; then
+    cecho -c red -t "wget was not found. Do you want to install it? (Y/n)"
+    install_wget_choice=$(./bin/gum choose "YES" "NO")
+    if [[ "$install_wget_choice" == "YES" ]]; then
+        cecho -c yellow -t "Installing wget..."
+        if [[ $arch == "Darwin" ]]; then
+            brew install wget
+        elif [[ $arch == "Linux" ]]; then
+            sudo apt-get install wget
+        else
+            quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+        fi
+    else
+        cecho -c yellow -t "wget was not installed. Please install wget manually to use trapp."
+    fi
+else
+    cecho -c green -t "WGET found!"
+fi
+
+# Check if logs directory exists
+if ! test -d "logs"; then
+    cecho -c yellow -t "Creating logs directory..."
+    mkdir logs
+fi
+
+# Check if the .cache directory exists
+if ! test -d ".cache"; then
+    cecho -c yellow -t "Creating .cache directory..."
+    mkdir .cache
+fi
+
 # If arch is Darwin check if brew is installed
 arch=$(uname -s)
-if [[ $arch == "Darwin" ]]
-then
-    if ! (command -v brew) > /dev/null
-    then
+if [[ $arch == "Darwin" ]]; then
+    if ! (command -v brew) >/dev/null; then
         cecho -c yellow -t "brew was not found. Do you want to install it? (Y/n)"
         install_brew_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_brew_choice" == "YES" ]];
-        then
+        if [[ "$install_brew_choice" == "YES" ]]; then
             cecho -c yellow -t "Installing brew..."
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         else
@@ -170,13 +204,11 @@ then
         cecho -c green -t "Homebrew found!"
     fi
 
-    check_openssl=$(brew list openssl@1.1)
-    if [[ "$check_openssl" == "" ]]
-    then
+    check_openssl=$(brew ls --versions openssl@1.1)
+    if [[ "$check_openssl" == "" ]]; then
         cecho -c yellow -t "openssl@1.1 was not found. Do you want to install it? (Y/n)"
         install_openssl_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_openssl_choice" == "YES" ]];
-        then
+        if [[ "$install_openssl_choice" == "YES" ]]; then
             cecho -c yellow -t "Installing openssl@1.1..."
             brew install openssl@1.1
         else
@@ -209,7 +241,7 @@ if ! command -v $bat_path &>/dev/null; then
     else
         cecho -c green -t "Rust found!"
     fi
-    # Pull bat from github 
+    # Pull bat from github
     git clone https://github.com/sharkdp/bat.git
     cd bat
     # Switch to stable commit
@@ -224,16 +256,14 @@ if ! command -v $bat_path &>/dev/null; then
 fi
 
 # Check if docker is installed and running
-if ! (command -v docker) > /dev/null
-then
+if ! (command -v docker) >/dev/null; then
     cecho -c yellow -t "Docker was not found."
     arch=$(uname -s)
     if [[ $arch == "Darwin" ]]; then
         # Ask user to install Docker
         cecho -c yellow -t "Docker was not found, do you want to install it using Homebrew?"
         install_docker_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_docker_choice" == "YES" ]];
-        then
+        if [[ "$install_docker_choice" == "YES" ]]; then
             cecho -c yellow -t "Installing Docker..."
             brew install --cask docker
         else
@@ -242,8 +272,7 @@ then
         cecho -c green -t "Docker installed!"
         # Check if colima is installed
         colima_ver="0.5.6"
-        if ! (command -v colima) > /dev/null
-        then
+        if ! (command -v colima) >/dev/null; then
             cecho -c yellow -t "colima was not found. Installing..."
             # download binary
             mkdir bin/colima && cd bin/colima
@@ -254,13 +283,12 @@ then
                 sudo mkdir /usr/local/bin
             fi
             # if usr/local/bin requires sudo, prompt for password
-            if [ -w "/usr/local/bin" ]
-            then
+            if [ -w "/usr/local/bin" ]; then
                 cecho -c yellow -t "Installing colima to /usr/local/bin..."
                 # install in $PATH
                 install colima-$(uname)-$(uname -m) /usr/local/bin/colima
             else
-                cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..." 
+                cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..."
                 sleep 2
                 # install in $PATH
                 sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
@@ -292,16 +320,13 @@ then
     fi
 fi
 
-if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]
-then
+if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
     arch=$(uname -s)
-    if [[ $arch == "Darwin" ]]
-    then
+    if [[ $arch == "Darwin" ]]; then
         cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
         # start colima
         colima start
-    elif [[ $arch == "Linux" ]]
-    then
+    elif [[ $arch == "Linux" ]]; then
         cecho -c yellow -t "Docker runtime not detected. Starting runtime (docker engine)..."
         sudo service docker start
     else
@@ -316,20 +341,18 @@ fi
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
     chrome_ver=$(google-chrome --version)
-    if [[ "$chrome_ver" == "" ]];
-    then
+    if [[ "$chrome_ver" == "" ]]; then
         # Ask user to install Google Chrome
         cecho -c yellow -t "Google Chrome was not found, do you want to install it using Homebrew?"
         install_chrome_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_chrome_choice" == "YES" ]];
-        then
+        if [[ "$install_chrome_choice" == "YES" ]]; then
             cecho -c yellow -t "Google Chrome was not found. Installing..."
             sudo apt update
             sudo apt install -y unzip xvfb libxi6 libgconf-2-4
             sudo apt install default-jdk
-            sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add 
-            sudo bash -c "echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google-chrome.list" 
-            sudo apt -y update 
+            sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
+            sudo bash -c "echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google-chrome.list"
+            sudo apt -y update
             sudo apt -y install google-chrome-stable
             chrome_ver=$(google-chrome --version)
         else
@@ -341,13 +364,11 @@ if [[ "$arch" == "Linux" ]]; then
     fi
 elif [[ "$arch" == "Darwin" ]]; then
     chrome_ver=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version)
-    if [[ "$chrome_ver" == "" ]];
-    then
+    if [[ "$chrome_ver" == "" ]]; then
         # Ask user to install Google Chrome
         cecho -c yellow -t "Google Chrome was not found, do you want to install it using Homebrew?"
         install_chrome_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_chrome_choice" == "YES" ]];
-        then
+        if [[ "$install_chrome_choice" == "YES" ]]; then
             cecho -c yellow -t "Installing Google Chrome..."
             brew install --cask google-chrome
             chrome_ver=$(/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version)
@@ -363,8 +384,7 @@ else
 fi
 
 # Check post-install
-if [[ "$chrome_ver" == "" ]];
-then
+if [[ "$chrome_ver" == "" ]]; then
     # Ask user to install Google Chrome
     cecho -c yellow -t "Google Chrome was not installed. Please install Google Chrome manually to use autofill."
 else
@@ -387,28 +407,22 @@ fi
 
 echo
 ARGFLAG=0
-for arg in "$@"; do
-    case $arg in
+# for arg in "$@"; do
+while [[ $# -gt 0 ]]; do
+    case $1 in
     -b | --wbkp)
         echo "Running program with backup option..."
         python3 runner.py wbkp
         ARGFLAG=1
         ;;
     -h | --help)
-        echo "Usage: ./start.sh [OPTION]"
-        echo "Options:"
-        echo "  -b, --wbkp      Run and start backup daemon"
-        echo "  -c, --clean     Clean up cache and daemon files"
-        echo "  -s, --stop      Stop backup daemon"
-        echo "  -r, --restart   Restart backup daemon"
-        echo "  -t, --test      Test if backup daemon is running"
-        echo "  -h, --help      Print help and exit"
+        help
         ARGFLAG=2
         ;;
     -c | --clean)
         echo "Cleaning up..."
         echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
-        rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp 
+        rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp
         echo "Removing preview files..."
         # Delete any preview files with the .preview extension
         find . -type f -name "*.preview" -delete
@@ -430,17 +444,60 @@ for arg in "$@"; do
         ./scripts/shell/bkp_daemon.sh stop
         # Start daemon as a background process
         cecho -c green -t "Starting backup daemon..."
-        nohup ./scripts/shell/bkp_daemon.sh start > bkp/bkp.out &
+        nohup ./scripts/shell/bkp_daemon.sh start >bkp/bkp.out &
         ARGFLAG=5
         ;;
     -t | --test)
         ./scripts/shell/bkp_daemon.sh status
         ARGFLAG=6
         ;;
+    -f | --fix)
+        shift # Remove the --fix argument
+        service=$1
+        if [[ "$service" == "" ]]; then
+            quit "No service specified!"
+        fi
+        cecho -c yellow -t "Fixing $service..."
+        if [[ "$service" == "colima" ]]; then
+            status=$(limactl list | grep colima | awk -F' ' '{print $2}')
+            cecho -c yellow -t "Colima cotainer status: $status"
+            if [[ "$status" == "Broken" ]]; then
+                limactl factory-reset colima
+                status=$(limactl list | grep colima | awk -F' ' '{print $2}')
+                if [[ "$status" == "Broken" ]]; then
+                    quit "Failed to fix colima!"
+                else
+                    cecho -c green -t "Colima fixed!"
+                fi
+            else
+                cecho -c green -t "Colima is not broken!"
+                quit
+            fi
+        elif [[ "$service" == "redis" ]]; then
+            docker_redis_metadata=$(python3 -c "from constants import REDIS_CONTAINER_NAME, REDIS_DATA_DIR; print(REDIS_CONTAINER_NAME, REDIS_DATA_DIR)")
+            container_name=$(echo $docker_redis_metadata | awk -F' ' '{print $1}')
+            data_volume_name=$(echo $docker_redis_metadata | awk -F' ' '{print $2}')
+            status=$(docker inspect -f '{{.State.Status}}' "$container_name" 2>&1)
+            cecho -c yellow -t "Redis container status: $status"
+            if [[ "$status" =~ "No such object" ]]; then
+                quit "No redis service found to fix!"
+            else
+                # Stop and remove redis container
+                docker rm -f $container_name 2>&1
+                docker volume rm $data_volume_name 2>&1
+                cecho -c green -t "Redis container removed!"
+                cecho -c green -t "To restart redis, run trapp again."
+            fi
+            quit
+        else
+            quit "Invalid service: $service"
+        fi
+        ;;
     *)
         quit "Invalid option: $arg"
         ;;
     esac
+    shift
 done
 if [ $ARGFLAG -eq 0 ]; then
     python3 runner.py
@@ -452,7 +509,7 @@ elif [ $ARGFLAG -eq 1 ]; then
         cecho -c yellow -t "Creating bkp directory..."
         mkdir bkp
     fi
-    nohup ./scripts/shell/bkp_daemon.sh start > bkp/bkp.out &
+    nohup ./scripts/shell/bkp_daemon.sh start >bkp/bkp.out &
     cecho -c green -t "Backup daemon started!"
     echo
     echo "Usage: ./start.sh [OPTION]"

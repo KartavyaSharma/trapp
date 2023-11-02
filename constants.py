@@ -84,12 +84,13 @@ VAULT_PATH = f"{PROJECT_ROOT}/.vault"
 #### Redis Constants ####
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
-REDIS_USERNAME = "default"
 REDIS_CONTAINER_NAME = "redis-trapp"
+REDIS_DATA_DIR = f"{REDIS_CONTAINER_NAME}-data"
+REDIS_DOCKER_IMAGE_TAG = "redis:7.2.2-bookworm"
+REDIS_USERNAME = "default"
 REDIS_TEST_PWD = "test"
 REDIS_CHARSET = "utf-8"
 REDIS_ERRORS = "strict"
-REDIS_DATA_DIR = f"{REDIS_CONTAINER_NAME}-data"
 REDIS_LOG_FILE = f"{PROJECT_ROOT}/logs/redis.log"
 REDIS_STATUS_TMP = f"{PROJECT_ROOT}/logs/redis_status.tmp"
 
@@ -115,7 +116,7 @@ CHROME_DRIVER_SERVER_OPTS = [
     "disable-infobars",
     "--disable-extensions",
 ]
-CHROME_DRIVER_COOKIE_FILE = f"{PROJECT_ROOT}/.cache/chrome_driver_<platform>.pkl"
+CHROME_DRIVER_COOKIE_DIR = f"{PROJECT_ROOT}/.cache/chrome_driver_<platform>"
 
 #### Selenium Constants ####
 SELENIUM_TIMEOUT = 5

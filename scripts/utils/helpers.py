@@ -188,3 +188,9 @@ def print_tabbed_doc_string(path: str) -> None:
     for line in lines[1:]:
         print(f"\t{line.strip()}")
     print()
+
+def get_class_from_tag(tag_w_class: str) -> str:
+    """
+    Get class from tag with class
+    """
+    return tag_w_class.split("=")[1].replace('"', '').strip()

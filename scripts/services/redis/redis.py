@@ -43,14 +43,10 @@ class RedisService:
         # Make sure Redis is running
         if not RedisService.status():
             raise ServiceNotRunningError("Redis")
-        # Flush Redis database
-        with open(f"{constants.REDIS_LOG_FILE}", "w") as log:
-            SubprocessService(
-                [
-                    f"docker exec -it {constants.REDIS_CONTAINER_NAME} /bin/bash -c 'echo -e \"AUTH {self.password}\\nFLUSHALL\" | redis-cli'"
-                ],
-                {"stdout": log, "stderr": log, "shell": True},
-            ).call()
+        try:
+            self.connect().flushall()
+        except redis.exceptions.ConnectionError:
+            raise ServiceNotRunningError("Redis")
 
     def stop(self) -> None:
         # Clear Redis database
@@ -88,7 +84,7 @@ class RedisService:
                     -p {constants.REDIS_PORT}:{constants.REDIS_PORT}\
                     --name {constants.REDIS_CONTAINER_NAME} \
                     --restart always \
-                    redis:7.2.2-bookworm /bin/bash -c 'redis-server --appendonly yes --requirepass ${{REDIS_PASSWORD}}'"
+                    {constants.REDIS_DOCKER_IMAGE_TAG} /bin/bash -c 'redis-server --appendonly yes --requirepass ${{REDIS_PASSWORD}}'"
                 ],
                 {"stdout": log, "stderr": log, "shell": True},
             ).call()

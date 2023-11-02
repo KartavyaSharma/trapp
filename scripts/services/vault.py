@@ -27,12 +27,12 @@ class VaultService:
         """
         Check if user has saved auth state for platform
         """
-        file_path = pathlib.Path(
-            constants.CHROME_DRIVER_COOKIE_FILE.replace(
+        platform_dir_path = pathlib.Path(
+            constants.CHROME_DRIVER_COOKIE_DIR.replace(
                 "<platform>", platform.name.lower()
             )
         )
-        if not file_path.exists():
+        if not platform_dir_path.exists():
             if not headed_support:
                 platform.non_headed_auth_instruction()
                 raise NoHeadedSupportError(platform.name)
