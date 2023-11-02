@@ -76,7 +76,7 @@ NY = ["NO", "YES"]
 MAX_COL_WIDTH = 40
 
 #### Platform Constants ####
-PLATFORM_MAP = {"linkedin": "linkedin", "joinhandshake": "handshake"}
+PLATFORM_MAP = {"linkedin": "linkedin", "joinhandshake": "handshake", "greenhouse": "greenhouse"}
 
 #### Auth Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"

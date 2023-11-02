@@ -136,7 +136,7 @@ class AutoService(object):
             date_applied=datetime.datetime.now(),
             status=status.Status.INIT,
             link=post_url,
-            notes=f"Addtional Information:{location}",
+            notes=f"{location}",
         )
 
         # Get dataframe

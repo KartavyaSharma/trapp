@@ -95,13 +95,14 @@ class Platform:
         """
         Wrapper for login workflow
         """
-        # Set current driver as auth driver
-        self.set_curr_driver(self.auth_driver)
-        self.go_to_login_url()
-        self.login()  # Login
-        self.retrieve_auth_state()
-        self.clean()
-        self.set_curr_driver(self.driver)  # Set current driver as main driver
+        if self.login_url:
+            # Set current driver as auth driver
+            self.set_curr_driver(self.auth_driver)
+            self.go_to_login_url()
+            self.login()  # Login
+            self.retrieve_auth_state()
+            self.clean()
+            self.set_curr_driver(self.driver)  # Set current driver as main driver
 
     def scrape_wrapper(self):
         """
@@ -128,8 +129,14 @@ class Platform:
         Gets cookies and saves them to disk
         """
         print("Saving auth state...", end=" ")
-        if not Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).exists():
-            Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).mkdir(parents=True, exist_ok=True)
+        if not Path(
+            constants.CHROME_DRIVER_COOKIE_DIR.replace("<platform>", self.name.lower())
+        ).exists():
+            Path(
+                constants.CHROME_DRIVER_COOKIE_DIR.replace(
+                    "<platform>", self.name.lower()
+                )
+            ).mkdir(parents=True, exist_ok=True)
         cookies = self.curr_driver.get_cookies()
         cookies_to_save = self.save_cookies(cookies=cookies)
         for cookie_object in cookies_to_save:
@@ -137,17 +144,22 @@ class Platform:
         print(f"{constants.OKGREEN}OK{constants.ENDC}")
 
     def load_cookies(self):
-        for file in Path(constants.CHROME_DRIVER_COOKIE_DIR.replace('<platform>', self.name.lower())).glob("*.pkl"):
+        for file in Path(
+            constants.CHROME_DRIVER_COOKIE_DIR.replace("<platform>", self.name.lower())
+        ).glob("*.pkl"):
             cookie_object = pickle.load(open(file, "rb"))
-            self.curr_driver.add_cookie(cookie_object)            
+            self.curr_driver.add_cookie(cookie_object)
 
     def get_cookie_file(self, cookie_object: any = None):
         """
         Get cookie file path
         """
-        file = constants.CHROME_DRIVER_COOKIE_DIR.replace(
-            "<platform>", self.name.lower()
-        ) + "/" + cookie_object["name"] + ".pkl"
+        file = (
+            constants.CHROME_DRIVER_COOKIE_DIR.replace("<platform>", self.name.lower())
+            + "/"
+            + cookie_object["name"]
+            + ".pkl"
+        )
         return file
 
     def go_to_base_url(self):
@@ -178,4 +190,4 @@ class Platform:
         """
         Instructions for authenticating <platform> on non-headed systems
         """
-        raise NotImplementedError
+        print("No authentication required for this platform.")

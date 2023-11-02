@@ -27,6 +27,8 @@ class VaultService:
         """
         Check if user has saved auth state for platform
         """
+        if platform.login_url == "":
+            return True
         platform_dir_path = pathlib.Path(
             constants.CHROME_DRIVER_COOKIE_DIR.replace(
                 "<platform>", platform.name.lower()
