@@ -61,6 +61,20 @@ WARNING = "\033[1;33m"
 FAIL = "\033[1;31m"
 ENDC = "\033[0m"
 
+GUM_BINARY_LINKS = {}
+GUM_BINARY_LINKS[
+    "Darwin arm64"
+] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz"
+GUM_BINARY_LINKS[
+    "Darwin x86_64"
+] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz"
+GUM_BINARY_LINKS[
+    "Linux arm64"
+] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz"
+GUM_BINARY_LINKS[
+    "Linux x86_64"
+] = "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz"
+
 ##### Command Constants #####
 GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
 GUM_CHOOSE = ["./bin/gum", "choose"]
@@ -76,7 +90,11 @@ NY = ["NO", "YES"]
 MAX_COL_WIDTH = 40
 
 #### Platform Constants ####
-PLATFORM_MAP = {"linkedin": "linkedin", "joinhandshake": "handshake", "greenhouse": "greenhouse"}
+PLATFORM_MAP = {
+    "linkedin": "linkedin",
+    "joinhandshake": "handshake",
+    "greenhouse": "greenhouse",
+}
 
 #### Auth Constants ####
 VAULT_PATH = f"{PROJECT_ROOT}/.vault"

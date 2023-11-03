@@ -15,8 +15,6 @@ from selenium.webdriver.support.expected_conditions import (
 sys.path.append(f"{pathlib.Path(__file__).parent.resolve()}/../..")
 
 from scripts.models.platform import Platform
-from scripts.utils.errors import UnexpectedPageStateError
-from scripts.utils.helpers import get_class_from_tag
 
 
 class GreenHouse(Platform):
@@ -39,7 +37,9 @@ class GreenHouse(Platform):
             )
         )
         title = self.curr_driver.find_element(By.CLASS_NAME, "app-title").text
-        company = self.curr_driver.find_element(By.CLASS_NAME, "company-name").text
+        company = self.curr_driver.find_element(
+            By.CLASS_NAME, "company-name"
+        ).text.replace("at ", "")
         location = self.curr_driver.find_element(By.CLASS_NAME, "location").text
         return (title, company, location, self.url)
 

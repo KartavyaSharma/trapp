@@ -16,7 +16,11 @@ class PlatformBuilder:
     Build platform instances
     """
 
-    platforms = {"LinkedIn".lower(): LinkenIn, "Handshake".lower(): Handshake, "GreenHouse".lower(): GreenHouse}
+    platforms = {
+        "LinkedIn".lower(): LinkenIn,
+        "Handshake".lower(): Handshake,
+        "GreenHouse".lower(): GreenHouse,
+    }
 
     @staticmethod
     def build(platform_name: str, url: str) -> Platform:

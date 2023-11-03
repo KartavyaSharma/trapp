@@ -35,8 +35,8 @@ OPTIONS:
 EOF
 }
 
-# Check if --help is passed as an argument
-if [[ "$1" == "--help" ]]; then
+# Check if --help or -h is passed as an argument
+if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     help
     exit 0
 fi
@@ -49,6 +49,28 @@ chmod +x $cecho_path
 cecho() {
     ${cecho_path} "$@"
 }
+
+clean() {
+    echo "Cleaning up..."
+    echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
+    rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp
+    echo "Removing preview files..."
+    # Delete any preview files with the .preview extension
+    find . -type f -name "*.preview" -delete
+    # Removing all dependencies
+    echo "Removing dependencies..."
+    rm -rf env
+    rm -rf bin
+    rm -rf bat
+    rm -rf logs
+    echo
+}
+
+# Check if --clean or -c is passed as an argument
+if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
+    clean
+    exit 0
+fi
 
 quit() {
     error=$@
@@ -87,14 +109,6 @@ if [[ "$arch" == "Linux" ]]; then
     fi
 fi
 
-# Dictionary to maintain gum binary links
-declare -A gum_binary_links
-
-gum_binary_links["Darwin arm64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz"
-gum_binary_links["Darwin x86_64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz"
-gum_binary_links["Linux arm64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz"
-gum_binary_links["Linux x86_64"]="https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz"
-
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
     cecho -c yellow -t "Not in a virtual environment"
@@ -132,9 +146,8 @@ if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
     echo "Determining system architecture..."
     arch=$(uname -s -m)
-    if test "${gum_binary_links["$arch"]+isset}"; then
-        url="${gum_binary_links["$arch"]}"
-    else
+    url=$(python3 -c "from constants import GUM_BINARY_LINKS as links; print(links['$arch']) if '$arch' in links else print('Invalid architecture')")
+    if [[ "$url" == "Invalid architecture" ]]; then
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
     cecho -c yellow -t "Fetching gum binary..."
@@ -414,26 +427,6 @@ while [[ $# -gt 0 ]]; do
         echo "Running program with backup option..."
         python3 runner.py wbkp
         ARGFLAG=1
-        ;;
-    -h | --help)
-        help
-        ARGFLAG=2
-        ;;
-    -c | --clean)
-        echo "Cleaning up..."
-        echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
-        rm -rf .cache bkp/pid bkp/logs bkp/bkp.out bkp
-        echo "Removing preview files..."
-        # Delete any preview files with the .preview extension
-        find . -type f -name "*.preview" -delete
-        # Removing all dependencies
-        echo "Removing dependencies..."
-        rm -rf env
-        rm -rf bin
-        rm -rf bat
-        rm -rf logs
-        echo
-        ARGFLAG=3
         ;;
     -s | --stop)
         ./scripts/shell/bkp_daemon.sh stop
