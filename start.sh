@@ -94,6 +94,23 @@ quit() {
     exit 0
 }
 
+# Check if logs directory exists
+if ! test -d "logs"; then
+    cecho -c yellow -t "Creating logs directory..."
+    mkdir logs
+fi
+
+# Check if the .cache directory exists
+if ! test -d ".cache"; then
+    cecho -c yellow -t "Creating .cache directory..."
+    mkdir .cache
+fi
+
+if ! test -d "bin"; then
+    cecho -c yellow -t "Creating bin directory..."
+    mkdir bin
+fi
+
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
@@ -169,7 +186,7 @@ if ! command -v ./bin/gum &>/dev/null; then
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
     cecho -c yellow -t "Fetching gum binary..."
-    mkdir bin && cd bin
+    cd bin
     wget "$url"
     tar -xzf $(basename "$url") gum
     chmod 755 $(basename "$url" | awk -F'.' '{print $1}' | awk -F'_' '{print $1}')
@@ -205,18 +222,6 @@ if ! (command -v wget) >/dev/null; then
     fi
 else
     cecho -c green -t "WGET found!"
-fi
-
-# Check if logs directory exists
-if ! test -d "logs"; then
-    cecho -c yellow -t "Creating logs directory..."
-    mkdir logs
-fi
-
-# Check if the .cache directory exists
-if ! test -d ".cache"; then
-    cecho -c yellow -t "Creating .cache directory..."
-    mkdir .cache
 fi
 
 # If arch is Darwin check if brew is installed
@@ -256,34 +261,53 @@ if ! test -d ".cache"; then
     touch ./.cache/gum.flag && echo "1" >>./.cache/gum.flag
 fi
 
+# On linux, don't build the bat binary, download it instead
+arch=$(uname -s)
 # Bat binary path
 bat_path="./bin/bat/bin/bat"
-bat_commit="fc95468" # Latest commit trapp is tested with
-# Check if sharkdp/bat is installed
-if ! command -v $bat_path &>/dev/null; then
-    cecho -c yellow -t "sharkdp/bat was not found. Installing..."
-    # Check if system has rust installed
-    if ! command -v rustc &>/dev/null; then
-        cecho -c yellow -t "Rust not found. Trapp requires rust to work. Installing..."
-        sleep 3
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-        cecho -c green -t "Rust installed!"
-        source $HOME/.cargo/env
-    else
-        cecho -c green -t "Rust found!"
-    fi
-    # Pull bat from github
-    git clone https://github.com/sharkdp/bat.git
-    cd bat
-    # Switch to stable commit
-    git reset --hard $bat_commit
-    # Build bat
-    mkdir ../bin/bat
-    cargo install --root ../bin/bat --locked bat
-    cd ..
+if [[ $arch == "Linux" ]]; then
+    # Get binary from link in constants file
+    bat_binary_link=$(python3 -c "from constants import BAT_LINUX_BINARY_LINK as link; print(link)")
+    cecho -c yellow -t "Fetching bat binary..."
+    cd bin
+    mkdir -p bat/bin && cd bat/bin
+    wget $bat_binary_link
+    tar -xzf $(basename "$bat_binary_link")
+    cd $(basename "$bat_binary_link")
+    mv bat ../ && cd ../
+    chmod 755 bat 
     cecho -c green -t "Installed bat!"
     echo "Cleaning up..."
-    rm -rf bat
+    rm $(basename "$bat_binary_link")
+    cd ../../..
+else
+    bat_commit="fc95468" # Latest commit trapp is tested with
+    # Check if sharkdp/bat is installed
+    if ! command -v $bat_path &>/dev/null; then
+        cecho -c yellow -t "sharkdp/bat was not found. Installing..."
+        # Check if system has rust installed
+        if ! command -v rustc &>/dev/null; then
+            cecho -c yellow -t "Rust not found. Trapp requires rust to work. Installing..."
+            sleep 3
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+            cecho -c green -t "Rust installed!"
+            source $HOME/.cargo/env
+        else
+            cecho -c green -t "Rust found!"
+        fi
+        # Pull bat from github
+        git clone https://github.com/sharkdp/bat.git
+        cd bat
+        # Switch to stable commit
+        git reset --hard $bat_commit
+        # Build bat
+        mkdir ../bin/bat
+        cargo install --root ../bin/bat --locked bat
+        cd ..
+        cecho -c green -t "Installed bat!"
+        echo "Cleaning up..."
+        rm -rf bat
+    fi
 fi
 
 # Check if docker is installed and running
