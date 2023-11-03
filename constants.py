@@ -76,6 +76,8 @@ GUM_FILTER = ["./bin/gum", "filter", "--fuzzy", "--no-limit", "--sort"]
 
 BAT = "./bin/bat/bin/bat"
 BAT_LINUX_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz"
+BAT_AMD_DARWIN_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-apple-darwin.tar.gz"
+BAT_ARM_DARWIN_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat_0.24.0_arm64.deb"
 
 YN = ["YES", "NO"]
 NY = ["NO", "YES"]
