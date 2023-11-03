@@ -114,7 +114,7 @@ fi
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
-    cecho -c yellow -t "You are on Linux. Performing check for required Python packages..."
+    echo "You are on Linux. Performing check for required Python packages..."
     if command -v pip3 &>/dev/null; then
         cecho -c green -t "pip3 found!"
     elif command -v pip &>/dev/null; then
@@ -129,6 +129,7 @@ if [[ "$arch" == "Linux" ]]; then
     if ! dpkg -s python3-venv >/dev/null 2>&1; then
         cecho -c red -t "python3-venv was not found. This is required to create a virtual environment."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
+        sleep 2
         sudo apt-get install python3-venv
     else
         cecho -c green -t "python3-venv found!"
@@ -137,6 +138,7 @@ if [[ "$arch" == "Linux" ]]; then
     if ! dpkg -s build-essential >/dev/null 2>&1; then
         cecho -c red -t "build-essential was not found. This is required to build the gum library."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
+        sleep 2
         sudo apt-get install build-essential
     else
         cecho -c green -t "build-essential found!"
@@ -204,6 +206,7 @@ else
     fi
 fi
 
+arch=$(uname -s)
 # Check if wget is installed
 if ! (command -v wget) >/dev/null; then
     cecho -c yellow -t "Installing wget..."
@@ -274,32 +277,27 @@ fi
 # On linux, don't build the bat binary, download it instead
 arch=$(uname -s)
 # Bat binary path
-bat_path="./bin/bat/bin/bat"
+bat_path="./bin/bat/bat"
+# Get binary from link in constants file
 if [[ $arch == "Linux" ]]; then
-    # Get binary from link in constants file
     bat_binary_link=$(python3 -c "from constants import BAT_LINUX_BINARY_LINK as link; print(link)")
 else
-    # Check darwin architecture
-    arch=$(uname -m)
-    if [[ $arch == "arm64" ]]; then
-        bat_binary_link=$(python3 -c "from constants import BAT_ARM_DARWIN_BINARY_LINK as link; print(link)")
-    else
-        bat_binary_link=$(python3 -c "from constants import BAT_AMD_DARWIN_BINARY_LINK as link; print(link)")
-    fi 
+    bat_binary_link=$(python3 -c "from constants import BAT_AMD_DARWIN_BINARY_LINK as link; print(link)")
 
 fi
 cecho -c yellow -t "Fetching bat binary..."
 cd bin
-mkdir -p bat/bin && cd bat/bin
+mkdir -p bat && cd bat
 wget $bat_binary_link
 tar -xzf $(basename "$bat_binary_link")
-cd $(basename "$bat_binary_link")
+cd $(basename "$bat_binary_link" | awk -F'.tar.gz' '{print $1}')
 mv bat ../ && cd ../
-chmod 755 bat 
+chmod +x bat 
 cecho -c green -t "Installed bat!"
 echo "Cleaning up..."
-rm $(basename "$bat_binary_link")
-cd ../../..
+find . ! -name 'bat' -type f -exec rm -f {} +
+find . ! -name 'bat' -name '.' -name '..' -type d -exec rm -rf {} +
+cd ../..
 
 # Check if docker is installed and running
 if ! (command -v docker) >/dev/null; then
