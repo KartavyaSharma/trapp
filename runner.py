@@ -338,7 +338,6 @@ def print_to_file():
 
 
 def auto():
-    # breakpoint()
     service = AutoService()  # Initialize AutoService
     # Ask user for job posting URL
     success_flag = True

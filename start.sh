@@ -3,6 +3,7 @@
 
 help() {
     cat <<EOF
+
 trapp 1.0.0
 A tracker for your job applications
 
@@ -103,11 +104,28 @@ if [[ "$arch" == "Linux" ]]; then
         cecho -c green -t "pip found!"
         alias pip3=pip
     else
-        cecho -c red -t "pip3 or pip not found. Likely because of a missing $(ensurepip) module. This is required to create a virtual environment."
+        cecho -c red -t "pip3 or pip not found. Likely because of a missing ensurepip module. This is required to create a virtual environment."
         cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
-        sudo apt-get install python3-venv python3-pip
+        sudo apt-get install python3-pip
+    fi
+    # Check if python3-venv is installed
+    if ! dpkg -s python3-venv >/dev/null 2>&1; then
+        cecho -c red -t "python3-venv was not found. This is required to create a virtual environment."
+        cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
+        sudo apt-get install python3-venv
+    else
+        cecho -c green -t "python3-venv found!"
+    fi
+    # Check if build-essential is installed
+    if ! dpkg -s build-essential >/dev/null 2>&1; then
+        cecho -c red -t "build-essential was not found. This is required to build the gum library."
+        cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
+        sudo apt-get install build-essential
+    else
+        cecho -c green -t "build-essential found!"
     fi
 fi
+
 
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
@@ -318,16 +336,16 @@ if ! (command -v docker) >/dev/null; then
         sudo sh ./bin/get-docker.sh
         sudo groupadd docker
         sudo usermod -aG docker ${USER}
-        su - ${USER} # Refresh user group
         if [ ! $(groups) =~ "docker" ]; then
             quit "Failed to add user to docker group!"
         fi
         # Test if docker is working as it should
-        docker run hello-world
+        sudo docker run hello-world
         if [ $? -ne 0 ]; then
             quit "Docker failed hello-world test!"
         fi
         cecho -c green -t "Docker installed!"
+        quit "Please restart your terminal to use docker without sudo."
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi

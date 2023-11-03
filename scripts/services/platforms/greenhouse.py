@@ -1,10 +1,7 @@
 import constants
 import pathlib
 import sys
-import time
-import re
 
-from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.expected_conditions import (
