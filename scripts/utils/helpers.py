@@ -65,9 +65,6 @@ def verify_headless_support() -> bool:
             ).check_call()
             # Install firefox dependency
             sp.SubprocessService(
-                ["sudo", "apt-get", "update"], {"stderr": subprocess.DEVNULL}
-            ).check_call()
-            sp.SubprocessService(
                 ["sudo", "apt-get", "install", "firefox"],
                 {"stderr": subprocess.DEVNULL},
             ).check_call()
@@ -87,9 +84,6 @@ def verify_headless_support() -> bool:
             print(
                 "The following packages will be installed:\nxserver-xephyr\ntigervnc-standalone-server\nx11-utils\ngnumeric"
             )
-            sp.SubprocessService(
-                ["sudo", "apt-get", "update"], {"stderr": subprocess.DEVNULL}
-            ).check_call()
             sp.SubprocessService(
                 [
                     "sudo",

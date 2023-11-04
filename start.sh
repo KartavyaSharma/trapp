@@ -364,13 +364,14 @@ if ! (command -v docker) >/dev/null; then
             quit "Docker failed hello-world test!"
         fi
         cecho -c green -t "Docker installed!"
-        quit "Please restart your terminal to use docker without sudo."
+        # quit "Please restart your terminal to use docker without sudo."
+        newgrp docker
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
 fi
 
-if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
+if [[ "$(docker ps 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
     arch=$(uname -s)
     if [[ $arch == "Darwin" ]]; then
         cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
@@ -403,7 +404,7 @@ if [[ "$arch" == "Linux" ]]; then
             wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
             sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
             # sudo bash -c "echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google-chrome.list"
-            sudo apt-get update
+            sudo apt update
             sudo apt -y install google-chrome-stable
             chrome_ver=$(google-chrome --version)
         else
