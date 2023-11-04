@@ -319,6 +319,33 @@ if ! (command -v docker) >/dev/null; then
             quit "Docker was not installed. Please install Docker manually to use trapp."
         fi
         cecho -c green -t "Docker installed!"
+        # Check if colima is installed
+        colima_ver="0.5.6"
+        if ! (command -v colima) >/dev/null; then
+            cecho -c yellow -t "colima was not found. Installing..."
+            # download binary
+            mkdir bin/colima && cd bin/colima
+            curl -LO https://github.com/abiosoft/colima/releases/download/v$colima_ver/colima-$(uname)-$(uname -m)
+            # Check if usr/local/bin is exists, if not create it
+            if ! test -d "/usr/local/bin"; then
+                cecho -c yellow -t "Creating /usr/local/bin..."
+                sudo mkdir /usr/local/bin
+            fi
+            # if usr/local/bin requires sudo, prompt for password
+            if [ -w "/usr/local/bin" ]; then
+                cecho -c yellow -t "Installing colima to /usr/local/bin..."
+                # install in $PATH
+                install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+            else
+                cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..."
+                sleep 2
+                # install in $PATH
+                sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
+            fi
+            cd ..
+        else
+            cecho -c green -t "Colima found!"
+        fi
     elif [[ $arch == "Linux" ]]; then
         # Installing docker using the convenience script
         curl -fsSL https://get.docker.com -o ./bin/get-docker.sh
@@ -340,34 +367,6 @@ if ! (command -v docker) >/dev/null; then
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
-fi
-
-# Check if colima is installed
-colima_ver="0.5.6"
-if ! (command -v colima) >/dev/null; then
-    cecho -c yellow -t "colima was not found. Installing..."
-    # download binary
-    mkdir bin/colima && cd bin/colima
-    curl -LO https://github.com/abiosoft/colima/releases/download/v$colima_ver/colima-$(uname)-$(uname -m)
-    # Check if usr/local/bin is exists, if not create it
-    if ! test -d "/usr/local/bin"; then
-        cecho -c yellow -t "Creating /usr/local/bin..."
-        sudo mkdir /usr/local/bin
-    fi
-    # if usr/local/bin requires sudo, prompt for password
-    if [ -w "/usr/local/bin" ]; then
-        cecho -c yellow -t "Installing colima to /usr/local/bin..."
-        # install in $PATH
-        install colima-$(uname)-$(uname -m) /usr/local/bin/colima
-    else
-        cecho -c yellow -t "usr/local/bin requires sudo to install Colima. Prepare to provide sudo password..."
-        sleep 2
-        # install in $PATH
-        sudo install colima-$(uname)-$(uname -m) /usr/local/bin/colima
-    fi
-    cd ..
-else
-    cecho -c green -t "Colima found!"
 fi
 
 if [[ "$(docker info 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
