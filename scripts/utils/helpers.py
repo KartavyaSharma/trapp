@@ -157,9 +157,13 @@ def load_urls_from_file():
     with open(".cache/urls.tmp", "w") as outF:
         outF.write(initial_message)
     outF.close()
+    urls = []
     os.system(f"{editor} .cache/urls.tmp")
     with open(".cache/urls.tmp", "r") as inF:
-        urls = inF.readlines()
+        for line in inF.readlines():
+            if line[0] == "#":
+                continue
+            urls.append(line)
     inF.close()
     os.remove(".cache/urls.tmp")
     return ",".join(urls).replace("\n", "")
