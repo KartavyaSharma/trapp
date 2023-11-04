@@ -25,7 +25,9 @@ pip3 download -r ./requirements.txt -d ./build/dependencies
 cd ./build
 
 # Create a tarball of the dependencies directory
-tar -czvf dependencies.tar.pip3.gz dependencies
+arch=$(uname -sm)
+arch=${arch// /_}
+tar -czvf dependencies.tar.$arch.gz dependencies
 
 # Clean up the dependencies directory
 rm -rf dependencies

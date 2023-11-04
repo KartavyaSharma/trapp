@@ -30,6 +30,9 @@ OPTIONS:
             colima
             redis
     
+    --build-dependencies
+        Build pip3 dependencies for trapp on the current system
+    
     -h, --help
         Print help and exit
 
@@ -73,6 +76,12 @@ if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
     exit 0
 fi
 
+# Check if --build-dependencies is passed as an argument
+if [[ "$1" == "--build-dependencies" ]]; then
+    ./scripts/shell/build_dependencies.sh
+    exit 0
+fi
+
 quit() {
     error=$@
     # Unset all variables
@@ -94,9 +103,11 @@ quit() {
     exit 0
 }
 
-# Create logs, .cache, bkp, and bin directories in one go
-cecho -c yellow -t "Creating directories..."
-mkdir -p logs .cache bkp bin
+# Create logs, .cache, bkp, and bin directories in one go if none exist
+if ! test -d "logs" || ! test -d ".cache" || ! test -d "bkp" || ! test -d "bin"; then
+    cecho -c yellow -t "Creating directories..."
+    mkdir -p logs .cache bkp bin
+fi
 
 # Check system architecture
 arch=$(uname -s)
@@ -283,7 +294,7 @@ if ! (command -v docker) >/dev/null; then
             quit "Docker failed hello-world test!"
         fi
         cecho -c green -t "Docker installed!"
-        # quit "Please restart your terminal to use docker without sudo."
+        cecho -c yellow -t "Restarting trapp, run ./start.sh again..."
         newgrp docker
     else
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."

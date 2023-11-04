@@ -22,7 +22,9 @@ if [ ! -f "./build/dependencies.tar.pip3.gz" ]; then
 fi
 
 # Extract the dependencies tarball
-tar -xzvf ./build/dependencies.tar.pip3.gz -C ./build
+arch=$(uname -sm)
+arch=${arch// /_}
+tar -xzvf ./build/dependencies.tar.$arch.gz -C ./build
 
 # Install the dependencies
 pip3 install --no-index --find-links=./build/dependencies -r ./requirements.txt

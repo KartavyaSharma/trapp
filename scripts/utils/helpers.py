@@ -95,16 +95,6 @@ def verify_headless_support() -> bool:
                 ],
                 {"stderr": subprocess.DEVNULL},
             ).check_call()
-            print(
-                f"{constants.WARNING}Additional python dependencies are required.{constants.ENDC}"
-            )
-            print(
-                "The following packages will be installed:\npyvirtualdisplay\npillow\nEasyProcess"
-            )
-            sp.SubprocessService(
-                ["pip3", "install", "pyvirtualdisplay", "pillow", "EasyProcess"],
-                {"stderr": subprocess.DEVNULL},
-            ).check_call()
             # Create xvfb cache file
             sp.SubprocessService(
                 ["touch", f"{constants.XVFB_CACHE_FLAG}"],
