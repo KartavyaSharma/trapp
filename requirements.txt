@@ -1,13 +1,17 @@
-##### Requirements without Version Specifiers #####
-shellingham
-pandas
-validators
-redis[hiredis]
 
-##### Requirements with Version Specifiers #####
+##### GENERAL DEPENDENCIES #####
 typer==0.9.0
 rich==13.5.3
 selenium==4.14.0
 httpx==0.25.0
 browser-cookie3==0.19.1
 beautifulsoup4==4.12.2
+shellingham==1.5.4
+pandas==2.1.2
+validators==0.22.0
+redis[hiredis]==5.0.1
+
+##### HEADLESS SUPPORT DEPENDENCIES #####
+pyvirtualdisplay==3.0
+pillow==10.1.0
+EasyProcess==1.1

@@ -94,58 +94,78 @@ quit() {
     exit 0
 }
 
-# Check if logs directory exists
-if ! test -d "logs"; then
-    cecho -c yellow -t "Creating logs directory..."
-    mkdir logs
-fi
-
-# Check if the .cache directory exists
-if ! test -d ".cache"; then
-    cecho -c yellow -t "Creating .cache directory..."
-    mkdir .cache
-fi
-
-if ! test -d "bin"; then
-    cecho -c yellow -t "Creating bin directory..."
-    mkdir bin
-fi
+# Create logs, .cache, bkp, and bin directories in one go
+cecho -c yellow -t "Creating directories..."
+mkdir -p logs .cache bkp bin
 
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
-    sudo apt update
-    echo "You are on Linux. Performing check for required Python packages..."
-    if command -v pip3 &>/dev/null; then
-        cecho -c green -t "pip3 found!"
-    elif command -v pip &>/dev/null; then
-        cecho -c green -t "pip found!"
-        alias pip3=pip
-    else
-        cecho -c red -t "pip3 or pip not found. Likely because of a missing ensurepip module. This is required to create a virtual environment."
-        cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
-        sudo apt-get install python3-pip
-    fi
-    # Check if python3-venv is installed
-    if ! dpkg -s python3-venv >/dev/null 2>&1; then
-        cecho -c red -t "python3-venv was not found. This is required to create a virtual environment."
-        cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
-        sleep 2
-        sudo apt-get install python3-venv
-    else
-        cecho -c green -t "python3-venv found!"
-    fi
-    # Check if build-essential is installed
-    if ! dpkg -s build-essential >/dev/null 2>&1; then
-        cecho -c red -t "build-essential was not found. This is required to build the gum library."
-        cecho -c yellow -t "Prepare to provide sudo password to install required virtual environment packages..."
-        sleep 2
-        sudo apt-get install build-essential
-    else
-        cecho -c green -t "build-essential found!"
-    fi
-fi
+    linux_required_packages=("wget" "unzip" "build-essential" "python3-pip" "python3-venv" "tar")
+    missing_linux_packages=()
 
+    # Check if required packages are installed
+    for package in "${linux_required_packages[@]}"; do
+        if ! dpkg -s "$package" >/dev/null 2>&1; then
+            missing_linux_packages+=("$package")
+        else
+            cecho -c green -t "$package found!"
+        fi
+    done
+
+    # Prompt user to install missing packages
+    if [[ "${#missing_linux_packages[@]}" -ne 0 ]]; then
+        cecho -c yellow -t "The following packages are required to run trapp: ${missing_linux_packages[*]}"
+        read -p "Do you want to install them? (Y/n)" install_packages_choice
+        if [[ "$install_packages_choice" == "Y" ]]; then
+            cecho -c yellow -t "Installing packages..."
+            sudo apt-get install "${missing_linux_packages[@]}"
+        else
+            quit "Required packages not installed. Please install them manually to use trapp."
+        fi
+    fi
+elif [[ "$arch" == "Darwin" ]]; then
+    # Make sure brew is installed
+    if ! (command -v brew) >/dev/null; then
+        cecho -c yellow -t "brew was not found. Do you want to install it? (Y/n)"
+        install_brew_choice=$(./bin/gum choose "YES" "NO")
+        if [[ "$install_brew_choice" == "YES" ]]; then
+            cecho -c yellow -t "Installing brew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        else
+            cecho -c yellow -t "brew was not installed. Please install brew manually to use trapp."
+        fi
+    else
+        cecho -c green -t "Homebrew found!"
+    fi
+
+    darwin_required_packages=("wget" "unzip" "python3" "tar" "openssl@1.1" "coreutils" "docker")
+    missing_darwin_packages=()
+
+    # Check if required packages are installed
+    for package in "${darwin_required_packages[@]}"; do
+        # Check if not in brew AND not in command in single if statement
+        if ! brew ls --versions "$package" >/dev/null 2>&1 && ! (command -v "$package") >/dev/null; then
+            missing_darwin_packages+=("$package")
+        else
+            cecho -c green -t "$package found!"
+        fi
+    done
+
+    # Prompt user to install missing packages
+    if [[ "${#missing_darwin_packages[@]}" -ne 0 ]]; then
+        cecho -c yellow -t "The following packages are required to run trapp: ${missing_darwin_packages[*]}"
+        read -p "Do you want to install them? (Y/n)" install_packages_choice
+        if [[ "$install_packages_choice" == "Y" ]]; then
+            cecho -c yellow -t "Installing packages..."
+            brew install "${missing_darwin_packages[@]}"
+        else
+            quit "Required packages not installed. Please install them manually to use trapp."
+        fi
+    fi
+else
+    quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+fi
 
 # Check if we are in a virtual environment
 if [[ "$VIRTUAL_ENV" == "" ]]; then
@@ -172,9 +192,9 @@ fi
 # Check if requirements are satisfied in virtual environment
 output=$(python3 ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
-    cecho -c red -t "Error: python3 ./tests/test_requirements.py failed with output^"
-    cecho -c yellow -t "Dependency requirements not satisfied. Installing dependencies..."
-    pip3 install -r requirements.txt
+    cecho -c yellow -t "Error: python3 ./tests/test_requirements.py failed with output^"
+    echo "Dependency requirements not satisfied. Installing dependencies..."
+    ./scripts/shell/load_dependencies.sh
 else
     cecho -c green -t "All dependencies are present!"
 fi
@@ -204,68 +224,6 @@ else
         cecho -c green -t "WOW, you already have the gum library you SHELL fiend!"
     else
         cecho -c green -t "Gum library detected!"
-    fi
-fi
-
-arch=$(uname -s)
-# Check if wget is installed
-if ! (command -v wget) >/dev/null; then
-    cecho -c yellow -t "Installing wget..."
-    if [[ $arch == "Darwin" ]]; then
-        brew install wget
-    elif [[ $arch == "Linux" ]]; then
-        sudo apt-get install wget
-    else
-        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-    fi
-    cecho -c green -t "WGET installed!"
-else
-    cecho -c green -t "WGET found!"
-fi
-
-# Check if unzip is installed
-if ! (command -v unzip) >/dev/null; then
-    cecho -c yellow -t "Installing unzip..."
-    if [[ $arch == "Darwin" ]]; then
-        brew install unzip
-    elif [[ $arch == "Linux" ]]; then
-        sudo apt-get install unzip
-    else
-        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
-    fi
-    cecho -c green -t "UNZIP installed!"
-else
-    cecho -c green -t "UNZIP found!"
-fi
-
-# If arch is Darwin check if brew is installed
-arch=$(uname -s)
-if [[ $arch == "Darwin" ]]; then
-    if ! (command -v brew) >/dev/null; then
-        cecho -c yellow -t "brew was not found. Do you want to install it? (Y/n)"
-        install_brew_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_brew_choice" == "YES" ]]; then
-            cecho -c yellow -t "Installing brew..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        else
-            cecho -c yellow -t "brew was not installed. Please install brew manually to use trapp."
-        fi
-    else
-        cecho -c green -t "Homebrew found!"
-    fi
-
-    check_openssl=$(brew ls --versions openssl@1.1)
-    if [[ "$check_openssl" == "" ]]; then
-        cecho -c yellow -t "openssl@1.1 was not found. Do you want to install it? (Y/n)"
-        install_openssl_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_openssl_choice" == "YES" ]]; then
-            cecho -c yellow -t "Installing openssl@1.1..."
-            brew install openssl@1.1
-        else
-            cecho -c yellow -t "openssl@1.1 was not installed. Please install openssl@1.1 manually to use trapp."
-        fi
-    else
-        cecho -c green -t "OPENSSL@1.1 found!"
     fi
 fi
 
@@ -307,19 +265,35 @@ fi
 
 # Check if docker is installed and running
 if ! (command -v docker) >/dev/null; then
-    cecho -c yellow -t "Docker was not found."
-    arch=$(uname -s)
-    if [[ $arch == "Darwin" ]]; then
-        # Ask user to install Docker
-        cecho -c yellow -t "Docker was not found, do you want to install it using Homebrew?"
-        install_docker_choice=$(./bin/gum choose "YES" "NO")
-        if [[ "$install_docker_choice" == "YES" ]]; then
-            cecho -c yellow -t "Installing Docker..."
-            brew install --cask docker
-        else
-            quit "Docker was not installed. Please install Docker manually to use trapp."
+    if [[ $arch == "Linux" ]]; then
+        cecho -c yellow -t "Docker was not found."
+        # Installing docker using the convenience script
+        curl -fsSL https://get.docker.com -o ./bin/get-docker.sh
+        cecho -c yellow -t "Installing docker... (This requires sudo)"
+        sleep 3
+        sudo sh ./bin/get-docker.sh
+        sudo groupadd docker
+        sudo usermod -aG docker ${USER}
+        if [ ! $(groups) =~ "docker" ]; then
+            quit "Failed to add user to docker group!"
+        fi
+        # Test if docker is working as it should
+        sudo docker run hello-world
+        if [ $? -ne 0 ]; then
+            quit "Docker failed hello-world test!"
         fi
         cecho -c green -t "Docker installed!"
+        # quit "Please restart your terminal to use docker without sudo."
+        newgrp docker
+    else
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+    fi
+fi
+
+arch=$(uname -s)
+if [[ $arch == "Darwin" ]]; then
+    # Check if docker runtime is present
+    if [[ "$(docker ps 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
         # Check if colima is installed
         colima_ver="0.5.6"
         if ! (command -v colima) >/dev/null; then
@@ -347,27 +321,6 @@ if ! (command -v docker) >/dev/null; then
         else
             cecho -c green -t "Colima found!"
         fi
-    elif [[ $arch == "Linux" ]]; then
-        # Installing docker using the convenience script
-        curl -fsSL https://get.docker.com -o ./bin/get-docker.sh
-        cecho -c yellow -t "Installing docker... (This requires sudo)"
-        sleep 3
-        sudo sh ./bin/get-docker.sh
-        sudo groupadd docker
-        sudo usermod -aG docker ${USER}
-        if [ ! $(groups) =~ "docker" ]; then
-            quit "Failed to add user to docker group!"
-        fi
-        # Test if docker is working as it should
-        sudo docker run hello-world
-        if [ $? -ne 0 ]; then
-            quit "Docker failed hello-world test!"
-        fi
-        cecho -c green -t "Docker installed!"
-        # quit "Please restart your terminal to use docker without sudo."
-        newgrp docker
-    else
-        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
 fi
 
@@ -398,12 +351,8 @@ if [[ "$arch" == "Linux" ]]; then
         install_chrome_choice=$(./bin/gum choose "YES" "NO")
         if [[ "$install_chrome_choice" == "YES" ]]; then
             cecho -c yellow -t "Google Chrome was not found. Installing..."
-            sudo apt install -y xvfb libxi6 
-            sudo apt install default-jdk
-            # sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
             wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
             sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-            # sudo bash -c "echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google-chrome.list"
             sudo apt update
             sudo apt -y install google-chrome-stable
             chrome_ver=$(google-chrome --version)

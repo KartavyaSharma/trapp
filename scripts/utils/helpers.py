@@ -55,11 +55,7 @@ def verify_headless_support() -> bool:
         )
         if not "/usr/bin/xvfb-run\n" in check_xvfb:
             print("xvfb not installed, installing...")
-            time.sleep(3)
             # Install xvfb
-            sp.SubprocessService(
-                ["sudo", "apt-get", "update"], {"stderr": subprocess.DEVNULL}
-            ).check_call()
             sp.SubprocessService(
                 ["sudo", "apt-get", "install", "xvfb"], {"stderr": subprocess.DEVNULL}
             ).check_call()
@@ -82,7 +78,7 @@ def verify_headless_support() -> bool:
                 f"{constants.WARNING}You are running on an headless server, addtional dependencies are required{constants.ENDC}"
             )
             print(
-                "The following packages will be installed:\nxserver-xephyr\ntigervnc-standalone-server\nx11-utils\ngnumeric"
+                "The following packages will be installed:\nxserver-xephyr\ntigervnc-standalone-server\nx11-utils\ngnumeric\nlibxi6\nlibgconf-2-4\ndefault-jdk"
             )
             sp.SubprocessService(
                 [
@@ -93,6 +89,9 @@ def verify_headless_support() -> bool:
                     "tigervnc-standalone-server",
                     "x11-utils",
                     "gnumeric",
+                    "libxi6",
+                    # "libgconf-2-4",
+                    "default-jdk",
                 ],
                 {"stderr": subprocess.DEVNULL},
             ).check_call()
