@@ -15,15 +15,16 @@ if [ ! -d "./build" ]; then
     exit 1
 fi
 
+arch=$(uname -sm)
+arch=${arch// /_}
+
 # Check if the dependencies tarball exists
-if [ ! -f "./build/dependencies.tar.pip3.gz" ]; then
+if [ ! -f "./build/dependencies.tar.$arch.gz" ]; then
     echo "The dependencies tarball does not exist. Run build_dependencies.sh first."
     exit 1
 fi
 
 # Extract the dependencies tarball
-arch=$(uname -sm)
-arch=${arch// /_}
 tar -xzvf ./build/dependencies.tar.$arch.gz -C ./build
 
 # Install the dependencies
