@@ -114,6 +114,7 @@ fi
 # Check system architecture
 arch=$(uname -s)
 if [[ "$arch" == "Linux" ]]; then
+    sudo apt update
     echo "You are on Linux. Performing check for required Python packages..."
     if command -v pip3 &>/dev/null; then
         cecho -c green -t "pip3 found!"
@@ -396,8 +397,7 @@ if [[ "$arch" == "Linux" ]]; then
         install_chrome_choice=$(./bin/gum choose "YES" "NO")
         if [[ "$install_chrome_choice" == "YES" ]]; then
             cecho -c yellow -t "Google Chrome was not found. Installing..."
-            sudo apt update
-            sudo apt install -y unzip xvfb libxi6 libgconf-2-4
+            sudo apt install -y xvfb libxi6 
             sudo apt install default-jdk
             # sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add
             wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
