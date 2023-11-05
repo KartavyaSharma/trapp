@@ -90,7 +90,7 @@ quit() {
     unset gum_binary_links
     unset url
     unset ARGFLAG
-    deactivate
+    # deactivate
     if [[ "$error" != "" ]]; then
         cecho -c red -t "Program exited with error. Deactivating virtual environment..."
         cecho -c red -t "Error: $error"
@@ -179,29 +179,25 @@ else
 fi
 
 # Check if we are in a virtual environment
-if [[ "$VIRTUAL_ENV" == "" ]]; then
-    cecho -c yellow -t "Not in a virtual environment"
-    # Check if env file exists in current directory
-    cecho -c yellow -t "Checking if env file exists..."
-    if test -d env; then
-        if test -f ./env/bin/activate; then
-            cecho -c green -t "Environment directory exists. Activating environment..."
-            source ./env/bin/activate
-        else
-            quit "$(env) folder exists, but activate file missing. Please delete the env folder and run ./start.sh again."
-        fi
-    else
-        cecho -c yellow -t "Environment directory does not exist. Creating a new environment..."
-        python3 -m venv env
-        cecho -c green -t "New virtual environment created. Activating..."
-        source ./env/bin/activate
-    fi
+# Check if python3 in virtual environment exists
+if ! command -v ./env/bin/python3 &>/dev/null; then
+    cecho -c yellow -t "Virtual environment not found. Creating a new environment..."
+    python3 -m venv env
+    cecho -c green -t "New virtual environment created!"
 else
     cecho -c green -t "Virtual environment found!"
 fi
 
+py () {
+    $(realpath ./env/bin/python3) "$@"
+}
+
+pip3 () {
+    py -m pip "$@"
+}
+
 # Check if requirements are satisfied in virtual environment
-output=$(python3 ./tests/test_requirements.py)
+output=$(py ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
     cecho -c yellow -t "Error: python3 ./tests/test_requirements.py failed with output^"
     echo "Dependency requirements not satisfied. Installing dependencies..."
@@ -215,7 +211,7 @@ if ! command -v ./bin/gum &>/dev/null; then
     cecho -c yellow -t "charmbracelet/gum was not found. Installing..."
     echo "Determining system architecture..."
     arch=$(uname -s -m)
-    url=$(python3 -c "from constants import GUM_BINARY_LINKS as links; print(links['$arch']) if '$arch' in links else print('Invalid architecture')")
+    url=$(py -c "from constants import GUM_BINARY_LINKS as links; print(links['$arch']) if '$arch' in links else print('Invalid architecture')")
     if [[ "$url" == "Invalid architecture" ]]; then
         quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
     fi
@@ -253,9 +249,9 @@ if ! test -f "$bat_path"; then
     cecho -c yellow -t "bat was not found. Installing..."
     # Get binary from link in constants file
     if [[ $arch == "Linux" ]]; then
-        bat_binary_link=$(python3 -c "from constants import BAT_LINUX_BINARY_LINK as link; print(link)")
+        bat_binary_link=$(py -c "from constants import BAT_LINUX_BINARY_LINK as link; print(link)")
     else
-        bat_binary_link=$(python3 -c "from constants import BAT_AMD_DARWIN_BINARY_LINK as link; print(link)")
+        bat_binary_link=$(py -c "from constants import BAT_AMD_DARWIN_BINARY_LINK as link; print(link)")
     fi
     cecho -c yellow -t "Fetching bat binary..."
     cd bin
@@ -409,7 +405,7 @@ if [ -d "bin/chrome-driver" ]; then
 else
     cecho -c yellow -t "Chrome driver not found. Installing..."
     mkdir bin/chrome-driver
-    python3 scripts/utils/install_chrome_driver.py
+    py scripts/utils/install_chrome_driver.py
     # Check if the script ran successfully
     if [ $? -ne 0 ]; then
         # rm -rf bin/chrome-driver
@@ -424,7 +420,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
     -b | --wbkp)
         echo "Running program with backup option..."
-        python3 runner.py wbkp
+        py runner.py wbkp
         ARGFLAG=1
         ;;
     -s | --stop)
@@ -466,7 +462,7 @@ while [[ $# -gt 0 ]]; do
                 quit
             fi
         elif [[ "$service" == "redis" ]]; then
-            docker_redis_metadata=$(python3 -c "from constants import REDIS_CONTAINER_NAME, REDIS_DATA_DIR; print(REDIS_CONTAINER_NAME, REDIS_DATA_DIR)")
+            docker_redis_metadata=$(py -c "from constants import REDIS_CONTAINER_NAME, REDIS_DATA_DIR; print(REDIS_CONTAINER_NAME, REDIS_DATA_DIR)")
             container_name=$(echo $docker_redis_metadata | awk -F' ' '{print $1}')
             data_volume_name=$(echo $docker_redis_metadata | awk -F' ' '{print $2}')
             status=$(docker inspect -f '{{.State.Status}}' "$container_name" 2>&1)
@@ -492,7 +488,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 if [ $ARGFLAG -eq 0 ]; then
-    python3 runner.py
+    py runner.py
 elif [ $ARGFLAG -eq 1 ]; then
     chmod +x ./scripts/shell/bkp_daemon.sh
     echo "=========================="

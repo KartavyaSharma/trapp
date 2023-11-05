@@ -28,7 +28,7 @@ fi
 tar -xzvf ./build/dependencies.tar.$arch.gz -C ./build
 
 # Install the dependencies
-pip3 install --no-index --find-links=./build/dependencies -r ./requirements.txt
+./env/bin/pip install --no-index --find-links=./build/dependencies -r ./requirements.txt
 
 # Clean up the dependencies directory
 rm -rf ./build/dependencies

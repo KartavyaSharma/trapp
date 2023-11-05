@@ -20,7 +20,7 @@ if [ ! -d "./build/dependencies" ]; then
 fi
 
 # Download pip3 dependencies into the dependencies directory
-pip3 download -r ./requirements.txt -d ./build/dependencies
+./env/bin/pip download -r ./requirements.txt -d ./build/dependencies
 
 cd ./build
 
