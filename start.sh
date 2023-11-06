@@ -188,12 +188,8 @@ if [[ "$1" == "--build-dependencies" ]]; then
     exit 0
 fi
 
-py () {
-    $(realpath ./env/bin/python3) "$@"
-}
-
 # Check if requirements are satisfied in virtual environment
-output=$(py ./tests/test_requirements.py)
+output=$(./env/bin/python3 ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
     cecho -c yellow -t "Error: python3 ./tests/test_requirements.py failed with output^"
     echo "Dependency requirements not satisfied. Installing dependencies..."
@@ -416,7 +412,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
     -b | --wbkp)
         echo "Running program with backup option..."
-        py runner.py wbkp
+        ./env/bin/python3 runner.py wbkp
         ARGFLAG=1
         ;;
     -s | --stop)
@@ -484,7 +480,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 if [ $ARGFLAG -eq 0 ]; then
-    py runner.py
+    ./env/bin/python3 runner.py
 elif [ $ARGFLAG -eq 1 ]; then
     chmod +x ./scripts/shell/bkp_daemon.sh
     echo "=========================="
