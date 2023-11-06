@@ -192,10 +192,6 @@ py () {
     $(realpath ./env/bin/python3) "$@"
 }
 
-pip3 () {
-    py -m pip "$@"
-}
-
 # Check if requirements are satisfied in virtual environment
 output=$(py ./tests/test_requirements.py)
 if [ $? -ne 0 ]; then
