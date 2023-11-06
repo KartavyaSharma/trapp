@@ -76,12 +76,6 @@ if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
     exit 0
 fi
 
-# Check if --build-dependencies is passed as an argument
-if [[ "$1" == "--build-dependencies" ]]; then
-    ./scripts/shell/build_dependencies.sh
-    exit 0
-fi
-
 quit() {
     error=$@
     # Unset all variables
@@ -186,6 +180,12 @@ if ! command -v ./env/bin/python3 &>/dev/null; then
     cecho -c green -t "New virtual environment created!"
 else
     cecho -c green -t "Virtual environment found!"
+fi
+
+# Check if --build-dependencies is passed as an argument
+if [[ "$1" == "--build-dependencies" ]]; then
+    ./scripts/shell/build_dependencies.sh
+    exit 0
 fi
 
 py () {
