@@ -31,4 +31,4 @@ tar -xzvf ./build/dependencies.tar.$arch.gz -C ./build
 ./env/bin/pip install --no-index --find-links=./build/dependencies -r ./requirements.txt
 
 # Clean up the dependencies directory
-rm -rf ./build/dependencies
+./bin/rip ./build/dependencies

@@ -54,6 +54,25 @@ cecho() {
     ${cecho_path} "$@"
 }
 
+# Check if rip is installed
+if ! command -v ./bin/rip &>/dev/null; then
+    cecho -c yellow -t "nivekuil/rip was not found. Installing..."
+    echo "Determining system architecture..."
+    arch=$(uname -s -m)
+    url=$(py -c "from constants import RIP_BINARY_LINKS as links; print(links['$arch']) if '$arch' in links else print('Invalid architecture')")
+    if [[ "$url" == "Invalid architecture" ]]; then
+        quit "Invalid architecture: $arch. trapp is only supported on x86_64 and arm64 versions of Darwin and Linux."
+    fi
+    cecho -c yellow -t "Fetching rip binary..."
+    cd bin
+    wget "$url"
+    tar -xzf $(basename "$url") rip
+    chmod 755 rip
+    cecho -c green -t "Installed rip!"
+    echo "Cleaning up..."
+    rm $(basename "$url")
+fi
+
 clean() {
     echo "Cleaning up..."
     echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
@@ -63,10 +82,10 @@ clean() {
     find . -type f -name "*.preview" -delete
     # Removing all dependencies
     echo "Removing dependencies..."
-    rm -rf env
-    rm -rf bin
-    rm -rf bat
-    rm -rf logs
+    ./bin/rip env
+    ./bin/rip bin
+    ./bat/rip bat
+    ./bat/rip logs
     echo
 }
 
@@ -211,12 +230,10 @@ if ! command -v ./bin/gum &>/dev/null; then
     cd bin
     wget "$url"
     tar -xzf $(basename "$url") gum
-    chmod 755 $(basename "$url" | awk -F'.' '{print $1}' | awk -F'_' '{print $1}')
+    chmod 755 gum 
     cecho -c green -t "Installed gum!"
     echo "Cleaning up..."
-    rm $(basename "$url")
-    find . ! -name 'gum' -type f -exec rm -f {} +
-    find . ! -name 'gum' -name '.' -name '..' -type d -exec rm -rf {} +
+    ./bin/rip $(basename "$url")
     cd ..
 else
     if ! test -d ".cache"; then

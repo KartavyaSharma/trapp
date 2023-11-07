@@ -150,3 +150,10 @@ LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
 
 #### xvfb Constants ####
 XVFB_CACHE_FLAG = f"{PROJECT_ROOT}/.cache/xvfb"
+
+#### rip binary links ####
+RIP_BINARY_LINKS = {
+    "Darwin arm64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-apple-darwin.tar.gz",
+    "Darwin x86_64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-apple-darwin.tar.gz",
+    "Linux x86_64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-unknown-linux-gnu.tar.gz",
+}

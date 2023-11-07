@@ -30,6 +30,6 @@ arch=${arch// /_}
 tar -czvf dependencies.tar.$arch.gz dependencies
 
 # Clean up the dependencies directory
-rm -rf dependencies
+./bin/rip dependencies
 
 cd .. 
