@@ -49,6 +49,7 @@ def verify_headless_support() -> bool:
     Check if xvfb is installed, if not, install it
     """
     if os.uname().sysname != "Darwin":
+        check_xvfb = ""
         print("Checking for xvfb...", end=" ")
         try:
             check_xvfb = sp.SubprocessService(["which xvfb-run"], OPTS).check_output(
