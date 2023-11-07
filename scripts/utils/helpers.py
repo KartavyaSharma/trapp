@@ -5,7 +5,6 @@ import pathlib
 import os
 import re
 import subprocess
-import time
 
 from . import process as sp
 

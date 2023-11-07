@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+typer = "==0.9.0"
+rich = "==13.5.3"
+selenium = "==4.14.0"
+httpx = "==0.25.0"
+browser-cookie3 = "==0.19.1"
+beautifulsoup4 = "==4.12.2"
+shellingham = "==1.5.4"
+pandas = "==2.1.2"
+validators = "==0.22.0"
+redis = {extras = ["hiredis"], version = "==5.0.1"}
+pyvirtualdisplay = "==3.0"
+pillow = "==10.1.0"
+easyprocess = "==1.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
