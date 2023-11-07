@@ -20,8 +20,8 @@ arch=${arch// /_}
 
 # Check if the dependencies tarball exists
 if [ ! -f "./build/dependencies.tar.$arch.gz" ]; then
-    echo "The dependencies tarball does not exist. Run build_dependencies.sh first."
-    exit 1
+    echo "The dependencies tarball does not exist. Running build_dependencies.sh."
+    ./scripts/shell/build_dependencies.sh
 fi
 
 # Extract the dependencies tarball

@@ -86,13 +86,13 @@ quit() {
     unset ARGFLAG
     # deactivate
     if [[ "$error" != "" ]]; then
-        cecho -c red -t "Program exited with error. Deactivating virtual environment..."
+        cecho -c red -t "Program exited with error." 
         cecho -c red -t "Error: $error"
         help
         exit 1
     else
         # Exit program
-        cecho -c green -t "Program exited. Deactivating virtual environment..."
+        cecho -c green -t "Program exited." 
     fi
     exit 0
 }
