@@ -3,8 +3,6 @@
 # This script is used to execute a command in a running container.
 # Usage: docker_exec.sh <container_name> <command>
 
-echo "HOOOO"
-
 cecho_path=$(realpath ./scripts/shell/echo.sh)
 chmod +x $cecho_path
 cecho () {

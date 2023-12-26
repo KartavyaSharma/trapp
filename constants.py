@@ -69,12 +69,14 @@ GUM_BINARY_LINKS = {
 }
 
 ##### Command Constants #####
-GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
-GUM_CHOOSE = ["./bin/gum", "choose"]
-GUM_INPUT_W_PLACEHOLDER = ["./bin/gum", "input", "--placeholder"]
-GUM_FILTER = ["./bin/gum", "filter", "--fuzzy", "--no-limit", "--sort"]
+# GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
+GUM_PATH = "gum"
+GUM_CHOOSE = [f"{GUM_PATH}", "choose"]
+GUM_INPUT_W_PLACEHOLDER = [f"{GUM_PATH}", "input", "--placeholder"]
+GUM_FILTER = [f"{GUM_PATH}", "filter", "--fuzzy", "--no-limit", "--sort"]
 
-BAT = "./bin/bat/bat"
+# BAT = "./bin/bat/bat"
+BAT = "bat"
 BAT_LINUX_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz"
 BAT_AMD_DARWIN_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-apple-darwin.tar.gz"
 
