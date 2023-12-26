@@ -4,7 +4,7 @@
 daemonName="TRAPP-DAEMON"
 
 # Define pid and log directories
-pidDir="./bkp/pid"
+pidDir="$TRAPP_HOME/bkp/pid"
 pidFile="$pidDir/$daemonName.pid"
 
 logDir="./bkp/logs"
