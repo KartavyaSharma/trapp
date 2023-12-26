@@ -89,6 +89,7 @@ clean() {
     rip $TRAPP_HOME/bin
     rip $TRAPP_HOME/logs
     rip $TRAPP_HOME/bkp
+    rip $TRAPP_HOME/__pycache__
     echo
 }
 
