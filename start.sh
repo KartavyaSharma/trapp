@@ -87,7 +87,6 @@ clean() {
     echo "Removing dependencies..."
     rip $TRAPP_HOME/env
     rip $TRAPP_HOME/bin
-    rip $TRAPP_HOME/bat
     rip $TRAPP_HOME/logs
     echo
 }
