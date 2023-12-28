@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 #^ Dynamically find bash path
 
+cecho_path=$(realpath $TRAPP_HOME/scripts/shell/echo.sh)
+chmod +x $cecho_path
+cecho() {
+    ${cecho_path} "$@"
+}
+
+# Set architecture
+arch=$(uname -s)
+
+# Check if ~/.trapp exists
+if ! test -d ~/.trapp; then
+    cecho -c yellow -t "Creating ~/.trapp..."
+    mkdir ~/.trapp
+fi
+
+# Set TRAPP_HOME to ~/.trapp
+export TRAPP_HOME=~/.trapp
+
 help() {
     cat <<EOF
 
@@ -39,33 +57,6 @@ OPTIONS:
 EOF
 }
 
-# Check if --help or -h is passed as an argument
-if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
-    help
-    exit 0
-fi
-
-# Check if ~/.trapp exists
-if ! test -d ~/.trapp; then
-    cecho -c yellow -t "Creating ~/.trapp..."
-    mkdir ~/.trapp
-fi
-
-# Set TRAPP_HOME to ~/.trapp
-export TRAPP_HOME=~/.trapp
-
-# Print welcome message
-python3 $TRAPP_HOME/scripts/utils/welcome.py
-
-cecho_path=$(realpath $TRAPP_HOME/scripts/shell/echo.sh)
-chmod +x $cecho_path
-cecho() {
-    ${cecho_path} "$@"
-}
-
-# Set architecture
-arch=$(uname -s)
-
 clean() {
     echo "Cleaning up..."
     echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
@@ -93,12 +84,6 @@ clean() {
     echo
 }
 
-# Check if --clean or -c is passed as an argument
-if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
-    clean
-    exit 0
-fi
-
 quit() {
     error=$@
     # Unset all variables
@@ -119,6 +104,21 @@ quit() {
     fi
     exit 0
 }
+
+# Check if --help or -h is passed as an argument
+if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+    help
+    exit 0
+fi
+
+# Print welcome message
+python3 $TRAPP_HOME/scripts/utils/welcome.py
+
+# Check if --clean or -c is passed as an argument
+if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
+    clean
+    exit 0
+fi
 
 # Create logs, .cache, bkp, and bin directories in one go if none exist
 if ! test -d "$TRAPP_HOME/logs" || ! test -d "$TRAPP_HOME/.cache" || ! test -d "$TRAPP_HOME/bkp" || ! test -d "$TRAPP_HOME/bin"; then
