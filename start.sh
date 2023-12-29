@@ -356,7 +356,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
     -b | --wbkp)
         echo "Running program with backup option..."
-        $TRAPP_HOME/env/bin/python3 runner.py wbkp
+        $TRAPP_HOME/env/bin/python3 $TRAPP_HOME/runner.py wbkp
         ARGFLAG=1
         ;;
     -s | --stop)
@@ -424,7 +424,7 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 if [ $ARGFLAG -eq 0 ]; then
-    $TRAPP_HOME/env/bin/python3 runner.py
+    $TRAPP_HOME/env/bin/python3 $TRAPP_HOME/runner.py
 elif [ $ARGFLAG -eq 1 ]; then
     chmod +x $TRAPP_HOME/scripts/shell/bkp_daemon.sh
     echo "=========================="
