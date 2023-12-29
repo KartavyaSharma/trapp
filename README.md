@@ -20,5 +20,11 @@
 
 NOTE: Currently only supported on Darwin and Linux based systems.
 
-1. Clone this repository locally
-2. `cd` into this repository and run `./start.sh`
+1. Tap the homebrew tap
+```
+brew tap KartavyaSharma/homebrew-trapp
+```
+2. Install the trapp package
+```
+brew install trapp
+```
