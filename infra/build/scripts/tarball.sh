@@ -12,6 +12,11 @@ github_url="https://github.com/KartavyaSharma/trapp.git"
 branch="master"
 tar_name="trapp-v1.0.0.tar.gz"
 
+# Remove the tarball if it already exists
+if [ -f "$tar_name" ]; then
+    rip $tar_name
+fi
+
 # Default message contains a list of files that were changed
 message="The following files were changed:\n $(git diff --name-only)\n"
 
