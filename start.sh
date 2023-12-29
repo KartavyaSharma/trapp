@@ -211,13 +211,13 @@ quit() {
     unset ARGFLAG
     # deactivate
     if [[ "$error" != "" ]]; then
-        cecho -c red -t "Program exited with error." 
+        cecho -c red -t "Program exited with error."
         cecho -c red -t "Error: $error"
         help
         exit 1
     else
         # Exit program
-        cecho -c green -t "Program exited." 
+        cecho -c green -t "Program exited."
     fi
     exit 0
 }
@@ -268,7 +268,6 @@ if [ $? -ne 0 ]; then
 else
     cecho -c green -t "All dependencies are present!"
 fi
-
 
 if [[ "$(docker ps 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
     if [[ $arch == "Darwin" ]]; then

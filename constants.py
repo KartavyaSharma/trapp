@@ -24,7 +24,7 @@ CHOICE_MAP = {
 }
 
 ##### File Constants #####
-SOURCE_CSV = "job_applications.csv"
+SOURCE_CSV = f"{PROJECT_ROOT}/job_applications.csv"
 COLUMN_NAMES = ["Company", "Position", "Date Applied", "Status", "Portal Link", "Notes"]
 
 ##### Input Constants #####
