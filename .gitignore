@@ -1,5 +1,7 @@
 .vscode
 .DS_Store
+.vault
+.cache
 __pycache__
 env
 gum
@@ -9,8 +11,6 @@ bkp
 bat
 bin
 dependencies
-.vault
-.cache
 
 **/*.pid
 **/*.log

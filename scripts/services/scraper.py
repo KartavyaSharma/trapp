@@ -20,6 +20,8 @@ class ScraperEngine:
         headed_support: bool = True,
     ):
         """
+        Create scraper engine instance.
+
         @param options: Options to pass to Chrome driver
         @param driver: Existing Chrome driver instance
         @param headed_support: Whether system supports headed mode
@@ -35,7 +37,9 @@ class ScraperEngine:
 
     def create_driver(self, custom_driver: any = None) -> None:
         """
-        Create Chrome driver instance
+        Create Chrome driver instance.
+
+        @param custom_driver: Optional custom driver
         """
         if custom_driver:
             self.driver = custom_driver
@@ -48,7 +52,11 @@ class ScraperEngine:
         auth_engine: any = None,
     ) -> None:
         """
+        Run scraper on a given URL with a config.
+
         @param config: Configuration object for scraper containing the platform, cookies, etc.
+        @param auth_engine: Optional authentication engine to use for authentication
+        @return Scraped data for platform
         """
         lock = lk.Lock(client=config.redis, name=config.platform.name)
         print(f"Scraping {config.platform.url}...")
@@ -87,6 +95,8 @@ class ScraperBuilder:
         self, default=True, opts: list[str] = [], user_opts: Options = None
     ) -> Options:
         """
+        Setup Chrome driver options.
+
         @param default: Whether to use default options
         @param opts: List of options to add to Chrome driver
         @param user_opts: User defined options
@@ -108,6 +118,8 @@ class ScraperBuilder:
         headed_support: bool = True,
     ) -> ScraperEngine:
         """
+        Scraper engine factory build method.
+
         @param opts: List of options to add to Chrome driver
         @return: ScraperEngine instance
         """

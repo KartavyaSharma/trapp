@@ -16,9 +16,6 @@ if ! test -d ~/.trapp; then
     mkdir ~/.trapp
 fi
 
-# Set TRAPP_HOME to ~/.trapp
-export TRAPP_HOME=~/.trapp
-
 help() {
     cat <<EOF
 

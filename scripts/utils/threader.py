@@ -24,11 +24,7 @@ class LogExceptions(object):
             log_engine = logger.LoggerBuilder.build(log_level=logging.ERROR)
             log_engine.error(traceback.format_exc())
             log_engine.error("Exception in worker process: %s" % e)
-            # LogExceptions.error(e)
-            # Re-raise the original exception so the Pool worker can
-            # clean up
             raise
-            # raise errors.PoolException(e)
 
         # It was fine, give a normal answer
         return result
