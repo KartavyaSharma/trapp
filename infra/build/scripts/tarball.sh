@@ -37,4 +37,8 @@ rip $tmp_dir
 
 echo "Created tarball: $tar_name"
 
+# Generate checksum and print it
+echo "SHA256 checksum:"
+shasum -a 256 $tar_name
+
 exit 0

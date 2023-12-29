@@ -17,5 +17,6 @@ dependencies
 **/*.out
 **/*.csv
 **/*.tmp
-*.tar.gz.*
+**/*.tar.gz.*
+**/*.tar.gz
 *.preview
