@@ -225,7 +225,7 @@ quit() {
 }
 
 # Check if --help or -h is passed as an argument
-if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+if [[ -n "$1" && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
     help
     exit 0
 fi
