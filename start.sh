@@ -58,7 +58,7 @@ if [[ "$TRAPP_HOME" == "" ]]; then
 
         if [[ -w $zsh_config ]]; then
             {
-                echo -e '\n# bun'
+                echo -e '\n# TRAPP Environment Variable'
 
                 for command in "${commands[@]}"; do
                     echo "$command"
