@@ -127,7 +127,7 @@ fi
 # Check if python3 in virtual environment exists
 if ! command -v $TRAPP_HOME/env/bin/python3 &>/dev/null; then
     cecho -c yellow -t "Virtual environment not found. Creating a new environment..."
-    python3 -m venv env
+    python3 -m venv $TRAPP_HOME/env
     cecho -c green -t "New virtual environment created!"
 else
     cecho -c green -t "Virtual environment found!"
