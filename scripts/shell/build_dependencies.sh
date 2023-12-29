@@ -3,6 +3,8 @@
 # This script is used to build the dependencies for the project.
 # It is intended to be run from the root of the project.
 
+artifact_home_dir=$TRAPP_HOME/infra/artifacts
+
 # Check if the script is being run from the root of the project
 if [ ! -f "./scripts/shell/build_dependencies.sh" ]; then
     echo "This script must be run from the root of the project."
@@ -10,19 +12,20 @@ if [ ! -f "./scripts/shell/build_dependencies.sh" ]; then
 fi
 
 # Create the build directory if it doesn't exist
-if [ ! -d "./build" ]; then
-    mkdir ./build
+if [ ! -d "$artifact_home_dir" ]; then
+    echo "The artifact home directory does not exist. Creating it."
+    mkdir $artifact_home_dir
 fi
 
 # Create the dependencies directory if it doesn't exist
-if [ ! -d "./build/dependencies" ]; then
-    mkdir ./build/dependencies
+if [ ! -d "$artifact_home_dir/dependencies" ]; then
+    mkdir $artifact_home_dir/dependencies
 fi
 
 # Download pip3 dependencies into the dependencies directory
-./env/bin/pip download -r ./requirements.txt -d ./build/dependencies
+$TRAPP_HOME/env/bin/pip download -r ./requirements.txt -d $artifact_home_dir/dependencies
 
-cd ./build
+cd $artifact_home_dir
 
 # Create a tarball of the dependencies directory
 arch=$(uname -sm)

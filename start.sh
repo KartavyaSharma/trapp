@@ -1,6 +1,134 @@
 #!/usr/bin/env bash
 #^ Dynamically find bash path
 
+set -euo pipefail
+
+if [[ ${OS:-} = Windows_NT ]]; then
+    echo 'error: Please install bun using Windows Subsystem for Linux'
+    exit 1
+fi
+
+tildify() {
+    if [[ $1 = $HOME/* ]]; then
+        local replacement=\~/
+
+        echo "${1/$HOME\//$replacement}"
+    else
+        echo "$1"
+    fi
+}
+
+# Check if the $TRAPP_HOME environment variable is set
+if [[ "$TRAPP_HOME" == "" ]]; then
+    install_env=TRAPP_HOME
+    quoted_install_dir=$(brew --prefix)/opt/trapp/libexec
+    echo "The TRAPP_HOME environment variable is not set!"
+    case $(basename "$SHELL") in
+    fish)
+        commands=(
+            "set --export $install_env $quoted_install_dir"
+        )
+
+        fish_config=$HOME/.config/fish/config.fish
+        tilde_fish_config=$(tildify "$fish_config")
+
+        if [[ -w $fish_config ]]; then
+            {
+                echo -e '\n# bun'
+
+                for command in "${commands[@]}"; do
+                    echo "$command"
+                done
+            } >>"$fish_config"
+
+            refresh_command="source $tilde_fish_config"
+        else
+            echo "Manually add the directory to $tilde_fish_config (or similar):"
+
+            for command in "${commands[@]}"; do
+                echo "  $command"
+            done
+        fi
+        ;;
+    zsh)
+        commands=(
+            "export $install_env=$quoted_install_dir"
+        )
+
+        zsh_config=$HOME/.zshrc
+        tilde_zsh_config=$(tildify "$zsh_config")
+
+        if [[ -w $zsh_config ]]; then
+            {
+                echo -e '\n# bun'
+
+                for command in "${commands[@]}"; do
+                    echo "$command"
+                done
+            } >>"$zsh_config"
+
+            refresh_command="exec $SHELL"
+        else
+            echo "Manually add the directory to $tilde_zsh_config (or similar):"
+
+            for command in "${commands[@]}"; do
+                echo "  $command"
+            done
+        fi
+        ;;
+    bash)
+        commands=(
+            "export $install_env=$quoted_install_dir"
+        )
+
+        bash_configs=(
+            "$HOME/.bashrc"
+            "$HOME/.bash_profile"
+        )
+
+        if [[ ${XDG_CONFIG_HOME:-} ]]; then
+            bash_configs+=(
+                "$XDG_CONFIG_HOME/.bash_profile"
+                "$XDG_CONFIG_HOME/.bashrc"
+                "$XDG_CONFIG_HOME/bash_profile"
+                "$XDG_CONFIG_HOME/bashrc"
+            )
+        fi
+
+        set_manually=true
+        for bash_config in "${bash_configs[@]}"; do
+            tilde_bash_config=$(tildify "$bash_config")
+
+            if [[ -w $bash_config ]]; then
+                {
+                    echo -e '\n# bun'
+
+                    for command in "${commands[@]}"; do
+                        echo "$command"
+                    done
+                } >>"$bash_config"
+
+                refresh_command="source $bash_config"
+                set_manually=false
+                break
+            fi
+        done
+
+        if [[ $set_manually = true ]]; then
+            echo "Manually add the directory to $tilde_bash_config (or similar):"
+
+            for command in "${commands[@]}"; do
+                echo "  $command"
+            done
+        fi
+        ;;
+    *)
+        echo 'Manually add the directory to ~/.bashrc (or similar):'
+        echo "  export $install_env=$quoted_install_dir"
+        ;;
+    esac
+fi
+
 cecho_path=$(realpath $TRAPP_HOME/scripts/shell/echo.sh)
 chmod +x $cecho_path
 cecho() {
@@ -9,12 +137,6 @@ cecho() {
 
 # Set architecture
 arch=$(uname -s)
-
-# Check if ~/.trapp exists
-if ! test -d ~/.trapp; then
-    cecho -c yellow -t "Creating ~/.trapp..."
-    mkdir ~/.trapp
-fi
 
 help() {
     cat <<EOF
