@@ -6,7 +6,7 @@
 artifact_home_dir=$TRAPP_HOME/infra/artifacts
 
 # Check if the script is being run from the root of the project
-if [ ! -f "./scripts/shell/build_dependencies.sh" ]; then
+if [ ! -f "$TRAPP_HOME/scripts/shell/build_dependencies.sh" ]; then
     echo "This script must be run from the root of the project."
     exit 1
 fi
