@@ -33,4 +33,4 @@ tar -xzvf $artifact_home_dir/dependencies.tar.$arch.gz -C $artifact_home_dir
 $TRAPP_HOME/env/bin/pip install --no-index --find-links=$artifact_home_dir/dependencies -r $TRAPP_HOME/requirements.txt
 
 # Clean up the dependencies directory
-rip $TRAPP_HOME/build/dependencies
+rip $artifact_home_dir/dependencies

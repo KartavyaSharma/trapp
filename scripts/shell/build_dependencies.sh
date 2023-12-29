@@ -35,4 +35,4 @@ tar -czvf dependencies.tar.$arch.gz dependencies
 # Clean up the dependencies directory
 rip dependencies
 
-cd .. 
+cd $TRAPP_HOME 
