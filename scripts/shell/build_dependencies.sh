@@ -23,7 +23,7 @@ if [ ! -d "$artifact_home_dir/dependencies" ]; then
 fi
 
 # Download pip3 dependencies into the dependencies directory
-$TRAPP_HOME/env/bin/pip download -r ./requirements.txt -d $artifact_home_dir/dependencies
+$TRAPP_HOME/env/bin/pip download -r $TRAPP_HOME/requirements.txt -d $artifact_home_dir/dependencies
 
 cd $artifact_home_dir
 
