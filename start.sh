@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #^ Dynamically find bash path
 
-set -euo pipefail
-
 if [[ ${OS:-} = Windows_NT ]]; then
     echo 'error: Please install bun using Windows Subsystem for Linux'
     exit 1
@@ -225,7 +223,7 @@ quit() {
 }
 
 # Check if --help or -h is passed as an argument
-if [[ -n "$1" && ( "$1" == "-h" || "$1" == "--help" ) ]]; then
+if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     help
     exit 0
 fi
