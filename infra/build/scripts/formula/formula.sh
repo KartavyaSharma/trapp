@@ -8,8 +8,13 @@ if [ ! -f "./infra/build/scripts/tarball.sh" ]; then
 fi
 
 # Run the tarball script and capture the last line of output
-output=$(./infra/build/scripts/tarball.sh)
-sha=$(echo "$output" | tail -n 1)
+./infra/build/scripts/tarball.sh
+
+# Get sha from the file ./infra/build/formula/$temp_sha_name
+sha=$(cat ./infra/build/formula/$temp_sha_name)
+
+# Unset the variable
+unset temp_sha_name
 
 # Check if the length of the last line is equal to 256
 if [ ! ${#sha} -eq 256 ]; then
