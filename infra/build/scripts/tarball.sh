@@ -87,7 +87,7 @@ mv $tar_name ./infra/build
 sha=$(shasum -a 256 ./infra/build/$tar_name | awk '{print $1}')
 
 # Create a temporary sha file and write the checksum to it
-echo "$sha" > ./infra/build/formula/$temp_sha_name
+echo "$sha" > ./infra/build/formula/sha
 
 # Print the checksum
 echo "$sha"
