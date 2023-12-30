@@ -75,13 +75,13 @@ tmp_dir=$(mktemp -d)
 git clone --depth 1 --branch $branch $github_url $tmp_dir
 
 # Create tarball from the files in the temporary directory, suppressing the output
-tar -czvf $tar_name -C $tmp_dir $TRAPP_HOME/infra/build >/dev/null
+tar -czvf $tar_name -C $tmp_dir ./infra/build >/dev/null
 
 # Clean up the temporary directory
 rip $tmp_dir
 
 # Generate checksum and print it
-sha=$(shasum -a 256 $TRAPP_HOME/infra/build/$tar_name | awk '{print $1}')
+sha=$(shasum -a 256 ./infra/build/$tar_name | awk '{print $1}')
 
 # Print the checksum
 echo "$sha"
