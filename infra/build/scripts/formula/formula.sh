@@ -10,6 +10,10 @@ fi
 brew_formula_repo="KartavyaSharma/homebrew-trapp"
 brew_formula_repo_url="https://github.com/$brew_formula_repo.git"
 
+trapp_release_tag="production"
+trapp_asset_name="trapp-v1.0.0.tar.gz"
+trapp_new_asset_path="./infra/build/$trapp_asset_name"
+
 # Run the tarball script and capture the last line of output
 ./infra/build/scripts/tarball.sh
 
@@ -52,3 +56,6 @@ git push origin master
 rip "$temp_dir"
 
 echo "Formula update complete."
+
+# Upload the new tarball to the release
+./infra/github/scripts/new_release.sh --tag="$trapp_release_tag" --asset-name="$trapp_asset_name" --path="$trapp_new_asset_path" --repo="$brew_formula_repo"
