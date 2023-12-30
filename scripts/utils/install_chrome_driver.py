@@ -103,7 +103,7 @@ def main():
     # Remove chrome-driver.zip
     print("Removing chrome-driver.zip...")
     subprocess.call(
-        f"rm {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip", shell=True
+        f"rip {constants.PROJECT_ROOT}/bin/chrome-driver/chrome-driver.zip", shell=True
     )
     # Make chrome-driver executable
     print("Making chrome-driver executable...")
