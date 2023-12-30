@@ -54,7 +54,6 @@ cd "$temp_dir" || exit 1
 git add .
 git commit -m "Update trapp formula to version $sha"
 git push origin master
-
 cd "$curr_dir" || exit 1
 
 # Remove the temporary directory
