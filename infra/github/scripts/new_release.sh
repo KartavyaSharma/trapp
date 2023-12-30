@@ -4,10 +4,11 @@
 RELEASE_TAG=""
 OLD_ASSET_NAME=""
 NEW_FILE_PATH=""
+REPO_PATH=""
 
 # Function to show usage
 usage() {
-    echo "Usage: $0 --tag=<tag> --asset-name=<name> --path=<new_path>"
+    echo "Usage: $0 --tag=<tag> --asset-name=<name> --path=<new_path> --repo=<repo_path>"
     exit 1
 }
 
@@ -22,6 +23,9 @@ while [ "$1" != "" ]; do
             ;;
         --path=*)
             NEW_FILE_PATH="${1#*=}"
+            ;;
+        --repo=*)
+            REPO_PATH="${1#*=}"
             ;;
         *)
             usage
@@ -43,10 +47,10 @@ echo "With new file at path: $NEW_FILE_PATH"
 
 # Step 1: Delete the old asset
 echo "Deleting the old asset..."
-gh release delete-asset "$RELEASE_TAG" -n "$OLD_ASSET_NAME"
+gh release delete-asset "$RELEASE_TAG" -n "$OLD_ASSET_NAME" -R "$REPO_PATH" -y
 
 # Step 2: Upload the new file
 echo "Uploading the new file..."
-gh release upload "$RELEASE_TAG" "$NEW_FILE_PATH"
+gh release upload "$RELEASE_TAG" "$NEW_FILE_PATH" -R "$REPO_PATH" --clobber
 
 echo "Release update complete."
