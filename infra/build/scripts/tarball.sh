@@ -7,7 +7,6 @@ if [ ! -f "./infra/build/scripts/tarball.sh" ]; then
     exit 1
 fi
 
-
 github_url="https://github.com/KartavyaSharma/trapp.git"
 branch="master"
 tar_name="trapp-v1.0.0.tar.gz"
@@ -75,16 +74,16 @@ tmp_dir=$(mktemp -d)
 # Clone the repository
 git clone --depth 1 --branch $branch $github_url $tmp_dir
 
-# Create tarball from the files in the temporary directory
-tar -czvf $tar_name -C $tmp_dir .
+# Create tarball from the files in the temporary directory, suppressing the output
+tar -czvf $tar_name -C $tmp_dir $TRAPP_HOME/infra/build >/dev/null
 
 # Clean up the temporary directory
 rip $tmp_dir
 
-echo "Created tarball: $tar_name"
-
 # Generate checksum and print it
-echo "\nSHA256 checksum:"
-shasum -a 256 $tar_name
+sha=$(shasum -a 256 $TRAPP_HOME/infra/build/$tar_name | awk '{print $1}')
+
+# Print the checksum
+echo "$sha"
 
 exit 0

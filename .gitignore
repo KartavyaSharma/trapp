@@ -2,6 +2,7 @@
 .DS_Store
 .vault
 .cache
+.env
 __pycache__
 env
 gum
@@ -19,6 +20,8 @@ dependencies
 **/*.tmp
 **/*.tar.gz.*
 **/*.tar.gz
+**/*.env
 *.preview
 
 infra/artifacts
+infra/build/formula/out

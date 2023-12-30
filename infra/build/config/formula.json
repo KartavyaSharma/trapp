@@ -1,0 +1,35 @@
+{
+    "metadata": {
+        "name": "trapp",
+        "description": "Automated Job Application Tracker on the CLI",
+        "homepage": "trapp.sh",
+        "url": "https://github.com/KartavyaSharma/trapp/releases/download/Production/trapp-v1.0.0.tar.gz"
+    },
+    "dependencies": [
+        "bash",
+        "bat",
+        "docker",
+        "gum",
+        "python3",
+        "rm-improved",
+        "gnu-tar",
+        "gawk",
+        "unzip",
+        "wget"
+    ],
+    "darwin": {
+        "dependencies": [
+            "coreutils",
+            "colima",
+            "openssl@1.1"
+        ]
+    },
+    "linux": {
+        "dependencies": [
+            "build-essential",
+            "python3-pip",
+            "python3-setuptools",
+            "python3-venv"
+        ]
+    }
+}

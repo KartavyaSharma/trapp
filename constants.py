@@ -61,13 +61,6 @@ WARNING = "\033[1;33m"
 FAIL = "\033[1;31m"
 ENDC = "\033[0m"
 
-GUM_BINARY_LINKS = {
-    "Darwin arm64": "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_arm64.tar.gz",
-    "Darwin x86_64": "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Darwin_x86_64.tar.gz",
-    "Linux arm64": "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_arm64.tar.gz",
-    "Linux x86_64": "https://github.com/charmbracelet/gum/releases/download/v0.11.0/gum_0.11.0_Linux_x86_64.tar.gz",
-}
-
 ##### Command Constants #####
 # GUM_PATH = f"{PROJECT_ROOT}/bin/gum"
 GUM_PATH = "gum"
@@ -77,8 +70,6 @@ GUM_FILTER = [f"{GUM_PATH}", "filter", "--fuzzy", "--no-limit", "--sort"]
 
 # BAT = "./bin/bat/bat"
 BAT = "bat"
-BAT_LINUX_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-gnu.tar.gz"
-BAT_AMD_DARWIN_BINARY_LINK = "https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-apple-darwin.tar.gz"
 
 YN = ["YES", "NO"]
 NY = ["NO", "YES"]
@@ -153,9 +144,6 @@ LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
 #### xvfb Constants ####
 XVFB_CACHE_FLAG = f"{PROJECT_ROOT}/.cache/xvfb"
 
-#### rip binary links ####
-RIP_BINARY_LINKS = {
-    "Darwin arm64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-apple-darwin.tar.gz",
-    "Darwin x86_64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-apple-darwin.tar.gz",
-    "Linux x86_64": "https://github.com/nivekuil/rip/releases/download/0.11.3/rip-0.11.3-x86_64-unknown-linux-gnu.tar.gz",
-}
+#### Formula configuration ####
+FORMULA_CONFIG_PATH = f"{PROJECT_ROOT}/infra/build/config/formula.json"
+FORMULA_PATH = f"{PROJECT_ROOT}/infra/build/formula/out"

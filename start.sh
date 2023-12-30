@@ -181,15 +181,21 @@ clean() {
     echo "Removing preview files..."
     # Delete any preview files with the .preview extension
     echo "The following files will be deleted:"
-    find $TRAPP_HOME -type f -name "*.preview" -print
-    # Ask user if they want to delete preview files
-    read -p "Are you sure you want to delete these files? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        find $TRAPP_HOME -type f -name "*.preview" -delete
-        echo "Deleted preview files!"
+    # Check if there are any preview files
+    preview_files=$(find $TRAPP_HOME -type f -name "*.preview" -print)
+    if [[ "$preview_files" == "" ]]; then
+        echo "No preview files found!"
     else
-        echo "Preview files not deleted!"
+        echo "$preview_files"
+        # Ask user if they want to delete preview files
+        read -p "Are you sure you want to delete these files? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            find $TRAPP_HOME -type f -name "*.preview" -delete
+            echo "Deleted preview files!"
+        else
+            echo "Preview files not deleted!"
+        fi
     fi
     # Removing all dependencies
     echo "Removing dependencies..."
