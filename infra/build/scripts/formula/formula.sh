@@ -64,3 +64,6 @@ echo "Formula update complete."
 
 # Upload the new tarball to the release
 ./infra/github/scripts/new_release.sh --tag="$trapp_release_tag" --asset-name="$trapp_asset_name" --path="$trapp_new_asset_path" --repo="$trapp_repo"
+
+# Remove the tarball
+rip "$trapp_new_asset_path"
