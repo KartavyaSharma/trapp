@@ -11,10 +11,7 @@ fi
 ./infra/build/scripts/tarball.sh
 
 # Get sha from the file ./infra/build/formula/$temp_sha_name
-sha=$(cat ./infra/build/formula/$temp_sha_name)
-
-# Unset the variable
-unset temp_sha_name
+sha=$(cat ./infra/build/formula/sha)
 
 # Check if the length of the last line is equal to 256
 if [ ! ${#sha} -eq 256 ]; then
