@@ -403,7 +403,7 @@ while [[ $# -gt 0 ]]; do
                 quit
             fi
         elif [[ "$service" == "redis" ]]; then
-            docker_redis_metadata=$(py -c "import sys; sys.path.append('$TRAPP_HOME'); from constants import REDIS_CONTAINER_NAME, REDIS_DATA_DIR; print(REDIS_CONTAINER_NAME, REDIS_DATA_DIR)")
+            docker_redis_metadata=$($TRAPP_HOME/env/bin/python3 -c "import sys; sys.path.append('$TRAPP_HOME'); from constants import REDIS_CONTAINER_NAME, REDIS_DATA_DIR; print(REDIS_CONTAINER_NAME, REDIS_DATA_DIR)")
             container_name=$(echo $docker_redis_metadata | awk -F' ' '{print $1}')
             data_volume_name=$(echo $docker_redis_metadata | awk -F' ' '{print $2}')
             status=$(docker inspect -f '{{.State.Status}}' "$container_name" 2>&1)
