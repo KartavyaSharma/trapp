@@ -125,6 +125,7 @@ if [[ "$TRAPP_HOME" == "" ]]; then
         echo "  export $install_env=$quoted_install_dir"
         ;;
     esac
+    echo "To finish installation, run: $refresh_command"
 fi
 
 cecho_path=$(realpath $TRAPP_HOME/scripts/shell/echo.sh)
