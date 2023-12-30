@@ -12,8 +12,8 @@ branch="master"
 tar_name="trapp-v1.0.0.tar.gz"
 
 # Remove the tarball if it already exists
-if [ -f "$tar_name" ]; then
-    rip $tar_name
+if [ -f "./infra/build/$tar_name" ]; then
+    rip "./infra/build/$tar_name"
 fi
 
 # Default message contains a list of files that were changed
@@ -75,7 +75,7 @@ tmp_dir=$(mktemp -d)
 git clone --depth 1 --branch $branch $github_url $tmp_dir
 
 # Create tarball from the files in the temporary directory, suppressing the output
-tar -czvf $tar_name -C $tmp_dir . >/dev/null
+tar -czvf $tar_name -C $tmp_dir . > /dev/null 2>&1
 
 # Clean up the temporary directory
 rip $tmp_dir
