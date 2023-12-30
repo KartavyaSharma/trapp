@@ -46,13 +46,15 @@ rip "$temp_dir/Formula/trapp.rb"
 # Move the generated formula to the formula repo overwriting the old formula
 mv ./infra/build/formula/out/trapp.rb "$temp_dir/Formula/trapp.rb"
 
+curr_dir=$(pwd)
+
 # Commit the changes
 cd "$temp_dir" || exit 1
 git add .
 git commit -m "Update trapp formula to version $sha"
 git push origin master
 
-cd "$temp_dir/.." || exit 1
+cd "$curr_dir" || exit 1
 
 # Remove the temporary directory
 rip "$temp_dir"
