@@ -66,3 +66,6 @@ echo "Formula update complete."
 
 # Remove the tarball
 rip "$trapp_new_asset_path"
+
+echo "To reinstall trapp run the following command:"
+echo "curr_dir=$(pwd) && cd $(brew --repo KartavyaSharma/homebrew-trapp) && git pull origin master && cd $curr_dir && brew reinstall trapp"
