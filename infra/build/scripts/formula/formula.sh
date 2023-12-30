@@ -14,7 +14,7 @@ fi
 sha=$(cat ./infra/build/formula/sha)
 
 # Run the codegen script and give it the sha as an argument
-./infra/build/scripts/codegen.sh --sha="$sha"
+./infra/build/scripts/formula/codegen.sh --sha="$sha"
 
 # Check if the codegen script ran successfully
 if [ -f "./infra/build/formula/out/trapp.rb" ]; then
