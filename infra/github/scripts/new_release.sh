@@ -47,7 +47,7 @@ echo "With new file at path: $NEW_FILE_PATH"
 
 # Step 1: Delete the old asset
 echo "Deleting the old asset..."
-gh release delete-asset "$RELEASE_TAG" -n "$OLD_ASSET_NAME" -R "$REPO_PATH" -y
+gh release delete-asset "$RELEASE_TAG" "$OLD_ASSET_NAME" -R "$REPO_PATH" -y
 
 # Step 2: Upload the new file
 echo "Uploading the new file..."

@@ -10,7 +10,7 @@ fi
 brew_formula_repo="KartavyaSharma/homebrew-trapp"
 brew_formula_repo_url="https://github.com/$brew_formula_repo.git"
 
-trapp_release_tag="production"
+trapp_release_tag="Production"
 trapp_asset_name="trapp-v1.0.0.tar.gz"
 trapp_new_asset_path="./infra/build/$trapp_asset_name"
 
