@@ -49,6 +49,8 @@ echo "With new file at path: $NEW_FILE_PATH"
 echo "Deleting the old asset..."
 gh release delete-asset "$RELEASE_TAG" "$OLD_ASSET_NAME" -R "$REPO_PATH" -y
 
+sleep 2
+
 # Step 2: Upload the new file
 echo "Uploading the new file..."
 gh release upload "$RELEASE_TAG" "$NEW_FILE_PATH" -R "$REPO_PATH" --clobber
