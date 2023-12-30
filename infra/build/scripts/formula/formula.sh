@@ -13,12 +13,6 @@ fi
 # Get sha from the file ./infra/build/formula/$temp_sha_name
 sha=$(cat ./infra/build/formula/sha)
 
-# Check if the length of the last line is equal to 256
-if [ ! ${#sha} -eq 256 ]; then
-    echo "Error: The length of the last line of output is not equal to 256."
-    exit 1
-fi
-
 # Run the codegen script and give it the sha as an argument
 ./infra/build/scripts/codegen.sh --sha="$sha"
 
