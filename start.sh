@@ -16,7 +16,7 @@ tildify() {
     fi
 }
 
-# Check if the $TRAPP_HOME environment variable is set
+# Check if the $TRAPP_HOME environment variable is set. Thanks to Bun.sh for this snippet.
 if [[ "$TRAPP_HOME" == "" ]]; then
     install_env=TRAPP_HOME
     quoted_install_dir=$(brew --prefix)/opt/trapp/libexec
