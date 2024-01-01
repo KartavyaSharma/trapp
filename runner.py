@@ -252,7 +252,7 @@ def edit():
     elif len(df.index) == 0:
         print(f"{constants.FAIL}No entries found!{constants.ENDC}")
         return
-    # print(original_df.iloc[[original_index]])
+    print(original_df.iloc[[original_index]])
     old_df = df.copy()
     # Ask user if they want to update or delete the entry
     print("What do you want to do?")
