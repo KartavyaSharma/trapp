@@ -297,10 +297,12 @@ def update(df, original_df, original_index, old_df):
         print("Choose column to update:")
         column_choice = Gum.choose([*constants.COLUMN_NAMES])
         # Ask user for new value
-        new_value = Gum.input(placeholder=f"Input new {column_choice}")
-        # new_value = SubprocessService(
-        #     [*constants.GUM_INPUT_W_PLACEHOLDER] + [f"Input new {column_choice}"]
-        # ).run()
+        new_value = Gum.input(placeholder=f"Input new {column_choice if column_choice != 'Date Applied' else {constants.INPUT_DATE_APPLIED}}")
+        if new_value == "":
+            print("No changes made.")
+            return
+        if column_choice == "Date Applied":
+            df[column_choice] = datetime.strptime(new_value, "%m/%d/%Y").date()        
         df[column_choice] = new_value
     # Confirm changes
     print("Confirm changes?")
