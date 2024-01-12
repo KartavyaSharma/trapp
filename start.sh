@@ -201,11 +201,13 @@ clean() {
     fi
     # Removing all dependencies
     echo "Removing dependencies..."
-    rip $TRAPP_HOME/env
-    rip $TRAPP_HOME/bin
-    rip $TRAPP_HOME/logs
-    rip $TRAPP_HOME/bkp
-    rip $TRAPP_HOME/__pycache__
+    dependencies=($TRAPP_HOME/env $TRAPP_HOME/bin $TRAPP_HOME/logs $TRAPP_HOME/bkp $TRAPP_HOME/__pycache__)
+    for dependency in "${dependencies[@]}"; do
+        if test -d "$dependency"; then
+            echo "Removing $dependency"
+            rip $dependency
+        fi
+    done
     echo
 }
 

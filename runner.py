@@ -215,7 +215,6 @@ def edit():
     df = pd.read_csv(constants.SOURCE_CSV)
     original_df = df.copy()
     # Get original index of matching rows
-    # original_index = df.index[df['Company'] == check_out].tolist()[0]
     df = df.loc[df[constants.COLUMN_NAMES[0]] == check_out]
     original_index = df.index.values[0]
     print(
@@ -252,7 +251,6 @@ def edit():
     elif len(df.index) == 0:
         print(f"{constants.FAIL}No entries found!{constants.ENDC}")
         return
-    print(original_df.iloc[[original_index]])
     old_df = df.copy()
     # Ask user if they want to update or delete the entry
     print("What do you want to do?")

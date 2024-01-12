@@ -74,6 +74,18 @@ tmp_dir=$(mktemp -d)
 # Clone the repository
 git clone --depth 1 --branch $branch $github_url $tmp_dir
 
+# Remove the .git directory
+rip $tmp_dir/.git
+
+# Remove the infra directory
+rip $tmp_dir/infra
+
+# Remove the docs/assets directory
+rip $tmp_dir/docs/assets
+
+# Remove the docs/README.md file
+rip $tmp_dir/docs/README.md
+
 # Create tarball from the files in the temporary directory, suppressing the output
 tar -czvf $tar_name -C $tmp_dir . > /dev/null 2>&1
 
