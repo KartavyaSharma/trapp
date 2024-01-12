@@ -5,12 +5,6 @@
 
 artifact_home_dir=$TRAPP_HOME/infra/artifacts
 
-# Check if $artifact_home_dir exists, fail if it doesn't
-if [ ! -d "$artifact_home_dir" ]; then
-    echo "The artifact home directory does not exist. Please run build_dependencies.sh first."
-    exit 1
-fi
-
 # Check if the script is being run from the root of the project
 if [ ! -f "$TRAPP_HOME/scripts/shell/build_dependencies.sh" ]; then
     echo "This script must be run from the root of the project."
@@ -20,7 +14,7 @@ fi
 # Check if the build directory exists
 if [ ! -d "$artifact_home_dir" ]; then
     echo "The artifact home directory does not exist. Creating it."
-    mkdir $artifact_home_dir
+    mkdir -p $artifact_home_dir
 fi
 
 arch=$(uname -sm)
