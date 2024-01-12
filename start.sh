@@ -215,9 +215,6 @@ quit() {
     error=$@
     # Unset all variables
     unset arch
-    unset bat_path
-    unset gum_binary_links
-    unset url
     unset ARGFLAG
     # deactivate
     if [[ "$error" != "" ]]; then

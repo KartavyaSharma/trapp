@@ -5,6 +5,11 @@
 
 artifact_home_dir=$TRAPP_HOME/infra/artifacts
 
+# If $artifact_home_dir doesn't exist, create it
+if [ ! -d "$artifact_home_dir" ]; then
+    mkdir -p $artifact_home_dir
+fi
+
 # Check if the script is being run from the root of the project
 if [ ! -f "$TRAPP_HOME/scripts/shell/build_dependencies.sh" ]; then
     echo "This script must be run from the root of the project."
