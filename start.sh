@@ -190,10 +190,8 @@ clean() {
     if [[ "$preview_files" == "" ]]; then
         echo "No preview files found!"
     else
-        # Delete any preview files with the .preview extension
         echo "The following files will be deleted:"
         echo "$preview_files"
-        # Ask user if they want to delete preview files
         read -p "Are you sure you want to delete these files? (y/n) " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -203,7 +201,6 @@ clean() {
             echo "Preview files not deleted!"
         fi
     fi
-    # Removing all dependencies
     echo "Removing dependencies..."
     dependencies=($TRAPP_HOME/env $TRAPP_HOME/bin $TRAPP_HOME/logs $TRAPP_HOME/bkp $TRAPP_HOME/__pycache__)
     for dependency in "${dependencies[@]}"; do

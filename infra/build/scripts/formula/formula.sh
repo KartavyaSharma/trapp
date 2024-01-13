@@ -15,16 +15,12 @@ trapp_release_tag="Production"
 trapp_asset_name="trapp-v1.0.0.tar.gz"
 trapp_new_asset_path="./infra/build/$trapp_asset_name"
 
-# Run the tarball script and capture the last line of output
 ./infra/build/scripts/tarball.sh
 
-# Get sha from the file ./infra/build/formula/$temp_sha_name
 sha=$(cat ./infra/build/formula/sha)
 
-# Remove the sha file
 rip ./infra/build/formula/sha
 
-# Run the codegen script and give it the sha as an argument
 ./env/bin/python3 ./infra/build/scripts/formula/codegen.py --sha="$sha"
 
 # Check if the codegen script ran successfully
@@ -35,10 +31,8 @@ else
     exit 1
 fi
 
-# Create a temporary directory to clone the formula repo
 temp_dir=$(mktemp -d)
 
-# Clone the formula repo
 git clone --depth 1 --branch master "$brew_formula_repo_url" "$temp_dir"
 
 # Delete the old formula
@@ -56,7 +50,6 @@ git commit -m "Update trapp formula to version $sha"
 git push origin master
 cd "$curr_dir" || exit 1
 
-# Remove the temporary directory
 rip "$temp_dir"
 
 echo "Formula update complete."
@@ -64,7 +57,6 @@ echo "Formula update complete."
 # Upload the new tarball to the release
 ./infra/github/scripts/new_release.sh --tag="$trapp_release_tag" --asset-name="$trapp_asset_name" --path="$trapp_new_asset_path" --repo="$trapp_repo"
 
-# Remove the tarball
 rip "$trapp_new_asset_path"
 
 echo -e "To reinstall trapp run the following command:\n"

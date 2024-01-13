@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #^ Dynamically find bash path
 
-# Make sure the script is being run from the root of the project
 if [ ! -f "./infra/build/scripts/tarball.sh" ]; then
     echo "This script must be run from the root of the project."
     exit 1
@@ -11,15 +10,12 @@ github_url="https://github.com/KartavyaSharma/trapp.git"
 branch="master"
 tar_name="trapp-v1.0.0.tar.gz"
 
-# Remove the tarball if it already exists
 if [ -f "./infra/build/$tar_name" ]; then
     rip "./infra/build/$tar_name"
 fi
 
-# Default message contains a list of files that were changed
 message="The following files were changed:\n $(git diff --name-only)\n"
 
-# Parse command line arguments
 OPTS=$(getopt -o b:m:h --long branch:,message:,help -n 'tarball.sh' -- "$@")
 if [ $? != 0 ]; then
     echo "Failed to parse command line arguments."
@@ -63,45 +59,28 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-# Commit the changes
 git add .
 git commit -m "$message"
 git push origin $branch
 
-# Create a temporary directory
 tmp_dir=$(mktemp -d)
 
-# Clone the repository
 git clone --depth 1 --branch $branch $github_url $tmp_dir
 
-# Remove the .git directory
 rip $tmp_dir/.git
-
-# Remove the infra directory
 rip $tmp_dir/infra
-
-# Remove the docs/assets directory
 rip $tmp_dir/docs/assets
-
-# Remove the docs/README.md file
 rip $tmp_dir/docs/README.md
 
-# Create tarball from the files in the temporary directory, suppressing the output
 tar -czvf $tar_name -C $tmp_dir . > /dev/null 2>&1
 
-# Clean up the temporary directory
 rip $tmp_dir
 
-# Move the tarball to the infra/build directory
 mv $tar_name ./infra/build
 
-# Generate checksum and print it
 sha=$(shasum -a 256 ./infra/build/$tar_name | awk '{print $1}')
 
-# Create a temporary sha file and write the checksum to it
 echo "$sha" > ./infra/build/formula/sha
-
-# Print the checksum
 echo "$sha"
 
 exit 0
