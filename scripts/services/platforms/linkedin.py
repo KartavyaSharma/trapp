@@ -74,7 +74,6 @@ class LinkenIn(Platform):
         post_info = self.curr_driver.find_element(
             By.CSS_SELECTOR,
             # Returns <company name> · <location> <date posted> · <# of applicants>
-            # ".job-details-jobs-unified-top-card__primary-description > div",
             ".job-details-jobs-unified-top-card__primary-description-container",
         ).text
         company = post_info.split("·")[0].strip()
