@@ -17,10 +17,14 @@ tildify() {
 }
 
 # Check if the $TRAPP_HOME environment variable is set. Thanks to Bun.sh for this snippet.
-if [[ "$TRAPP_HOME" == "" ]]; then
+if [[ "$TRAPP_HOME" == "" || ! "$TRAPP_HOME" =~ "libexec" ]]; then
+    echo "The TRAPP_HOME environment variable is not set or does not contain 'libexec'!"
+
     install_env=TRAPP_HOME
     quoted_install_dir=$(brew --prefix)/opt/trapp/libexec
+
     echo "The TRAPP_HOME environment variable is not set!"
+
     case $(basename "$SHELL") in
     fish)
         commands=(
