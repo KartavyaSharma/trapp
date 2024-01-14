@@ -16,7 +16,7 @@ $$$$$$\    $$$$$$\  $$$$$$\   $$$$$$\   $$$$$$\
                              \__|      \__|                        
 ```
 
-## Usage
+## Installation
 
 NOTE: Currently only supported on Darwin and Linux based systems.
 
@@ -27,4 +27,14 @@ brew tap KartavyaSharma/homebrew-trapp
 2. Install the trapp package
 ```
 brew install trapp
+```
+## Usage
+
+To run `trapp`, simply run the following command:
+```
+trapp
+```
+To get a list of all the available commands, run:
+```
+trapp --help
 ```
