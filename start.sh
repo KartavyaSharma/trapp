@@ -267,6 +267,9 @@ if [[ "$1" == "--build-dependencies" ]]; then
     exit 0
 fi
 
+# Ensure that pkg_resources is installed
+$TRAPP_HOME/env/bin/python3 -m pip install --upgrade pip setuptools wheel
+
 # Check if requirements are satisfied in virtual environment
 output=$($TRAPP_HOME/env/bin/python3 $TRAPP_HOME/tests/test_requirements.py)
 if [ $? -ne 0 ]; then
