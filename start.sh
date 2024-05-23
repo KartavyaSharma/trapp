@@ -17,7 +17,8 @@ tildify() {
 }
 
 # Check if the $TRAPP_HOME environment variable is set. Thanks to Bun.sh for this snippet.
-if [[ "$TRAPP_HOME" == "" || ! "$TRAPP_HOME" =~ "libexec" ]]; then
+if [[ ! "$1" == "--dev" ]] && [[ "$TRAPP_HOME" == "" || ! "$TRAPP_HOME" =~ "libexec" ]]; then
+# if [[ "$TRAPP_HOME" == "" ]]; then
     echo "The TRAPP_HOME environment variable is not set or does not contain 'libexec'!"
 
     install_env=TRAPP_HOME
@@ -133,6 +134,11 @@ if [[ "$TRAPP_HOME" == "" || ! "$TRAPP_HOME" =~ "libexec" ]]; then
     exit 0
 fi
 
+# Check if $1 == "--dev", if it is, clear $1
+if [[ "$1" == "--dev" ]]; then
+    shift
+fi
+
 cecho_path=$(realpath $TRAPP_HOME/scripts/shell/echo.sh)
 chmod +x $cecho_path
 cecho() {
@@ -183,7 +189,7 @@ EOF
 clean() {
     echo "Cleaning up..."
     echo -e "Removing .cache\nRemoving pid\nRemoving logs\nRemoving TRAPP-DAEMON.pid\nRemoving bkp.out"
-    rip $TRAPP_HOME/.cache $TRAPP_HOME/bkp/pid $TRAPP_HOME/bkp/logs $TRAPP_HOME/bkp/bkp.out bkp
+    rip $TRAPP_HOME/.cache $TRAPP_HOME/bkp/pid $TRAPP_HOME/bkp/logs $TRAPP_HOME/bkp/bkp.out bkp 2>/dev/null
     echo "Removing preview files..."
     # Check if there are any preview files
     preview_files=$(find $TRAPP_HOME -type f -name "*.preview" -print)
@@ -265,13 +271,6 @@ fi
 if [[ "$1" == "--build-dependencies" ]]; then
     $TRAPP_HOME/scripts/shell/build_dependencies.sh
     exit 0
-fi
-
-# Ensure that pkg_resources is installed
-if ! pip show "pkg_resources" >/dev/null 2>&1; then
-    cecho -c yellow -t "pkg_resources not found. Installing..."
-    $TRAPP_HOME/env/bin/pip3 install pkg_resources
-    cecho -c green -t "pkg_resources installed!"
 fi
 
 # Check if requirements are satisfied in virtual environment
