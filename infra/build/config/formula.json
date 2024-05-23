@@ -21,7 +21,8 @@
         "dependencies": [
             "coreutils",
             "colima",
-            "openssl@1.1"
+            "openssl@1.1",
+            "python-setuptools"
         ]
     },
     "linux": {
