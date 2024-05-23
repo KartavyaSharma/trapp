@@ -237,7 +237,7 @@ if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
 fi
 
 # Print welcome message
-$TRAPP_HOME/env/bin/python3 $TRAPP_HOME/scripts/utils/welcome.py
+python3 $TRAPP_HOME/scripts/utils/welcome.py
 
 # Check if --clean or -c is passed as an argument
 if [[ "$1" == "-c" ]] || [[ "$1" == "--clean" ]]; then
