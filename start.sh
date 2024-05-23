@@ -285,9 +285,8 @@ fi
 
 if [[ "$(docker ps 2>&1)" =~ "Cannot connect to the Docker daemon" ]]; then
     if [[ $arch == "Darwin" ]]; then
-        cecho -c yellow -t "Docker runtime not detected. Starting runtime (colima)..."
-        # start colima
-        colima start
+        # Ask user to install Docker Desktop
+        cecho -c yellow -t "Docker runtime not detected. Please install Docker Desktop to use trapp."
     elif [[ $arch == "Linux" ]]; then
         cecho -c yellow -t "Docker runtime not detected. Starting runtime (docker engine)..."
         sudo service docker start
