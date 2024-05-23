@@ -14,7 +14,8 @@ if [ -f "./infra/build/$tar_name" ]; then
     rip "./infra/build/$tar_name"
 fi
 
-message="The following files were changed:\n $(git diff --name-only)\n"
+message="The following files were changed:
+$(git diff --name-only)"
 
 OPTS=$(getopt -o b:m:h --long branch:,message:,help -n 'tarball.sh' -- "$@")
 if [ $? != 0 ]; then
