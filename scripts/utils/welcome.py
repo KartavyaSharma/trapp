@@ -1,3 +1,6 @@
+import warnings
+# Ignore SyntaxWarning
+warnings.filterwarnings("ignore", category=SyntaxWarning)
 # Print this in orange
 print("\033[1m")
 art = ["" for _ in range(11)]
