@@ -268,7 +268,11 @@ if [[ "$1" == "--build-dependencies" ]]; then
 fi
 
 # Ensure that pkg_resources is installed
-$TRAPP_HOME/env/bin/python3 -m pip install --upgrade pip setuptools wheel
+if ! pip show "pkg_resources" >/dev/null 2>&1; then
+    cecho -c yellow -t "pkg_resources not found. Installing..."
+    $TRAPP_HOME/env/bin/pip3 install pkg_resources
+    cecho -c green -t "pkg_resources installed!"
+fi
 
 # Check if requirements are satisfied in virtual environment
 output=$($TRAPP_HOME/env/bin/python3 $TRAPP_HOME/tests/test_requirements.py)
