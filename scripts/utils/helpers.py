@@ -26,13 +26,13 @@ def has_gui() -> bool:
     # Check /usr/share/xsessions
     try:
         check_xsessions = sp.SubprocessService(
-            ["\ls /usr/share/xsessions"], OPTS
+            ["ls /usr/share/xsessions"], OPTS
         ).check_output(output=True)
     except Exception as e:
         return False
     # if not "No such file or directory" in check_xsessions:
     #     return True
-    check_dir = sp.SubprocessService(["\ls", "/usr/bin/*session"], OPTS).check_output(
+    check_dir = sp.SubprocessService(["ls", "/usr/bin/*session"], OPTS).check_output(
         output=True
     )
     # If check_dir has only /usr/bin/byobu-select-session  /usr/bin/dbus-run-session, then we are on a server
