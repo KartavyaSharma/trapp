@@ -1,28 +1,22 @@
-"""Test availability of required packages."""
-
 from pathlib import Path
-
+import importlib.metadata
 import warnings
-
-with warnings.catch_warnings():
-    # Ignore deprecated pkg_resources warning
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-    import pkg_resources
-
 
 _REQUIREMENTS_PATH = Path(__file__).parent.with_name("requirements.txt")
 
 with open(_REQUIREMENTS_PATH) as f:
     requirements = f.read().splitlines()
 
-# Check if all requirements are satisfied
-unsatisfied_requirements = []
-for requirement in requirements:
+# Function to check if a package is installed
+def is_package_installed(package_name):
     try:
-        pkg_resources.require(requirement)
-    except pkg_resources.DistributionNotFound:
-        unsatisfied_requirements.append(requirement)
+        importlib.metadata.version(package_name)
+        return True
+    except importlib.metadata.PackageNotFoundError:
+        return False
+
+# Check if all requirements are satisfied
+unsatisfied_requirements = [req for req in requirements if not is_package_installed(req)]
 
 if unsatisfied_requirements:
     raise Exception(
