@@ -15,8 +15,7 @@
     "gnu-tar",
     "gawk",
     "unzip",
-    "wget",
-    "rip"
+    "wget"
   ],
   "darwin": {
     "dependencies": [
